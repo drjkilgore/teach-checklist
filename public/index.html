@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -294,6 +293,28 @@ input::placeholder{color:var(--silver)}
         <button class="btn btn-sky" onclick="downloadExcel()">Download .xlsx</button>
       </div>
       <div class="em" id="tokErr" style="margin-top:6px">Invalid token or error fetching records.</div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div class="dl-panel" style="margin-top:1rem">
+      <h3>🔐 Admin — Manage Submissions</h3>
+      <p>Enter your admin token to view and delete submissions.</p>
+      <div class="tok-row" style="margin-bottom:10px">
+        <input type="password" id="adminToken" placeholder="Enter admin token">
+        <button class="btn btn-primary" onclick="loadAdminTable()">Load Submissions</button>
+      </div>
+      <div class="em" id="adminErr" style="margin-top:6px"></div>
+      <div id="adminTable" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span id="adminCount" style="font-size:13px;color:var(--muted)"></span>
+          <button class="btn btn-crimson" style="font-size:12px;padding:6px 14px" onclick="deleteAll()">Delete All</button>
+        </div>
+        <div style="overflow-x:auto;border:1px solid var(--border);border-radius:var(--r)">
+          <table style="width:100%;border-collapse:collapse;font-size:12px" id="adminRows"></table>
+        </div>
+        <p style="font-size:11px;color:var(--silver);margin-top:8px">Check boxes next to entries you want to delete, then click Delete Selected.</p>
+        <button class="btn btn-crimson" style="margin-top:8px;font-size:12px;padding:6px 14px" onclick="deleteSelected()">Delete Selected</button>
+      </div>
     </div>
   </div>
 </div>
@@ -812,9 +833,90 @@ async function downloadExcel(){
     XLSX.utils.book_append_sheet(wb,ws2,'By State');
     XLSX.writeFile(wb,`TEACH_Submissions_${new Date().toISOString().slice(0,10)}.xlsx`);
   }catch(e){ errEl.textContent='Error: '+e.message; errEl.classList.add('show'); }
+}// ── ADMIN PANEL ───────────────────────────────────────────
+async function loadAdminTable(){
+  const token = document.getElementById('adminToken').value.trim();
+  const errEl = document.getElementById('adminErr');
+  errEl.classList.remove('show'); errEl.textContent='';
+
+  if(!token){ errEl.textContent='Please enter your admin token.'; errEl.classList.add('show'); return; }
+
+  try{
+    const res = await fetch(`/.netlify/functions/get-submissions?token=${encodeURIComponent(token)}`);
+    if(!res.ok) throw new Error('Invalid token');
+    const rows = await res.json();
+    if(!Array.isArray(rows)) throw new Error('Invalid data');
+
+    document.getElementById('adminCount').textContent = `${rows.length} submission${rows.length!==1?'s':''} in database`;
+    document.getElementById('adminTable').style.display = 'block';
+
+    const hdr = '<thead><tr style="background:var(--light);border-bottom:1px solid var(--border)">'
+      + '<th style="padding:6px 8px"><input type="checkbox" id="checkAll" onchange="toggleAll(this)"></th>'
+      + '<th style="padding:6px 8px;text-align:left;font-weight:600;color:#002E5D">Date</th>'
+      + '<th style="padding:6px 8px;text-align:left;font-weight:600;color:#002E5D">Resident</th>'
+      + '<th style="padding:6px 8px;text-align:left;font-weight:600;color:#002E5D">State</th>'
+      + '<th style="padding:6px 8px;text-align:left;font-weight:600;color:#002E5D">Coach</th>'
+      + '<th style="padding:6px 8px;text-align:left;font-weight:600;color:#002E5D">Complete</th>'
+      + '</tr></thead>';
+
+    const body = '<tbody>' + rows.map(r => {
+      const dt = r.submitted_at ? new Date(r.submitted_at).toLocaleDateString() : '';
+      const nm = (r.resident_name||'—') + (r.student_id?' ('+r.student_id+')':'');
+      const pct = r.total_items ? Math.round((r.checked_count/r.total_items)*100)+'%' : '—';
+      return '<tr style="border-bottom:1px solid #F5F5F5">'
+        + '<td style="padding:5px 8px"><input type="checkbox" class="admin-cb" value="'+r.id+'"></td>'
+        + '<td style="padding:5px 8px;color:#555">'+dt+'</td>'
+        + '<td style="padding:5px 8px;font-weight:500;color:#002E5D">'+nm+'</td>'
+        + '<td style="padding:5px 8px">'+( r.state||'—')+'</td>'
+        + '<td style="padding:5px 8px;color:#555">'+(r.coach_email||'—')+'</td>'
+        + '<td style="padding:5px 8px">'+pct+'</td>'
+        + '</tr>';
+    }).join('') + '</tbody>';
+
+    table.innerHTML = hdr + body;
+  }catch(e){
+    errEl.textContent='Error: '+e.message; errEl.classList.add('show');
+  }
+}
+
+function toggleAll(cb){
+  document.querySelectorAll('.admin-cb').forEach(c=>c.checked=cb.checked);
+}
+
+async function deleteSelected(){
+  const token = document.getElementById('adminToken').value.trim();
+  const checked = Array.from(document.querySelectorAll('.admin-cb:checked')).map(c=>c.value);
+  if(!checked.length){ showToast('No submissions selected.','error',3000); return; }
+  if(!confirm(`Delete ${checked.length} selected submission${checked.length!==1?'s':''}? This cannot be undone.`)) return;
+  await doDelete(token, checked);
+}
+
+async function deleteAll(){
+  const token = document.getElementById('adminToken').value.trim();
+  const count = document.querySelectorAll('.admin-cb').length;
+  if(!confirm(`Delete ALL ${count} submissions? This cannot be undone.`)) return;
+  await doDelete(token, 'ALL');
+}
+
+async function doDelete(token, ids){
+  const errEl = document.getElementById('adminErr');
+  try{
+    const res = await fetch(`/.netlify/functions/delete-submissions?token=${encodeURIComponent(token)}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ ids })
+    });
+    const result = await res.json();
+    if(!result.success) throw new Error(result.error||'Delete failed');
+    showToast('✓ Deleted successfully','success');
+    loadAdminTable(); // refresh
+  }catch(e){
+    errEl.textContent='Delete error: '+e.message; errEl.classList.add('show');
+  }
 }
 </script>
 </body>
 </html>
+
 
 
