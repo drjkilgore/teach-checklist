@@ -25,10 +25,32 @@ function httpsPost(hostname, path, headers, body) {
 
 // ── HTML → PDF via PDFShift ───────────────────────────────
 async function htmlToPDF(html, apiKey) {
+  // Wrap HTML in a style that scales content to fit one page
+  const scaledHtml = html.replace(
+    '</head>',
+    `<style>
+      @page { size: Letter; margin: 8mm; }
+      body {
+        transform-origin: top left;
+        font-size: 11px !important;
+      }
+      table { font-size: 11px !important; }
+      td, th { font-size: 11px !important; padding: 3px 6px !important; }
+      div[style*="font-size:28px"] { font-size: 22px !important; }
+      div[style*="font-size:13px"] { font-size: 11px !important; }
+      div[style*="font-size:12px"] { font-size: 10px !important; }
+      div[style*="height:12px"] { height: 4px !important; }
+      div[style*="height:10px"] { height: 4px !important; }
+      td[style*="padding:20px"] { padding: 10px !important; }
+      td[style*="padding:14px"] { padding: 8px !important; }
+    </style></head>`
+  );
+
   const payload = JSON.stringify({
-    source: html,
+    source: scaledHtml,
     format: 'Letter',
-    margin: { top: '10mm', bottom: '10mm', left: '10mm', right: '10mm' },
+    margin: { top: '8mm', bottom: '8mm', left: '8mm', right: '8mm' },
+    scale: 0.72,
   });
 
   const auth = Buffer.from(`api:${apiKey}`).toString('base64');
@@ -46,7 +68,6 @@ async function htmlToPDF(html, apiKey) {
     throw new Error(`PDFShift error ${result.status}: ${result.body.toString()}`);
   }
 
-  // Return as base64 string
   return result.body.toString('base64');
 }
 
