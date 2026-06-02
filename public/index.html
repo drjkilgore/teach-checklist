@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,11 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script>
-// Load pdf-lib and make it available globally
-window.PDFLib = null;
-</script>
-<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" onload="window.PDFLib = PDFLib; console.log('pdf-lib loaded OK, version:', PDFLib.PDFDocument ? 'ready' : 'not ready');"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <style>
 :root{
   --navy:#002E5D;--crimson:#8B0000;--sky:#12A7E6;--light:#F5F5F5;
@@ -467,7 +464,8 @@ function buildChecklist(){
 function fileToBase64(file){
   return new Promise((res,rej)=>{
     const r=new FileReader();
-    r.onload=()=>res(r.result); // keep full data URL for EmailJS
+    // EmailJS needs raw base64 without the "data:...;base64," prefix
+    r.onload=()=>res(r.result.split(',')[1]);
     r.onerror=rej;
     r.readAsDataURL(file);
   });
@@ -545,11 +543,15 @@ function buildEmailText(){
 
 // ── BUILD PDF IN BROWSER ──────────────────────────────────
 async function buildPDF(){
-  // Make sure pdf-lib is loaded
-  if(!window.PDFLib || !window.PDFLib.PDFDocument){
-    throw new Error('pdf-lib not loaded yet. Please try again.');
+  // pdf-lib exposes itself as window.PDFLib when loaded via script tag
+  const lib = window.PDFLib;
+  if(!lib || !lib.PDFDocument){
+    throw new Error('pdf-lib not available. Check CDN load.');
   }
-  const { PDFDocument, rgb, StandardFonts } = window.PDFLib;
+  console.log('buildPDF: PDFLib available, PDFDocument=', typeof lib.PDFDocument);
+  const PDFDocument = lib.PDFDocument;
+  const rgb = lib.rgb;
+  const StandardFonts = lib.StandardFonts;
   const s = STATES[selState];
   const name = document.getElementById('resName').value;
   const sid  = document.getElementById('stuId').value;
@@ -707,9 +709,9 @@ async function buildPDF(){
   });
 
   const pdfBytes = await pdfDoc.save();
-  console.log('PDF bytes length:', pdfBytes.length);
+  console.log('PDF bytes length:', pdfBytes.length, '— should be > 20000');
 
-  // Safe base64 encoding for binary data (btoa fails on large Uint8Arrays)
+  // Chunked base64 encoding (safe for large binary data)
   let binary = '';
   const chunkSize = 8192;
   for(let i = 0; i < pdfBytes.length; i += chunkSize){
@@ -717,8 +719,9 @@ async function buildPDF(){
     binary += String.fromCharCode(...chunk);
   }
   const b64 = btoa(binary);
-  console.log('PDF base64 length:', b64.length);
-  return `data:application/pdf;base64,${b64}`;
+  console.log('PDF base64 length:', b64.length, '— should be > 26000');
+  // Return raw base64 only — EmailJS does NOT want the data:...;base64, prefix
+  return b64;
 }
 
 // ── SUBMIT ────────────────────────────────────────────────
@@ -743,10 +746,11 @@ async function submitForm(){
   try {
     console.log('STEP 1: Generating PDF...');
     pdfDataUrl = await buildPDF();
-    console.log('STEP 1 OK: PDF generated, dataUrl length=', pdfDataUrl ? pdfDataUrl.length : 0);
-    console.log('STEP 1: PDF starts with:', pdfDataUrl ? pdfDataUrl.substring(0,50) : 'NULL');
-    if(pdfDataUrl && pdfDataUrl.length < 10000){
-      console.warn('STEP 1 WARNING: PDF seems too small (', pdfDataUrl.length, 'chars) — may be corrupt');
+    console.log('STEP 1 OK: PDF base64 length=', pdfDataUrl ? pdfDataUrl.length : 0);
+    if(pdfDataUrl && pdfDataUrl.length < 20000){
+      console.warn('STEP 1 WARNING: PDF seems too small (', pdfDataUrl.length, 'chars) — pdf-lib may not be generating correctly');
+    } else {
+      console.log('STEP 1: PDF size looks good ✓');
     }
     btn.textContent='Sending…';
     showToast('Sending email with PDF attached…','sending',20000);
