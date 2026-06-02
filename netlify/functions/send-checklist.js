@@ -1,3 +1,4 @@
+
 const https = require('https');
 
 // ── HTTPS helper ──────────────────────────────────────────
@@ -87,10 +88,14 @@ exports.handler = async (event) => {
       checkedItems, fileNames,
     } = data;
 
-    const sgKey    = process.env.SENDGRID_API_KEY;
+    const sgKey     = process.env.SENDGRID_API_KEY;
     const fromEmail = process.env.SEND_FROM_EMAIL;
     const fromName  = process.env.SEND_FROM_NAME || '#TEACH Checklist System';
-    const pdfKey   = process.env.PDFSHIFT_API_KEY;
+    const pdfKey    = process.env.PDFSHIFT_API_KEY;
+
+    console.log('ENV CHECK — SENDGRID_API_KEY:', sgKey ? 'SET' : 'MISSING');
+    console.log('ENV CHECK — SEND_FROM_EMAIL:', fromEmail || 'MISSING');
+    console.log('ENV CHECK — PDFSHIFT_API_KEY:', pdfKey ? 'SET' : 'MISSING');
 
     if (!sgKey || !fromEmail) {
       throw new Error('SendGrid not configured.');
@@ -100,10 +105,13 @@ exports.handler = async (event) => {
     const attachments = [];
 
     // 1. Generate PDF from HTML if PDFShift is configured
+    let pdfGenerated = false;
+    let pdfError = null;
     if (pdfKey) {
       try {
-        console.log('Generating PDF via PDFShift...');
+        console.log('PDFShift: starting generation, HTML length:', htmlBody.length);
         const pdfBase64 = await htmlToPDF(htmlBody, pdfKey);
+        console.log('PDFShift: success, PDF base64 length:', pdfBase64.length);
         const safeName = (residentName || 'Resident').replace(/\s+/g, '_');
         attachments.push({
           content:     pdfBase64,
@@ -111,10 +119,14 @@ exports.handler = async (event) => {
           type:        'application/pdf',
           disposition: 'attachment',
         });
-        console.log('PDF generated OK, size:', pdfBase64.length);
+        pdfGenerated = true;
+        console.log('PDFShift: attachment added OK');
       } catch (e) {
-        console.error('PDF generation failed (continuing without PDF):', e.message);
+        pdfError = e.message;
+        console.error('PDFShift FAILED:', e.message);
       }
+    } else {
+      console.log('PDFShift: skipped — PDFSHIFT_API_KEY not set');
     }
 
     // 2. Add uploaded files
@@ -176,7 +188,9 @@ exports.handler = async (event) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         success: true,
-        pdfAttached: pdfKey ? true : false,
+        pdfGenerated,
+        pdfError,
+        attachmentCount: attachments.length,
       }),
     };
 
