@@ -735,18 +735,17 @@ async function submitForm(){
       date,
       checked_count: String(checkedCount),
       total_items:   String(total),
-      'attachments[0].name': attachments[0]?attachments[0].name:'',
-      'attachments[0].data': attachments[0]?attachments[0].data:'',
-      'attachments[1].name': attachments[1]?attachments[1].name:'',
-      'attachments[1].data': attachments[1]?attachments[1].data:'',
-      'attachments[2].name': attachments[2]?attachments[2].name:'',
-      'attachments[2].data': attachments[2]?attachments[2].data:'',
-      'attachments[3].name': attachments[3]?attachments[3].name:'',
-      'attachments[3].data': attachments[3]?attachments[3].data:'',
-      'attachments[4].name': attachments[4]?attachments[4].name:'',
-      'attachments[4].data': attachments[4]?attachments[4].data:'',
     };
-    if(attachments.length>0) params.attachments=attachments;
+
+    // EmailJS Business plan native attachments format
+    if(attachments.length > 0){
+      params.attachments = attachments.map(a => ({
+        name: a.name,
+        data: `data:${a.type};base64,${a.data}`,
+      }));
+      console.log('Sending', params.attachments.length, 'attachments:',
+        params.attachments.map(a=>a.name));
+    }
 
     await emailjs.send(EJS_SI, EJS_TI, params);
     showToast('✓ Email sent successfully!','success');
@@ -817,6 +816,7 @@ async function downloadExcel(){
 </script>
 </body>
 </html>
+
 
 
 
