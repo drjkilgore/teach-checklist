@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -724,21 +726,26 @@ async function submitForm(){
   // 1. Generate filled PDF checklist
   let pdfDataUrl = null;
   try {
+    console.log('STEP 1: Generating PDF...');
     pdfDataUrl = await buildPDF();
+    console.log('STEP 1 OK: PDF generated, dataUrl length=', pdfDataUrl ? pdfDataUrl.length : 0);
+    console.log('STEP 1: PDF starts with:', pdfDataUrl ? pdfDataUrl.substring(0,50) : 'NULL');
     btn.textContent='Sending…';
     showToast('Sending email with PDF attached…','sending',20000);
   } catch(e) {
-    console.warn('PDF generation failed:',e);
+    console.error('STEP 1 FAILED: PDF generation error:', e);
     showToast('PDF generation failed, sending text only…','sending',10000);
   }
 
   // 2. Convert uploaded files to base64
+  console.log('STEP 2: Processing', files.length, 'uploaded files');
   const attachments=[];
 
   // Add the generated checklist PDF first
   if(pdfDataUrl){
     const pdfName=`TEACH_Checklist_${selState}_${name.replace(/\s+/g,'_')}.pdf`;
     attachments.push({ name: pdfName, data: pdfDataUrl });
+    console.log('STEP 2: Added PDF checklist as attachment[0]:', pdfName);
   }
 
   // Add user-uploaded files
@@ -746,10 +753,15 @@ async function submitForm(){
     try{
       const dataUrl=await fileToBase64(f);
       attachments.push({ name: f.name, data: dataUrl });
-    }catch(e){ console.warn('File read error:',e); }
+      console.log('STEP 2: Added uploaded file:', f.name, 'size=', dataUrl.length);
+    }catch(e){ console.error('STEP 2 FAILED: File read error for', f.name, e); }
   }
 
+  console.log('STEP 2 DONE: Total attachments=', attachments.length, attachments.map(a=>a.name));
+
   try{
+    // Build params — attachments must be an array of {name, data} objects
+    // where data is a base64 data URL (e.g. "data:application/pdf;base64,...")
     const params = {
       to_email:      recip,
       cc_email:      coach,
@@ -761,13 +773,30 @@ async function submitForm(){
       date,
       checked_count: String(checkedCount),
       total_items:   String(total),
+      // Spread individual attachment slots for EmailJS template variables
+      'attachments[0].name': attachments[0] ? attachments[0].name : '',
+      'attachments[0].data': attachments[0] ? attachments[0].data : '',
+      'attachments[1].name': attachments[1] ? attachments[1].name : '',
+      'attachments[1].data': attachments[1] ? attachments[1].data : '',
+      'attachments[2].name': attachments[2] ? attachments[2].name : '',
+      'attachments[2].data': attachments[2] ? attachments[2].data : '',
+      'attachments[3].name': attachments[3] ? attachments[3].name : '',
+      'attachments[3].data': attachments[3] ? attachments[3].data : '',
+      'attachments[4].name': attachments[4] ? attachments[4].name : '',
+      'attachments[4].data': attachments[4] ? attachments[4].data : '',
     };
 
+    // Also pass full array in case EmailJS supports it natively
     if(attachments.length > 0){
       params.attachments = attachments;
     }
 
+    console.log('STEP 3: Calling emailjs.send with', Object.keys(params).length, 'params');
+    console.log('STEP 3: attachment[0].name =', params['attachments[0].name']);
+    console.log('STEP 3: attachment[0].data length =', params['attachments[0].data'].length);
+
     await emailjs.send(EJS_SI, EJS_TI, params);
+    console.log('STEP 3 OK: emailjs.send succeeded');
     showToast('✓ Email sent with completed PDF checklist!','success');
 
     // Save to Supabase
@@ -836,6 +865,5 @@ async function downloadExcel(){
 </script>
 </body>
 </html>
-
 
 
