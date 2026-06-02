@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,6 +28,36 @@ body{font-family:var(--font);background:var(--light);color:var(--ink);font-size:
 .ld{width:1px;height:30px;background:rgba(255,255,255,.2)}
 .ls{font-size:12px;font-weight:300;color:rgba(255,255,255,.65);line-height:1.35;letter-spacing:.2px}
 .caep{font-size:11px;font-weight:600;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.2);padding:5px 12px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}
+.help-link{font-size:13px;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;border:1px solid rgba(255,255,255,.25);padding:5px 14px;border-radius:20px;background:none;font-family:var(--font);letter-spacing:.3px;margin-right:10px;text-decoration:none}
+.help-link:hover{color:#fff;border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.08)}
+
+/* HELP MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:var(--rl);max-width:680px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal-header{background:var(--navy);padding:20px 28px;display:flex;align-items:center;justify-content:space-between;border-radius:var(--rl) var(--rl) 0 0;position:sticky;top:0}
+.modal-header h2{font-size:18px;font-weight:800;color:var(--white)}
+.modal-header .hash{color:var(--silver)}
+.modal-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:22px;cursor:pointer;line-height:1;padding:0}
+.modal-close:hover{color:#fff}
+.modal-body{padding:28px}
+.modal-section{margin-bottom:1.75rem}
+.modal-section:last-child{margin-bottom:0}
+.modal-section h3{font-size:14px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--light);display:flex;align-items:center;gap:8px}
+.modal-section h3 .icon{font-size:16px}
+.modal-section p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:8px}
+.modal-section p:last-child{margin-bottom:0}
+.step-list{list-style:none;padding:0;counter-reset:steps}
+.step-list li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--light);font-size:14px;color:var(--ink);line-height:1.5}
+.step-list li:last-child{border-bottom:none}
+.step-num{background:var(--crimson);color:#fff;font-size:11px;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.info-card{background:var(--light);border-radius:var(--r);padding:12px 14px}
+.info-card strong{display:block;font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.info-card span{font-size:13px;color:var(--muted)}
+.tip-box{background:#EBF5FB;border:1px solid #B3DEF5;border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--muted);line-height:1.6;margin-top:10px}
+.tip-box strong{color:var(--navy)}
+@media(max-width:500px){.info-grid{grid-template-columns:1fr}}
 
 .wrap{max-width:860px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
 
@@ -154,7 +185,10 @@ input::placeholder{color:var(--silver)}
     <div class="ld"></div>
     <div class="ls">Resident Completion<br>Checklist System</div>
   </div>
-  <div class="caep">CAEP Accredited</div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button class="help-link" onclick="document.getElementById('helpModal').classList.add('open')">? How it Works</button>
+    <div class="caep">CAEP Accredited</div>
+  </div>
 </header>
 
 <div class="wrap">
@@ -315,6 +349,75 @@ input::placeholder{color:var(--silver)}
         <p style="font-size:11px;color:var(--silver);margin-top:8px">Check boxes next to entries you want to delete, then click Delete Selected.</p>
         <button class="btn btn-crimson" style="margin-top:8px;font-size:12px;padding:6px 14px" onclick="deleteSelected()">Delete Selected</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-header">
+      <h2><span class="hash">#</span>TEACH Resident Completion Checklist — Overview &amp; Guide</h2>
+      <button class="modal-close" onclick="document.getElementById('helpModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="modal-section">
+        <h3><span class="icon">📋</span>What This App Does</h3>
+        <p>The <strong>#TEACH Resident Completion Checklist</strong> is a digital tool for coaches to document and submit a resident's program completion requirements. It generates a formatted checklist specific to each state, delivers it by email to the appropriate parties, and keeps a running record of all submissions.</p>
+        <p>The app supports five states — <strong>Alabama, Arizona, Indiana, Michigan, and North Carolina</strong> — each with their own state-specific requirements, license types, and documentation standards.</p>
+      </div>
+
+      <div class="modal-section">
+        <h3><span class="icon">👣</span>How to Complete a Checklist</h3>
+        <ol class="step-list">
+          <li><span class="step-num">1</span><div><strong>Select State</strong> — Choose the state where the resident completed their program. Each state has unique requirements in Sections 3, 4, 7, 8, and 9.</div></li>
+          <li><span class="step-num">2</span><div><strong>Resident Information</strong> — Enter the resident's full name, student ID (optional), your email as coach, and the email address the completed form should be sent to (e.g. advisor or program director).</div></li>
+          <li><span class="step-num">3</span><div><strong>Complete the Checklist</strong> — Work through all 10 sections and check each item that has been completed. Sections 1 and 2 are the same for all states. Sections 3–4 and 7–9 vary by state.</div></li>
+          <li><span class="step-num">4</span><div><strong>Upload Documents</strong> — Attach any supporting documents such as transcripts, evaluations, background check confirmations, certifications, or assessment score reports. All attached files will be included in the email.</div></li>
+          <li><span class="step-num">5</span><div><strong>Review &amp; Submit</strong> — Review the summary, confirm the recipient email, and click Submit. The system will email the completed checklist as a formatted PDF along with any uploaded attachments. A copy is automatically sent to the coach.</div></li>
+        </ol>
+      </div>
+
+      <div class="modal-section">
+        <h3><span class="icon">📧</span>What Gets Sent</h3>
+        <p>When you submit, two things are delivered by email:</p>
+        <div class="info-grid">
+          <div class="info-card">
+            <strong>Email Body</strong>
+            <span>A formatted HTML version of the completed checklist showing all checked and unchecked items, resident info, state, and date.</span>
+          </div>
+          <div class="info-card">
+            <strong>PDF Attachment</strong>
+            <span>A PDF version of the same checklist — ready to download and upload directly into the resident's CRM portal.</span>
+          </div>
+          <div class="info-card">
+            <strong>Uploaded Files</strong>
+            <span>All documents you attach (transcripts, evaluations, etc.) are included as additional attachments in the same email.</span>
+          </div>
+          <div class="info-card">
+            <strong>CC to Coach</strong>
+            <span>The coach's email is automatically CC'd on every submission so you always have a copy in your inbox.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <h3><span class="icon">📊</span>Submission Records</h3>
+        <p>Every submission is automatically saved to the database. You can download a full Excel export or manage submissions at any time by visiting the <strong>Admin Panel</strong>.</p>
+        <div class="tip-box">
+          <strong>Admin Panel:</strong> Go to <strong>/admin</strong> on this site (e.g. <em>your-site.netlify.app/admin</em>) and enter your admin token to view all submissions, search by resident name, filter by state, delete test entries, and download the Excel report.
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <h3><span class="icon">💡</span>Tips</h3>
+        <p>• You do not need to check every box to submit — partial submissions are allowed and the email will clearly show which items are complete and which are not.</p>
+        <p>• The checklist automatically uses the correct state-specific requirements based on the state you select — you do not need to make any adjustments.</p>
+        <p>• Uploaded files can be any format — PDF, Word, image, Excel. There is no strict file type restriction.</p>
+        <p>• If you need to resubmit, simply start a new checklist. Each submission is saved independently.</p>
+      </div>
+
     </div>
   </div>
 </div>
