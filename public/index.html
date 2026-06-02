@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>#TEACH Resident Completion Checklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --black: #0a0a0a;
+  --white: #ffffff;
+  --gray-100: #f5f5f5;
+  --gray-200: #e8e8e8;
+  --gray-400: #9a9a9a;
+  --gray-600: #555555;
+  --gray-800: #2a2a2a;
+  --accent: #e8c84a;
+  --accent-dark: #c9aa2e;
+  --danger: #e84a4a;
+  --success: #2db37a;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow', sans-serif;
+  --radius: 4px;
+  --radius-lg: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--black);
+  color: var(--white);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ── HEADER ── */
+.site-header {
+  background: var(--black);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand-hash {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.brand-teach {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.brand-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255,255,255,0.2);
+}
+
+.brand-subtitle {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--gray-400);
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+}
+
+.caep-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--gray-400);
+  text-transform: uppercase;
+}
+
+.caep-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+/* ── MAIN LAYOUT ── */
+.main-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+/* ── STEP INDICATOR ── */
+.step-track {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 2.5rem;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.step-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.step-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  color: var(--gray-400);
+  background: transparent;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.step-num.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--black);
+}
+
+.step-num.done {
+  background: var(--success);
+  border-color: var(--success);
+  color: var(--white);
+}
+
+.step-label {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--gray-600);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.step-label.active { color: var(--white); }
+.step-label.done   { color: var(--success); }
+
+.step-connector {
+  flex: 1;
+  min-width: 20px;
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+  margin: 0 8px;
+  flex-shrink: 1;
+}
+
+/* ── PROGRESS ── */
+.progress-wrap {
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.progress-bar {
+  flex: 1;
+  height: 2px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.progress-pct {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 1px;
+  min-width: 36px;
+  text-align: right;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--gray-800);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 1.25rem;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-title .title-accent {
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* ── STATE GRID ── */
+.state-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.state-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-lg);
+  padding: 18px 10px 14px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  color: var(--white);
+}
+
+.state-btn:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.25);
+  transform: translateY(-1px);
+}
+
+.state-btn.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--black);
+}
+
+.state-code {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.state-name {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.7;
+  line-height: 1.3;
+}
+
+/* ── FORM FIELDS ── */
+.field-group { margin-bottom: 1.25rem; }
+.field-group:last-child { margin-bottom: 0; }
+
+.field-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  margin-bottom: 8px;
+}
+
+.field-required { color: var(--accent); margin-left: 2px; }
+
+input[type="text"],
+input[type="email"] {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius);
+  padding: 11px 14px;
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 15px;
+  transition: border-color 0.15s;
+  outline: none;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus {
+  border-color: var(--accent);
+  background: rgba(232,200,74,0.06);
+}
+
+input::placeholder { color: var(--gray-600); }
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.error-msg {
+  font-size: 12px;
+  color: var(--danger);
+  margin-top: 5px;
+  display: none;
+}
+.error-msg.show { display: block; }
+
+/* ── CHECKLIST ── */
+.cl-section { margin-bottom: 1.5rem; }
+
+.cl-section-head {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.05);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.cl-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.cl-col-head {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  margin-bottom: 8px;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  cursor: pointer;
+}
+
+.check-item:last-child { border-bottom: none; }
+
+.check-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.check-item label {
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.82);
+  line-height: 1.5;
+  cursor: pointer;
+  flex: 1;
+}
+
+.check-item label.checked {
+  color: var(--white);
+  text-decoration: none;
+}
+
+.sub-list {
+  margin: 6px 0 2px 26px;
+  list-style: none;
+}
+
+.sub-list li {
+  font-size: 12px;
+  color: var(--gray-400);
+  padding: 2px 0;
+  display: flex;
+  gap: 6px;
+}
+
+.sub-list li::before {
+  content: "–";
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ── UPLOAD ── */
+.upload-zone {
+  border: 1px dashed rgba(255,255,255,0.2);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: rgba(255,255,255,0.02);
+}
+
+.upload-zone:hover {
+  border-color: var(--accent);
+  background: rgba(232,200,74,0.04);
+}
+
+.upload-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+  display: block;
+  opacity: 0.4;
+}
+
+.upload-zone p { font-size: 13px; color: var(--gray-400); }
+.upload-zone strong { color: var(--white); font-weight: 500; }
+
+.file-list { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+
+.file-icon { opacity: 0.5; font-size: 16px; }
+.file-size { color: var(--gray-400); font-size: 11px; margin-left: auto; margin-right: 8px; }
+
+.remove-file {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  opacity: 0.7;
+}
+.remove-file:hover { opacity: 1; }
+
+/* ── SUMMARY ── */
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-size: 14px;
+  gap: 1rem;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-key { color: var(--gray-400); flex-shrink: 0; }
+.summary-val { color: var(--white); text-align: right; font-weight: 500; }
+
+.completion-bar {
+  margin: 1rem 0;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  height: 6px;
+  overflow: hidden;
+}
+.completion-fill {
+  height: 100%;
+  background: var(--success);
+  border-radius: 3px;
+}
+
+.warn-box {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: rgba(232,200,74,0.1);
+  border: 1px solid rgba(232,200,74,0.25);
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.info-box {
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--gray-400);
+  line-height: 1.6;
+}
+
+.info-box strong { color: var(--white); }
+
+/* ── BUTTONS ── */
+.btn-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  gap: 12px;
+}
+
+.btn {
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: transparent;
+  color: var(--white);
+  transition: all 0.15s;
+}
+
+.btn:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.3);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--black);
+}
+
+.btn-primary:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  color: var(--black);
+}
+
+.btn-success {
+  background: var(--success);
+  border-color: var(--success);
+  color: var(--white);
+}
+
+.btn-success:hover { background: #25a06d; }
+
+.btn-danger {
+  background: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.btn-danger:hover { background: rgba(232,74,74,0.1); }
+
+/* ── DONE SCREEN ── */
+.done-screen {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.done-icon {
+  font-size: 56px;
+  display: block;
+  margin-bottom: 1.5rem;
+  animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.done-screen h2 {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin-bottom: 10px;
+}
+
+.done-screen p {
+  color: var(--gray-400);
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.done-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+/* ── DOWNLOAD PANEL ── */
+.download-panel {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.download-panel h3 {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  margin-bottom: 1rem;
+}
+
+.token-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.token-row input {
+  flex: 1;
+  width: auto;
+}
+
+/* ── FOOTER ── */
+.site-footer {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4rem;
+}
+
+.footer-brand {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-600);
+}
+
+.footer-brand span { color: var(--accent); }
+
+.footer-meta {
+  font-size: 12px;
+  color: var(--gray-600);
+}
+
+@media (max-width: 640px) {
+  .state-grid { grid-template-columns: repeat(3, 1fr); }
+  .two-col, .cl-two-col { grid-template-columns: 1fr; }
+  .site-header { padding: 0 1rem; }
+  .main-wrap { padding: 1.5rem 1rem 3rem; }
+  .caep-badge { display: none; }
+  .step-label { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-brand">
+    <div>
+      <span class="brand-hash">#</span><span class="brand-teach">TEACH</span>
+    </div>
+    <div class="brand-divider"></div>
+    <div class="brand-subtitle">Resident Completion<br>Checklist System</div>
+  </div>
+  <div class="caep-badge">
+    <div class="caep-dot"></div>
+    CAEP Accredited Provider
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main-wrap">
+
+  <!-- STEP INDICATOR -->
+  <div class="step-track" id="stepTrack">
+    <div class="step-node">
+      <div class="step-num active" id="snum1">1</div>
+      <span class="step-label active" id="slbl1">State</span>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-node">
+      <div class="step-num" id="snum2">2</div>
+      <span class="step-label" id="slbl2">Resident</span>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-node">
+      <div class="step-num" id="snum3">3</div>
+      <span class="step-label" id="slbl3">Checklist</span>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-node">
+      <div class="step-num" id="snum4">4</div>
+      <span class="step-label" id="slbl4">Documents</span>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-node">
+      <div class="step-num" id="snum5">5</div>
+      <span class="step-label" id="slbl5">Submit</span>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:20%"></div></div>
+    <div class="progress-pct" id="progressPct">20%</div>
+  </div>
+
+  <!-- STEP 1: STATE -->
+  <div id="step1">
+    <div class="card">
+      <div class="card-title"><span class="title-accent"></span>Select State</div>
+      <div class="state-grid" id="stateGrid"></div>
+    </div>
+    <div class="btn-row">
+      <span></span>
+      <button class="btn btn-primary" id="s1next" onclick="goStep(2)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: RESIDENT -->
+  <div id="step2" style="display:none">
+    <div class="card">
+      <div class="card-title"><span class="title-accent"></span>Resident Information</div>
+      <div class="two-col">
+        <div class="field-group">
+          <label class="field-label" for="residentName">Resident Full Name<span class="field-required">*</span></label>
+          <input type="text" id="residentName" placeholder="First Last">
+          <div class="error-msg" id="nameErr">Name is required.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="studentId">Student ID</label>
+          <input type="text" id="studentId" placeholder="e.g. 123456">
+        </div>
+      </div>
+      <div class="field-group" style="margin-top:0.5rem">
+        <label class="field-label" for="coachEmail">Your Email (Coach)<span class="field-required">*</span></label>
+        <input type="email" id="coachEmail" placeholder="coach@example.com">
+        <div class="error-msg" id="coachErr">Valid email required.</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="recipEmail">Send Completed Form To<span class="field-required">*</span></label>
+        <input type="email" id="recipEmail" placeholder="advisor@example.com">
+        <div class="error-msg" id="recipErr">Valid email required.</div>
+        <div style="font-size:12px;color:var(--gray-400);margin-top:6px">A copy is automatically CC'd to your coach email on submission.</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-primary" onclick="validateStep2()">Next →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: CHECKLIST -->
+  <div id="step3" style="display:none">
+    <div class="card" id="checklistCard">
+      <div class="card-title" id="checklistCardTitle"><span class="title-accent"></span>Checklist</div>
+      <div id="checklistBody"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="goStep(2)">← Back</button>
+      <button class="btn btn-primary" onclick="goStep(4)">Next →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: DOCUMENTS -->
+  <div id="step4" style="display:none">
+    <div class="card">
+      <div class="card-title"><span class="title-accent"></span>Supporting Documents</div>
+      <p style="font-size:13px;color:var(--gray-400);margin-bottom:1.25rem">Attach transcripts, evaluations, certifications, background checks, and any other required documents.</p>
+      <div class="upload-zone" onclick="document.getElementById('fileInput').click()" id="uploadZone">
+        <span class="upload-icon">📎</span>
+        <p><strong>Click to browse</strong> or drag and drop</p>
+        <p style="margin-top:4px;font-size:11px">PDF, JPG, PNG, DOCX — any size</p>
+      </div>
+      <input type="file" id="fileInput" multiple style="display:none" onchange="handleFiles(this.files)">
+      <div class="file-list" id="fileList"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="goStep(3)">← Back</button>
+      <button class="btn btn-primary" onclick="goStep(5)">Review & Submit →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: REVIEW -->
+  <div id="step5" style="display:none">
+    <div class="card">
+      <div class="card-title"><span class="title-accent"></span>Review Summary</div>
+      <div id="summaryBody"></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="font-size:13px"><span class="title-accent"></span>Delivery</div>
+      <div class="summary-row"><span class="summary-key">Send to</span><span class="summary-val" id="sumRecip">—</span></div>
+      <div class="summary-row"><span class="summary-key">Coach CC</span><span class="summary-val" id="sumCoach">—</span></div>
+      <div class="summary-row"><span class="summary-key">Attachments</span><span class="summary-val" id="sumFiles">—</span></div>
+    </div>
+    <div class="info-box">
+      <strong>How submission works:</strong> Clicking Submit saves this record to the database and opens your email client with the completed checklist pre-filled. Confirm and send from your email app.
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="goStep(4)">← Back</button>
+      <button class="btn btn-success" id="submitBtn" onclick="submitForm()">✓ Submit &amp; Send</button>
+    </div>
+  </div>
+
+  <!-- DONE -->
+  <div id="stepDone" style="display:none">
+    <div class="card">
+      <div class="done-screen">
+        <span class="done-icon">✅</span>
+        <h2>Checklist Submitted</h2>
+        <p id="doneLine1"></p>
+        <p id="doneLine2"></p>
+        <p style="font-size:12px;margin-top:4px;color:var(--gray-600)">Record saved to database.</p>
+        <div class="done-actions">
+          <button class="btn btn-primary" onclick="openEmailAgain()">Open Email Again</button>
+          <button class="btn" onclick="startOver()">Start New Checklist</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOWNLOAD PANEL -->
+    <div class="download-panel">
+      <h3>📊 Download All Submissions (Excel)</h3>
+      <p style="font-size:13px;color:var(--gray-400);margin-bottom:1rem">Enter your download token to export all submission records as an Excel file.</p>
+      <div class="token-row">
+        <input type="password" id="downloadToken" placeholder="Enter download token">
+        <button class="btn btn-primary" onclick="downloadExcel()">Download .xlsx</button>
+      </div>
+      <div class="error-msg" id="tokenErr" style="margin-top:6px">Invalid token or error fetching data.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-brand"><span>#</span>TEACH Checklist System</div>
+  <div class="footer-meta">Confidential – Internal Use Only</div>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// STATE DATA
+// ─────────────────────────────────────────────────────────────
+const STATES = {
+  AL:{name:"Alabama",color:"#1a1a1a",section8:"Completion Letter Sent",s9:"Professional License",s9item:"Applied for Professional Educator Certificate",bgCheck:"Background Checks on file - FBI and ASBI",
+    s3:[
+      {text:"The documentation of passing scores on all required Assessment(s) have been submitted to #TEACH",subs:["Praxis Subject Exam","If no Praxis for subject: must have earned a non-education major in a teaching field (e.g., dance rather than dance education) OR must have earned at least 30 credit hours, including 18 upper-division, in the teaching field of the program being completed."]},
+      {text:"Documentation of passing score on required pedagogy exam",subs:["Individuals who complete LESS THAN three full years of teaching experience while holding the CCTF — edTPA is required","Individuals who complete three full years of teaching experience while holding the CCTF — PLT is required"]},
+      {text:"Documentation of a practical or highly effective school-based evaluation has been submitted to #TEACH"}
+    ],
+    s4:[
+      {text:"The final coaching conversation has been recorded in the CRM system (Coach)"},
+      {text:"Required certifications are valid",subs:["CPR/First Aid (Valid for 2 years)"]},
+      {text:"Documentation that Resident has taught at least <b>1 full academic year</b>"}
+    ],
+    s8:["Program Completion Letter sent to Resident"],
+    noMentor:false
+  },
+  AZ:{name:"Arizona",color:"#1a1a1a",section8:"License Conversion Letters Sent",s9:"Standard Professional License",s9item:"Applied for Standard Professional License",bgCheck:"Background Check on file (N/A in AZ)",
+    s3:[
+      {text:"Documentation that Resident has met Content Knowledge Requirement",subs:["Option A: Arizona Exam","Option B: Out of State Exam","Option C: Degree in the Subject","Option D: Teaching Experience"]},
+      {text:"Documentation that Resident has met Professional Knowledge Requirement",subs:["Option A: Arizona Exam","Option B: Out of State Exam","Option C: Teaching Experience"]},
+      {text:"Documentation that Resident has met other requirements",subs:["OPI (as required for World Language and Bilingual Education)","Passed the Constitutions of the United States and Arizona Exams","Completed AZ Literacy Endorsement"]}
+    ],
+    s4:[
+      {text:"The final coaching conversation has been recorded in the CRM system (Coach)"},
+      {text:"Required certifications are valid",subs:["CPR/First Aid/AED (Valid for 2 years)"]},
+      {text:"Documentation that the Resident has taught at least <b>1 full academic year or 150 days</b>"}
+    ],
+    s8:["Program Completion Letter sent to Resident"],
+    noMentor:false
+  },
+  IN:{name:"Indiana",color:"#1a1a1a",section8:"Completion Letter Sent",s9:"Practitioners License",s9item:"Applied for Practitioners License (2 yr or 5 yr)",bgCheck:"Background Check on file (N/A in IN)",
+    s3:[
+      {text:"The documentation of passing scores on all required Assessment(s) have been submitted to #TEACH",subs:["Praxis Subject Exam AND PLT (Principals of Teaching & Learning)","Early Literacy Endorsement — Required for Elementary and Special Education","OPI (as required for World Language and Bilingual Education), SLIPI (as required for ASL)","Documentation of a practical or highly effective school-based evaluation has been submitted to #TEACH"]}
+    ],
+    s4:[
+      {text:"Documentation that Resident has taught at least <b>2 full academic years (for 5 yr License) or 10 Weeks (2 yr License)</b>",subs:["If a candidate teaches under a T2T and/or Emergency Permit for two years, and all program requirements are met, they may be approved for the 5-year Practitioner License (PL) instead of the 2-year Initial Practitioner License (IPL). If just 10 Weeks, the 2 Yr IPL is the only option."]},
+      {text:"The final coaching conversation has been recorded in the CRM system (Coach)"},
+      {text:"Required certifications are valid",subs:["CPR/AED/Heimlich Maneuver (Valid for 2 years)","Youth Suicide Prevention (One-time completion requirement)","Child Abuse Training (Valid for 2 years)","Human Trafficking Training (One-time completion requirement)"]}
+    ],
+    s8:["Program Completion Letter sent to Resident"],
+    noMentor:true
+  },
+  MI:{name:"Michigan",color:"#1a1a1a",section8:"Completion Letter Sent",s9:"Standard Certificate",s9item:"Applied for Standard Certification",bgCheck:"Background Check on file",
+    s3:[
+      {text:"The documentation of passing scores on all required Assessment(s) have been submitted to #TEACH",subs:["MTTC, PKS (as required), OPI (as required for World Language and Bilingual Education), ASLPI/SLIPI (as required for American Sign Language)"]}
+    ],
+    s4:[
+      {text:"Documentation that Resident has taught at least <b>3 full academic years</b>"},
+      {text:"Resident has met at least 600 hours of teaching with at least 50 hours in each endorsement area",subs:["If the resident has not met at least 50 hours in each endorsement area, advisors should confirm they wish to move forward with the standard for the areas they have met the time taught. If confirmed, a priority note should be added to the account."]},
+      {text:"The final coaching conversation has been recorded in the CRM system (Coach)"},
+      {text:"Update status in MOECS"}
+    ],
+    s8:["Program Completion Letter sent to Resident"],
+    noMentor:true
+  },
+  NC:{name:"North Carolina",color:"#1a1a1a",section8:"Completion Letters Sent",s9:"Professional License",s9item:"Applied for Professional License",bgCheck:"Background Check on file (N/A in NC)",
+    s3:[
+      {text:"The documentation of a passing score on the Pearson and/or Praxis Subject Assessment(s) in the area of certification has been submitted to #TEACH"},
+      {text:"The documentation of a passing score on the EdTPA has been submitted to #TEACH"}
+    ],
+    s4:[
+      {text:"The Field Experience Form has been completed, signed by the principal, and recorded in the CRM"},
+      {text:"Summative Evaluation, completed by the school administrator, has been submitted to #TEACH"},
+      {text:"The final coaching conversation has been recorded in the CRM system (Coach)"},
+      {text:"Documentation that Resident has taught at least <b>1 full academic year</b>"}
+    ],
+    s8:["Form V sent to Resident","Program Completion Letter sent to Resident"],
+    noMentor:true
+  }
+};
+
+// ─────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────
+let selectedState = null;
+let uploadedFiles = [];
+let checkboxStates = {};
+let lastEmailHref = '';
+let currentStep = 1;
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
+(function init() {
+  const grid = document.getElementById('stateGrid');
+  Object.entries(STATES).forEach(([code, s]) => {
+    const btn = document.createElement('button');
+    btn.className = 'state-btn';
+    btn.innerHTML = `<div class="state-code">${code}</div><div class="state-name">${s.name}</div>`;
+    btn.onclick = () => selectState(code, btn);
+    grid.appendChild(btn);
+  });
+
+  // Drag & drop
+  const zone = document.getElementById('uploadZone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--accent)'; });
+  zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; });
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.style.borderColor = ''; handleFiles(e.dataTransfer.files); });
+})();
+
+// ─────────────────────────────────────────────────────────────
+// STATE SELECT
+// ─────────────────────────────────────────────────────────────
+function selectState(code, btn) {
+  document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedState = code;
+  document.getElementById('s1next').disabled = false;
+}
+
+// ─────────────────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────────────────
+function goStep(n) {
+  const ids = ['step1','step2','step3','step4','step5','stepDone'];
+  ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.display='none'; });
+
+  if (n <= 5) {
+    document.getElementById(`step${n}`).style.display = 'block';
+  } else {
+    document.getElementById('stepDone').style.display = 'block';
+  }
+
+  currentStep = n;
+  const pct = Math.round((n / 5) * 100);
+  document.getElementById('progressFill').style.width = Math.min(pct, 100) + '%';
+  document.getElementById('progressPct').textContent = Math.min(pct, 100) + '%';
+
+  for (let i = 1; i <= 5; i++) {
+    const num = document.getElementById(`snum${i}`);
+    const lbl = document.getElementById(`slbl${i}`);
+    num.className = 'step-num' + (i < n ? ' done' : i === n ? ' active' : '');
+    lbl.className = 'step-label' + (i < n ? ' done' : i === n ? ' active' : '');
+    num.textContent = i < n ? '✓' : i;
+  }
+
+  if (n === 3) buildChecklist();
+  if (n === 5) buildSummary();
+  window.scrollTo(0, 0);
+}
+
+// ─────────────────────────────────────────────────────────────
+// STEP 2 VALIDATION
+// ─────────────────────────────────────────────────────────────
+function validateStep2() {
+  let ok = true;
+  const name = document.getElementById('residentName').value.trim();
+  const coach = document.getElementById('coachEmail').value.trim();
+  const recip = document.getElementById('recipEmail').value.trim();
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  document.getElementById('nameErr').classList.toggle('show', !name);
+  document.getElementById('coachErr').classList.toggle('show', !emailRe.test(coach));
+  document.getElementById('recipErr').classList.toggle('show', !emailRe.test(recip));
+
+  if (!name || !emailRe.test(coach) || !emailRe.test(recip)) ok = false;
+  if (ok) goStep(3);
+}
+
+// ─────────────────────────────────────────────────────────────
+// BUILD CHECKLIST
+// ─────────────────────────────────────────────────────────────
+function buildChecklist() {
+  const s = STATES[selectedState];
+  checkboxStates = {};
+  const body = document.getElementById('checklistBody');
+  const title = document.getElementById('checklistCardTitle');
+  title.innerHTML = `<span class="title-accent"></span>${selectedState} — ${s.name} Checklist`;
+  body.innerHTML = '';
+
+  function mkCheck(id, labelHTML) {
+    checkboxStates[id] = false;
+    const div = document.createElement('div');
+    div.className = 'check-item';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.id = id;
+    cb.onchange = e => { checkboxStates[id] = e.target.checked; };
+    const lbl = document.createElement('label');
+    lbl.htmlFor = id;
+    lbl.innerHTML = labelHTML;
+    div.appendChild(cb); div.appendChild(lbl);
+    return div;
+  }
+
+  function mkSubs(items) {
+    const ul = document.createElement('ul'); ul.className = 'sub-list';
+    items.forEach(s => { const li = document.createElement('li'); li.textContent = s; ul.appendChild(li); });
+    return ul;
+  }
+
+  function section(num, title, items) {
+    const sec = document.createElement('div'); sec.className = 'cl-section';
+    const h = document.createElement('div'); h.className = 'cl-section-head';
+    h.textContent = `${num}. ${title}`; sec.appendChild(h);
+    items.forEach((item, i) => {
+      const id = `chk_${num}_${i}`;
+      const text = item.text || item;
+      sec.appendChild(mkCheck(id, text));
+      if (item.subs) sec.appendChild(mkSubs(item.subs));
+    });
+    return sec;
+  }
+
+  const s1 = ["All courses were completed and met the minimum 3.0 score requirement","All courses have been logged in the learning management system","A transcript request can be processed at the resident's request"];
+  body.appendChild(section(1, 'Coursework (Coach)', s1));
+
+  const s2 = ["The Teacher Proficiency Assessment (TPA) scores (3) are recorded in the Status Report","The Family Conferences Self-Assessment has been recorded in the system","The Professionalism Self-Assessment has been recorded in the system","The Fall Assessment for Planning and Teaching has been recorded in the system","The Spring Assessment for Planning and Teaching has been recorded in the system"];
+  if (!s.noMentor) s2.push("Mentor Assessment has been recorded in the system.");
+  body.appendChild(section(2, '#TEACH Assessments (Coach)', s2));
+  body.appendChild(section(3, 'State Assessments and Requirements', s.s3));
+  body.appendChild(section(4, 'Documentation and Conversations', s.s4));
+
+  // Sections 5-10 in two-column pairs
+  function twoColSections(leftNum, leftTitle, leftItems, rightNum, rightTitle, rightItems) {
+    const wrap = document.createElement('div'); wrap.className = 'cl-two-col';
+    [
+      [leftNum, leftTitle, leftItems],
+      [rightNum, rightTitle, rightItems]
+    ].forEach(([num, title, items]) => {
+      const col = document.createElement('div');
+      const h = document.createElement('div'); h.className = 'cl-section-head';
+      h.textContent = `${num}. ${title}`; col.appendChild(h);
+      items.forEach((item, i) => {
+        const id = `chk_${num}_${i}`;
+        const text = item.text || item;
+        col.appendChild(mkCheck(id, text));
+        if (item.subs) col.appendChild(mkSubs(item.subs));
+      });
+      wrap.appendChild(col);
+    });
+    body.appendChild(wrap);
+  }
+
+  const s5 = [{text:"Confirm that the program balance is paid in full",subs:["Advisor Portal > Contract Tool > Payment Info","Intern Portal > Payments > Program Fees > Remaining Balance"]}];
+  const s6nc = selectedState === 'NC' ? "Regional or National Accreditation Confirmed" : "Regional Accreditation Confirmed";
+  const s6 = ["Official Transcripts on file", s6nc];
+  twoColSections(5,'Check Financial Standing',s5, 6,'Official Transcripts',s6);
+
+  const s7 = [s.bgCheck];
+  const s8 = s.s8;
+  twoColSections(7,'Background Checks',s7, 8,s.section8,s8);
+
+  const s9 = [s.s9item];
+  const s10 = ["Request to send formal Completion Certificate via Parchment sent to processor."];
+  twoColSections(9,s.s9,s9, 10,'Completion Certificate',s10);
+}
+
+// ─────────────────────────────────────────────────────────────
+// FILES
+// ─────────────────────────────────────────────────────────────
+function handleFiles(files) {
+  Array.from(files).forEach(f => {
+    uploadedFiles.push(f);
+    const item = document.createElement('div'); item.className = 'file-item';
+    const kb = (f.size / 1024).toFixed(0);
+    item.innerHTML = `<span class="file-icon">📄</span><span>${f.name}</span><span class="file-size">${kb} KB</span><button class="remove-file" aria-label="Remove" onclick="removeFile('${f.name}',this.parentElement)">×</button>`;
+    document.getElementById('fileList').appendChild(item);
+  });
+}
+
+function removeFile(name, el) {
+  uploadedFiles = uploadedFiles.filter(f => f.name !== name);
+  el.remove();
+}
+
+// ─────────────────────────────────────────────────────────────
+// SUMMARY
+// ─────────────────────────────────────────────────────────────
+function buildSummary() {
+  const s = STATES[selectedState];
+  const body = document.getElementById('summaryBody');
+  body.innerHTML = '';
+  const total = Object.keys(checkboxStates).length;
+  const checked = Object.values(checkboxStates).filter(Boolean).length;
+  const pct = total ? Math.round(checked/total*100) : 0;
+
+  const rows = [
+    ['State', `${selectedState} — ${s.name}`],
+    ['Resident', document.getElementById('residentName').value || '—'],
+    ['Student ID', document.getElementById('studentId').value || 'N/A'],
+    ['Items completed', `${checked} / ${total} (${pct}%)`],
+  ];
+
+  rows.forEach(([k,v]) => {
+    const r = document.createElement('div'); r.className = 'summary-row';
+    r.innerHTML = `<span class="summary-key">${k}</span><span class="summary-val">${v}</span>`;
+    body.appendChild(r);
+  });
+
+  // Completion bar
+  const bar = document.createElement('div'); bar.className = 'completion-bar';
+  bar.innerHTML = `<div class="completion-fill" style="width:${pct}%"></div>`;
+  body.appendChild(bar);
+
+  if (checked < total) {
+    const w = document.createElement('div'); w.className = 'warn-box';
+    w.textContent = `${total - checked} item(s) unchecked. You can still submit, but review before sending.`;
+    body.appendChild(w);
+  }
+
+  document.getElementById('sumRecip').textContent = document.getElementById('recipEmail').value || '—';
+  document.getElementById('sumCoach').textContent = document.getElementById('coachEmail').value || '—';
+  document.getElementById('sumFiles').textContent = uploadedFiles.length ? uploadedFiles.map(f=>f.name).join(', ') : 'None';
+}
+
+// ─────────────────────────────────────────────────────────────
+// BUILD EMAIL BODY TEXT
+// ─────────────────────────────────────────────────────────────
+function buildEmailText() {
+  const s = STATES[selectedState];
+  const name = document.getElementById('residentName').value;
+  const sid = document.getElementById('studentId').value;
+  const date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+
+  function ck(id) { return checkboxStates[id] ? '[X]' : '[ ]'; }
+
+  const lines = [
+    `#TEACH RESIDENT COMPLETION CHECKLIST — ${selectedState} (${s.name})`,
+    `Confidential – Internal Use Only`,
+    `Date: ${date}`,
+    '',
+    `RESIDENT INFORMATION`,
+    `Name: ${name}`,
+    sid ? `Student ID: ${sid}` : '',
+    '',
+    '1. COURSEWORK (COACH)',
+    `${ck('chk_1_0')} All courses were completed and met the minimum 3.0 score requirement`,
+    `${ck('chk_1_1')} All courses have been logged in the learning management system`,
+    `${ck('chk_1_2')} A transcript request can be processed at the resident's request`,
+    '',
+    '2. #TEACH ASSESSMENTS (COACH)',
+    `${ck('chk_2_0')} The Teacher Proficiency Assessment (TPA) scores (3) are recorded in the Status Report`,
+    `${ck('chk_2_1')} The Family Conferences Self-Assessment has been recorded in the system`,
+    `${ck('chk_2_2')} The Professionalism Self-Assessment has been recorded in the system`,
+    `${ck('chk_2_3')} The Fall Assessment for Planning and Teaching has been recorded in the system`,
+    `${ck('chk_2_4')} The Spring Assessment for Planning and Teaching has been recorded in the system`,
+    ...(!s.noMentor ? [`${ck('chk_2_5')} Mentor Assessment has been recorded in the system.`] : []),
+    '',
+    '3. STATE ASSESSMENTS AND REQUIREMENTS',
+    ...s.s3.flatMap((item,i) => [
+      `${ck('chk_3_'+i)} ${(item.text||item).replace(/<[^>]+>/g,'')}`,
+      ...(item.subs||[]).map(sub => `    • ${sub}`)
+    ]),
+    '',
+    '4. DOCUMENTATION AND CONVERSATIONS',
+    ...s.s4.flatMap((item,i) => [
+      `${ck('chk_4_'+i)} ${(item.text||item).replace(/<[^>]+>/g,'')}`,
+      ...(item.subs||[]).map(sub => `    • ${sub}`)
+    ]),
+    '',
+    '5. CHECK FINANCIAL STANDING',
+    `${ck('chk_5_0')} Confirm that the program balance is paid in full`,
+    `    • Advisor Portal > Contract Tool > Payment Info`,
+    `    • Intern Portal > Payments > Program Fees > Remaining Balance`,
+    '',
+    '6. OFFICIAL TRANSCRIPTS',
+    `${ck('chk_6_0')} Official Transcripts on file`,
+    `${ck('chk_6_1')} ${selectedState==='NC'?'Regional or National Accreditation Confirmed':'Regional Accreditation Confirmed'}`,
+    '',
+    '7. BACKGROUND CHECKS',
+    `${ck('chk_7_0')} ${s.bgCheck}`,
+    '',
+    `8. ${s.section8.toUpperCase()}`,
+    ...s.s8.map((t,i) => `${ck('chk_8_'+i)} ${t}`),
+    '',
+    `9. ${s.s9.toUpperCase()}`,
+    `${ck('chk_9_0')} ${s.s9item}`,
+    '',
+    '10. COMPLETION CERTIFICATE',
+    `${ck('chk_10_0')} Request to send formal Completion Certificate via Parchment sent to processor.`,
+    '',
+    ...(uploadedFiles.length ? ['ATTACHED DOCUMENTS', ...uploadedFiles.map(f=>`  • ${f.name}`), ''] : []),
+    '---',
+    `Submitted: ${date}`,
+    `Coach: ${document.getElementById('coachEmail').value}`,
+  ];
+
+  return lines.filter(l => l !== undefined).join('\n');
+}
+
+// ─────────────────────────────────────────────────────────────
+// SUBMIT
+// ─────────────────────────────────────────────────────────────
+async function submitForm() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  const s = STATES[selectedState];
+  const name = document.getElementById('residentName').value;
+  const sid = document.getElementById('studentId').value;
+  const coach = document.getElementById('coachEmail').value;
+  const recip = document.getElementById('recipEmail').value;
+  const total = Object.keys(checkboxStates).length;
+  const checkedCount = Object.values(checkboxStates).filter(Boolean).length;
+  const emailText = buildEmailText();
+  const subjectLine = `#TEACH Completion Checklist — ${name}${sid?' ('+sid+')':''} — ${selectedState}`;
+
+  // Save to Supabase via Netlify function
+  try {
+    await fetch('/.netlify/functions/save-submission', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        state: selectedState,
+        stateName: s.name,
+        residentName: name,
+        studentId: sid || null,
+        coachEmail: coach,
+        recipientEmail: recip,
+        checkedItems: checkboxStates,
+        totalItems: total,
+        checkedCount,
+        fileNames: uploadedFiles.map(f=>f.name).join(', ') || null,
+        emailSubject: subjectLine,
+        formBody: emailText,
+      })
+    });
+  } catch(e) {
+    console.warn('Save failed:', e);
+  }
+
+  // Open email client
+  lastEmailHref = `mailto:${encodeURIComponent(recip)}?cc=${encodeURIComponent(coach)}&subject=${encodeURIComponent(subjectLine)}&body=${encodeURIComponent(emailText)}`;
+  window.location.href = lastEmailHref;
+
+  document.getElementById('doneLine1').textContent = `Form sent to: ${recip}`;
+  document.getElementById('doneLine2').textContent = `Coach copy: ${coach}`;
+
+  goStep(6);
+}
+
+function openEmailAgain() { window.location.href = lastEmailHref; }
+
+function startOver() {
+  selectedState = null; uploadedFiles = []; checkboxStates = [];
+  ['residentName','studentId','coachEmail','recipEmail'].forEach(id => { document.getElementById(id).value=''; });
+  document.getElementById('fileList').innerHTML = '';
+  document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('s1next').disabled = true;
+  document.getElementById('downloadToken').value = '';
+  document.getElementById('tokenErr').classList.remove('show');
+  goStep(1);
+}
+
+// ─────────────────────────────────────────────────────────────
+// EXCEL DOWNLOAD
+// ─────────────────────────────────────────────────────────────
+async function downloadExcel() {
+  const token = document.getElementById('downloadToken').value.trim();
+  const errEl = document.getElementById('tokenErr');
+  errEl.classList.remove('show');
+
+  if (!token) { errEl.textContent = 'Please enter your download token.'; errEl.classList.add('show'); return; }
+
+  try {
+    const res = await fetch(`/.netlify/functions/get-submissions?token=${encodeURIComponent(token)}`);
+    if (!res.ok) throw new Error('Unauthorized or server error');
+    const rows = await res.json();
+    if (!Array.isArray(rows)) throw new Error('Invalid data');
+
+    const wb = XLSX.utils.book_new();
+
+    // Main sheet
+    const wsData = [
+      ['Submitted At','State Code','State Name','Resident Name','Student ID','Coach Email','Recipient Email','Items Checked','Total Items','Pct Complete','Files Attached','Email Subject'],
+      ...rows.map(r => [
+        r.submitted_at ? new Date(r.submitted_at).toLocaleString() : '',
+        r.state || '',
+        r.state_name || '',
+        r.resident_name || '',
+        r.student_id || '',
+        r.coach_email || '',
+        r.recipient_email || '',
+        r.checked_count || 0,
+        r.total_items || 0,
+        r.total_items ? Math.round((r.checked_count/r.total_items)*100)+'%' : '—',
+        r.file_names || '',
+        r.email_subject || '',
+      ])
+    ];
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = [22,8,14,22,12,26,26,10,10,10,30,40].map(w => ({wch:w}));
+
+    // Style header row
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for (let c = range.s.c; c <= range.e.c; c++) {
+      const addr = XLSX.utils.encode_cell({r:0, c});
+      if (!ws[addr]) continue;
+      ws[addr].s = {
+        font: { bold: true, color: { rgb: 'FFFFFF' } },
+        fill: { fgColor: { rgb: '0A0A0A' } },
+        alignment: { horizontal: 'center' }
+      };
+    }
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Submissions');
+
+    // Summary by state
+    const stateCount = {};
+    rows.forEach(r => { stateCount[r.state] = (stateCount[r.state]||0)+1; });
+    const ws2Data = [
+      ['State','Submissions'],
+      ...Object.entries(stateCount).sort((a,b)=>b[1]-a[1]).map(([s,n])=>[s,n]),
+      [],
+      ['Total', rows.length],
+    ];
+    const ws2 = XLSX.utils.aoa_to_sheet(ws2Data);
+    ws2['!cols'] = [{wch:16},{wch:14}];
+    XLSX.utils.book_append_sheet(wb, ws2, 'By State');
+
+    const date = new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb, `TEACH_Submissions_${date}.xlsx`);
+
+  } catch(e) {
+    console.error(e);
+    errEl.textContent = 'Error: ' + e.message;
+    errEl.classList.add('show');
+  }
+}
+</script>
+</body>
+</html>
