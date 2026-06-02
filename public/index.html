@@ -711,44 +711,37 @@ async function submitForm(){
   const date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
 
   // Convert uploaded files to base64
-  const attachments=[];
+  const fileAttachments=[];
   for(const f of files){
     try{
       const b64=await fileToBase64(f);
       const mime=getMimeType(f.name);
-      attachments.push({ name: f.name, data: b64, type: mime });
-      console.log('Attachment:', f.name, mime, b64.length, 'chars');
-    }catch(e){ console.warn('File read error:',f.name, e); }
+      fileAttachments.push({ name:f.name, data:b64, type:mime });
+      console.log('File ready:', f.name, mime, b64.length+'chars');
+    }catch(e){ console.warn('File error:',f.name,e); }
   }
-  console.log('Total attachments:', attachments.length);
 
   try{
-    const params = {
-      to_email:      recip,
-      cc_email:      coach,
-      subject,
-      message:       htmlBody,
-      message_text:  textBody,
-      resident_name: name,
-      student_id:    sid||'N/A',
-      state:         `${selState} — ${s.name}`,
-      date,
-      checked_count: String(checkedCount),
-      total_items:   String(total),
-    };
+    const res = await fetch('/.netlify/functions/send-checklist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        state: selState, stateName: s.name,
+        residentName: name, studentId: sid||null,
+        coachEmail: coach, recipientEmail: recip,
+        checkedCount, totalItems: total,
+        fileAttachments,
+        emailSubject: subject,
+        htmlBody, textBody,
+        checkedItems: cbStates,
+        fileNames: files.map(f=>f.name).join(', ')||null,
+      })
+    });
 
-    // EmailJS Business plan native attachments format
-    if(attachments.length > 0){
-      params.attachments = attachments.map(a => ({
-        name: a.name,
-        data: `data:${a.type};base64,${a.data}`,
-      }));
-      console.log('Sending', params.attachments.length, 'attachments:',
-        params.attachments.map(a=>a.name));
-    }
+    const result = await res.json();
+    if(!result.success) throw new Error(result.error||'Unknown error');
 
-    await emailjs.send(EJS_SI, EJS_TI, params);
-    showToast('✓ Email sent successfully!','success');
+    showToast('✓ Email sent with all attachments!','success');
 
     // Save to Supabase
     try{
@@ -763,13 +756,13 @@ async function submitForm(){
       });
     }catch(e){ console.warn('DB save:',e); }
 
-    document.getElementById('dl1').textContent=`Checklist sent to: ${recip}`;
+    document.getElementById('dl1').textContent=`Email sent to: ${recip}`;
     document.getElementById('dl2').textContent=`Copy sent to: ${coach}`;
     goStep(6);
 
   }catch(err){
-    console.error('EmailJS error:',err);
-    showToast('Email failed: '+(err.text||err.message||'Check EmailJS settings'),'error',8000);
+    console.error('Send error:',err);
+    showToast('Error: '+(err.message||'Send failed'),'error',8000);
     btn.disabled=false; btn.textContent='✓ Submit & Send Email';
   }
 }
