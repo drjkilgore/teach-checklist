@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,6 +93,22 @@ input::placeholder{color:var(--silver)}
 .sub-list li::before{content:"–";color:var(--sky);flex-shrink:0}
 .cl-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .cl-col-head{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px;padding:6px 10px;background:var(--light);border-radius:var(--r);margin-bottom:6px}
+
+/* DRAFT LIST */
+.draft-list-card{background:var(--white);border:1.5px solid var(--sky);border-radius:var(--rl);padding:1.25rem;margin-bottom:1.25rem;box-shadow:var(--sh)}
+.draft-list-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between}
+.draft-list-title span{display:flex;align-items:center;gap:8px}
+.draft-count{background:var(--crimson);color:#fff;font-size:11px;font-weight:800;padding:2px 7px;border-radius:10px}
+.draft-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:all .15s;background:var(--white)}
+.draft-row:last-child{margin-bottom:0}
+.draft-row:hover{border-color:var(--sky);background:#EBF5FB;transform:translateY(-1px);box-shadow:var(--sh)}
+.draft-row-info{flex:1}
+.draft-row-name{font-size:14px;font-weight:600;color:var(--navy)}
+.draft-row-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.draft-row-state{background:var(--navy);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;white-space:nowrap}
+.draft-row-date{font-size:11px;color:var(--silver);text-align:right;white-space:nowrap}
+.draft-empty{font-size:13px;color:var(--muted);text-align:center;padding:1rem 0}
+.draft-loading{font-size:13px;color:var(--muted);text-align:center;padding:1rem 0}
 
 /* DRAFT BANNER */
 .draft-banner{background:#EBF5FB;border:1.5px solid var(--sky);border-radius:var(--r);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:1.25rem;flex-wrap:wrap}
@@ -311,19 +329,31 @@ input::placeholder{color:var(--silver)}
       <div class="prog-pct" id="pPct">25%</div>
     </div>
 
+    <!-- DRAFT LIST (shown on login if drafts exist) -->
+    <div id="draftListPanel" style="display:none">
+      <div class="draft-list-card">
+        <div class="draft-list-title">
+          <span>📝 Resume a Saved Draft <span class="draft-count" id="draftListCount">0</span></span>
+          <button onclick="hideDraftList()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1;padding:0" title="Close">×</button>
+        </div>
+        <div id="draftListBody">
+          <div class="draft-loading">Loading drafts…</div>
+        </div>
+        <div style="margin-top:10px;text-align:center">
+          <button class="btn btn-primary" onclick="hideDraftList()" style="font-size:12px;padding:7px 18px">+ Start New Checklist Instead</button>
+        </div>
+      </div>
+    </div>
+
     <!-- STEP 1: RESIDENT INFO -->
     <div id="step1">
       <div class="card">
         <div class="card-title"><span class="ct-bar"></span>Resident Information</div>
 
-        <!-- Draft lookup -->
-        <div style="background:var(--light);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:1.25rem">
-          <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px">Resume a saved draft</div>
-          <div style="display:flex;gap:8px">
-            <input type="text" id="draftLookupId" placeholder="Enter Student ID to resume draft" style="flex:1;width:auto">
-            <button class="btn btn-outline" style="white-space:nowrap" onclick="lookupDraft()">Load Draft</button>
-          </div>
-          <div class="em" id="draftLookupErr" style="margin-top:6px"></div>
+        <!-- Draft resume button -->
+        <div style="background:var(--light);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div style="font-size:13px;color:var(--muted)">Have a checklist in progress?</div>
+          <button class="btn btn-outline" style="font-size:12px;padding:7px 16px;white-space:nowrap" onclick="showDraftList()">📋 View Saved Drafts</button>
         </div>
 
         <div class="two-col">
@@ -662,9 +692,11 @@ function showApp() {
     selState = coach.states[0];
   }
 
-  // Show state display
   renderStateDisplay();
   goStep(1);
+
+  // Load drafts and show picker if any exist
+  loadDraftList();
 }
 
 function renderStateDisplay() {
@@ -690,14 +722,89 @@ function selectState(code, el) {
   el.classList.add('sel');
 }
 
+// ── DRAFT LIST ────────────────────────────────────────────
+let cachedDrafts = [];
+
+async function loadDraftList() {
+  try {
+    const res = await fetch('/.netlify/functions/draft', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'get_all', token: sessionToken })
+    }).then(r => r.json());
+    cachedDrafts = res.drafts || [];
+    renderDraftList();
+    if (cachedDrafts.length > 0) {
+      document.getElementById('draftListPanel').style.display = 'block';
+    }
+  } catch(e) { console.warn('Draft load failed:', e); }
+}
+
+function renderDraftList() {
+  const body = document.getElementById('draftListBody');
+  const count = document.getElementById('draftListCount');
+  count.textContent = cachedDrafts.length;
+  if (!cachedDrafts.length) {
+    body.innerHTML = '<div class="draft-empty">No saved drafts found.</div>';
+    return;
+  }
+  body.innerHTML = cachedDrafts.map((d, idx) => {
+    const updated = d.updated_at ? new Date(d.updated_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+    const created = d.created_at ? new Date(d.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+    const name = d.resident_name || 'Unnamed Resident';
+    return `<div class="draft-row" onclick="resumeDraftFromList(${idx})">
+      <div class="draft-row-info">
+        <div class="draft-row-name">${name}</div>
+        <div class="draft-row-meta">Student ID: ${d.student_id}&nbsp;·&nbsp;Started: ${created}&nbsp;·&nbsp;Last saved: ${updated}</div>
+      </div>
+      <span class="draft-row-state">${d.state}</span>
+    </div>`;
+  }).join('');
+}
+
+function showDraftList() {
+  loadDraftList();
+  document.getElementById('draftListPanel').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+function hideDraftList() {
+  document.getElementById('draftListPanel').style.display = 'none';
+}
+
+async function resumeDraftFromList(idx) {
+  const d = cachedDrafts[idx];
+  if (!d) return;
+  showToast('Loading draft\u2026', 'info', 3000);
+  const res = await fetch('/.netlify/functions/draft', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'load', token: sessionToken, studentId: d.student_id })
+  }).then(r => r.json());
+  if (!res.success || !res.draft) { showToast('Could not load draft.', 'error'); return; }
+  const draft = res.draft;
+  hideDraftList();
+  document.getElementById('resName').value    = draft.resident_name || '';
+  document.getElementById('stuId').value      = draft.student_id || '';
+  document.getElementById('recipEmail').value = draft.recipient_email || '';
+  selState = draft.state;
+  currentDraftId = draft.id;
+  renderStateDisplay();
+  buildChecklist();
+  if (draft.form_data && draft.form_data.checked) {
+    Object.entries(draft.form_data.checked).forEach(([id, val]) => {
+      cbStates[id] = val;
+      const cb = document.getElementById(id);
+      if (cb) cb.checked = val;
+    });
+  }
+  showToast('Draft loaded \u2014 ' + (draft.resident_name || draft.student_id), 'success');
+  goStep(2, true);
+}
+
 // ── DRAFT ─────────────────────────────────────────────────
 async function lookupDraft() {
-  const studentId = document.getElementById('draftLookupId').value.trim();
-  const errEl = document.getElementById('draftLookupErr');
-  errEl.classList.remove('show');
-  if (!studentId) { errEl.textContent='Please enter a Student ID.'; errEl.classList.add('show'); return; }
-
-  showToast('Looking up draft…', 'info', 3000);
+  const studentId = document.getElementById('stuId').value.trim();
+  if (!studentId) { showToast('Please enter a Student ID first.', 'error', 3000); return; }
+  showToast('Looking up draft\u2026', 'info', 3000);
   const res = await fetch('/.netlify/functions/draft', {
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ action:'load', token:sessionToken, studentId })
@@ -987,11 +1094,11 @@ async function submitForm(){
 
 function startNew(){
   files=[]; cbStates={}; currentDraftId=null;
-  ['resName','stuId','recipEmail','draftLookupId'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['resName','stuId','recipEmail'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('fileList').innerHTML='';
-  document.getElementById('draftLookupErr').classList.remove('show');
   if(coach.states.length>1) selState=null;
   renderStateDisplay();
+  loadDraftList();
   goStep(1);
 }
 
@@ -1004,7 +1111,5 @@ function showToast(msg,type='success',dur=4000){
 </script>
 </body>
 </html>
-
-
 
 
