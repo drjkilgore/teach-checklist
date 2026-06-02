@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>#TEACH Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --navy:#002E5D;--crimson:#8B0000;--sky:#12A7E6;--light:#F5F5F5;
+  --silver:#C5C5C5;--white:#FFFFFF;--ink:#1a1a1a;--muted:#555;
+  --border:#DCDCDC;--font:'Inter',sans-serif;--r:6px;--rl:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--light);color:var(--ink);font-size:15px}
+
+.site-header{background:var(--navy);padding:0 2rem;height:68px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.lt{font-weight:800;font-size:28px;letter-spacing:-.5px}
+.lh{color:var(--silver)}.lw{color:var(--white)}
+.header-sub{font-size:12px;font-weight:300;color:rgba(255,255,255,.6);margin-left:12px}
+.back-link{font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;border:1px solid rgba(255,255,255,.2);padding:5px 14px;border-radius:20px}
+.back-link:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+
+.wrap{max-width:1000px;margin:0 auto;padding:2.5rem 1.5rem 4rem}
+
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);padding:1.5rem;margin-bottom:1.25rem;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.card-title{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);margin-bottom:1.25rem;padding-bottom:12px;border-bottom:2px solid var(--light);display:flex;align-items:center;gap:10px}
+.ct-bar{width:4px;height:18px;background:var(--crimson);border-radius:2px;flex-shrink:0}
+
+.login-box{max-width:400px;margin:4rem auto}
+.fl{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);margin-bottom:7px}
+input[type=password],input[type=text]{width:100%;border:1.5px solid var(--border);border-radius:var(--r);padding:10px 14px;font-family:var(--font);font-size:14px;color:var(--ink);outline:none;transition:border-color .15s;margin-bottom:10px}
+input:focus{border-color:var(--sky)}
+
+.btn{padding:10px 24px;border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:700;letter-spacing:.3px;cursor:pointer;border:1.5px solid var(--border);background:var(--white);color:var(--navy);transition:all .15s;text-transform:uppercase}
+.btn:hover{background:var(--light)}
+.btn-primary{background:var(--navy);border-color:var(--navy);color:var(--white);width:100%;padding:12px}
+.btn-primary:hover{background:#001e3d}
+.btn-crimson{background:var(--crimson);border-color:var(--crimson);color:var(--white)}
+.btn-crimson:hover{background:#6b0000}
+.btn-sky{background:var(--sky);border-color:var(--sky);color:var(--white)}
+.btn-sky:hover{background:#0e8ec4}
+.btn-sm{padding:5px 12px;font-size:11px}
+
+.err{font-size:12px;color:var(--crimson);margin-top:4px;display:none}
+.err.show{display:block}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:1.5rem}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;text-align:center}
+.stat-num{font-size:26px;font-weight:800;color:var(--navy);line-height:1}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{background:var(--light);border-bottom:2px solid var(--border)}
+th{padding:10px 12px;text-align:left;font-weight:700;color:var(--navy);font-size:12px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--light);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-complete{background:#e6f0fa;color:var(--navy)}
+.badge-partial{background:#fff0f0;color:var(--crimson)}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px}
+.toolbar-left{display:flex;align-items:center;gap:10px}
+.search-box{padding:7px 12px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:13px;width:220px;outline:none}
+.search-box:focus{border-color:var(--sky)}
+.filter-sel{padding:7px 12px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:13px;outline:none;background:var(--white)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:var(--rl);font-size:14px;font-weight:600;color:#fff;box-shadow:0 4px 20px rgba(0,0,0,.15);z-index:9999;display:none;max-width:340px}
+.toast.show{display:block}
+.toast.success{background:var(--navy)}
+.toast.error{background:var(--crimson)}
+
+.site-footer{background:var(--navy);padding:1rem 2rem;display:flex;justify-content:space-between;margin-top:4rem}
+.footer-brand{font-size:14px;font-weight:800;color:#fff}
+.fh{color:var(--silver)}
+.footer-meta{font-size:11px;color:rgba(255,255,255,.4)}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div style="display:flex;align-items:center">
+    <div class="lt"><span class="lh">#</span><span class="lw">TEACH</span></div>
+    <span class="header-sub">Admin Panel</span>
+  </div>
+  <a href="/" class="back-link">← Back to App</a>
+</header>
+
+<div class="wrap">
+
+  <!-- LOGIN -->
+  <div class="login-box" id="loginBox">
+    <div class="card">
+      <div class="card-title"><span class="ct-bar"></span>Admin Login</div>
+      <label class="fl">Admin Token</label>
+      <input type="password" id="adminPwd" placeholder="Enter your admin token" onkeydown="if(event.key==='Enter')login()">
+      <div class="err" id="loginErr">Invalid token. Please try again.</div>
+      <button class="btn btn-primary" onclick="login()">Sign In</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD (hidden until logged in) -->
+  <div id="dashboard" style="display:none">
+
+    <!-- STATS -->
+    <div class="stats-row" id="statsRow"></div>
+
+    <!-- TABLE CARD -->
+    <div class="card">
+      <div class="card-title"><span class="ct-bar"></span>All Submissions</div>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input class="search-box" type="text" placeholder="Search resident name..." oninput="filterTable()" id="searchBox">
+          <select class="filter-sel" onchange="filterTable()" id="stateFilter">
+            <option value="">All States</option>
+            <option>AL</option><option>AZ</option><option>IN</option><option>MI</option><option>NC</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-sky btn-sm" onclick="downloadExcel()">⬇ Download Excel</button>
+          <button class="btn btn-crimson btn-sm" onclick="deleteSelected()">🗑 Delete Selected</button>
+          <button class="btn btn-crimson btn-sm" onclick="deleteAll()" style="opacity:.7">🗑 Delete All</button>
+        </div>
+      </div>
+
+      <div class="tbl-wrap">
+        <table id="mainTable">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="checkAll" onchange="toggleAll(this)"></th>
+              <th>Date</th>
+              <th>Resident</th>
+              <th>Student ID</th>
+              <th>State</th>
+              <th>Coach</th>
+              <th>Recipient</th>
+              <th>Complete</th>
+              <th>Files</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div id="noResults" style="display:none;padding:2rem;text-align:center;color:var(--muted);font-size:13px">No submissions found.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer class="site-footer">
+  <div class="footer-brand"><span class="fh">#</span>TEACH</div>
+  <div class="footer-meta">Admin Panel — Confidential</div>
+</footer>
+
+<script>
+let allRows = [];
+let adminToken = '';
+
+function showToast(msg, type='success', dur=4000){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+type;
+  setTimeout(()=>t.className='toast', dur);
+}
+
+async function login(){
+  const pwd = document.getElementById('adminPwd').value.trim();
+  const errEl = document.getElementById('loginErr');
+  errEl.classList.remove('show');
+  if(!pwd){ errEl.classList.add('show'); return; }
+
+  try{
+    const res = await fetch(`/.netlify/functions/get-submissions?token=${encodeURIComponent(pwd)}`);
+    if(!res.ok) throw new Error('Invalid token');
+    const rows = await res.json();
+    if(!Array.isArray(rows)) throw new Error('Invalid response');
+
+    adminToken = pwd;
+    allRows = rows;
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    renderStats();
+    renderTable(rows);
+  } catch(e) {
+    errEl.textContent = 'Invalid token. Please try again.';
+    errEl.classList.add('show');
+  }
+}
+
+function renderStats(){
+  const total = allRows.length;
+  const states = {};
+  let complete = 0;
+  allRows.forEach(r => {
+    states[r.state] = (states[r.state]||0)+1;
+    if(r.total_items && r.checked_count === r.total_items) complete++;
+  });
+  const topState = Object.entries(states).sort((a,b)=>b[1]-a[1])[0];
+
+  const statsRow = document.getElementById('statsRow');
+  statsRow.innerHTML = [
+    [total, 'Total Submissions'],
+    [complete, 'Fully Complete'],
+    [total - complete, 'In Progress'],
+    [topState ? topState[0] : '—', 'Most Active State'],
+    [Object.keys(states).length, 'States Active'],
+  ].map(([n,l]) => `
+    <div class="stat-card">
+      <div class="stat-num">${n}</div>
+      <div class="stat-lbl">${l}</div>
+    </div>`).join('');
+}
+
+function renderTable(rows){
+  const tbody = document.getElementById('tableBody');
+  const noRes = document.getElementById('noResults');
+
+  if(!rows.length){
+    tbody.innerHTML='';
+    noRes.style.display='block';
+    return;
+  }
+  noRes.style.display='none';
+
+  tbody.innerHTML = rows.map(r => {
+    const dt = r.submitted_at ? new Date(r.submitted_at).toLocaleDateString() : '—';
+    const pct = r.total_items ? Math.round((r.checked_count/r.total_items)*100) : 0;
+    const badge = pct===100
+      ? `<span class="badge badge-complete">100%</span>`
+      : `<span class="badge badge-partial">${pct}%</span>`;
+    const files = r.file_names
+      ? `<span style="font-size:11px;color:var(--muted)" title="${r.file_names}">📎 ${r.file_names.split(',').length}</span>`
+      : '—';
+    return `<tr>
+      <td><input type="checkbox" class="row-cb" value="${r.id}"></td>
+      <td style="color:var(--muted);white-space:nowrap">${dt}</td>
+      <td style="font-weight:600;color:var(--navy)">${r.resident_name||'—'}</td>
+      <td style="color:var(--muted)">${r.student_id||'—'}</td>
+      <td><strong>${r.state||'—'}</strong></td>
+      <td style="color:var(--muted);font-size:12px">${r.coach_email||'—'}</td>
+      <td style="color:var(--muted);font-size:12px">${r.recipient_email||'—'}</td>
+      <td>${badge}</td>
+      <td>${files}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterTable(){
+  const search = document.getElementById('searchBox').value.toLowerCase();
+  const state  = document.getElementById('stateFilter').value;
+  const filtered = allRows.filter(r => {
+    const nameMatch = !search || (r.resident_name||'').toLowerCase().includes(search);
+    const stateMatch = !state || r.state === state;
+    return nameMatch && stateMatch;
+  });
+  renderTable(filtered);
+}
+
+function toggleAll(cb){
+  document.querySelectorAll('.row-cb').forEach(c => c.checked = cb.checked);
+}
+
+async function deleteSelected(){
+  const ids = Array.from(document.querySelectorAll('.row-cb:checked')).map(c=>c.value);
+  if(!ids.length){ showToast('No rows selected.','error',3000); return; }
+  if(!confirm(`Delete ${ids.length} selected submission${ids.length!==1?'s':''}? This cannot be undone.`)) return;
+  await doDelete(ids);
+}
+
+async function deleteAll(){
+  if(!confirm(`Delete ALL ${allRows.length} submissions? This cannot be undone.`)) return;
+  await doDelete('ALL');
+}
+
+async function doDelete(ids){
+  try{
+    const res = await fetch(`/.netlify/functions/delete-submissions?token=${encodeURIComponent(adminToken)}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ ids })
+    });
+    const result = await res.json();
+    if(!result.success) throw new Error(result.error||'Delete failed');
+
+    // Reload
+    const res2 = await fetch(`/.netlify/functions/get-submissions?token=${encodeURIComponent(adminToken)}`);
+    allRows = await res2.json();
+    renderStats();
+    filterTable();
+    showToast('✓ Deleted successfully','success');
+  }catch(e){
+    showToast('Error: '+e.message,'error');
+  }
+}
+
+function downloadExcel(){
+  if(!allRows.length){ showToast('No data to download.','error',3000); return; }
+  const wb = XLSX.utils.book_new();
+  const wsData = [
+    ['Submitted At','State','State Name','Resident Name','Student ID','Coach Email','Recipient Email','Checked','Total','% Complete','Files','Subject'],
+    ...allRows.map(r=>[
+      r.submitted_at?new Date(r.submitted_at).toLocaleString():'',
+      r.state||'', r.state_name||'', r.resident_name||'', r.student_id||'',
+      r.coach_email||'', r.recipient_email||'',
+      r.checked_count||0, r.total_items||0,
+      r.total_items?Math.round((r.checked_count/r.total_items)*100)+'%':'—',
+      r.file_names||'', r.email_subject||''
+    ])
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols'] = [20,6,14,22,10,26,26,8,8,10,30,36].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb, ws, 'Submissions');
+
+  const stCt={};
+  allRows.forEach(r=>{ stCt[r.state]=(stCt[r.state]||0)+1; });
+  const ws2 = XLSX.utils.aoa_to_sheet([['State','Count'],...Object.entries(stCt).sort((a,b)=>b[1]-a[1]),[],['Total',allRows.length]]);
+  ws2['!cols'] = [{wch:16},{wch:10}];
+  XLSX.utils.book_append_sheet(wb, ws2, 'By State');
+
+  XLSX.writeFile(wb, `TEACH_Submissions_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+// Allow Enter key on password field
+document.getElementById('adminPwd').focus();
+</script>
+</body>
+</html>
