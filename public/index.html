@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -544,7 +543,7 @@ function buildSummary(){
   if(checked<total){ const w=document.createElement('div'); w.className='warn-box'; w.textContent=`${total-checked} item(s) unchecked. You may still submit.`; body.appendChild(w); }
   document.getElementById('sumRecip').textContent=document.getElementById('recipEmail').value||'—';
   document.getElementById('sumCoach').textContent=document.getElementById('coachEmail').value||'—';
-  document.getElementById('sumFiles').textContent=files.length?`Completed checklist + ${files.map(f=>f.name).join(', ')`:'Completed checklist only';
+  document.getElementById('sumFiles').textContent=files.length?`Completed checklist + ${files.map(f=>f.name).join(', ')}`:'Completed checklist only';
 }
 
 // ── BUILD EMAIL TEXT ──────────────────────────────────────
@@ -712,3 +711,4 @@ async function downloadExcel(){
 </script>
 </body>
 </html>
+
