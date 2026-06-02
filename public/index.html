@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -741,7 +743,13 @@ async function submitForm(){
     const result = await res.json();
     if(!result.success) throw new Error(result.error||'Unknown error');
 
-    showToast('✓ Email sent with all attachments!','success');
+    const pdfMsg = result.pdfGenerated
+      ? ' PDF checklist attached.'
+      : result.pdfError
+        ? ` (PDF error: ${result.pdfError})`
+        : ' (No PDF — check PDFSHIFT_API_KEY)';
+
+    showToast('✓ Email sent!' + pdfMsg, 'success', 8000);
 
     // Save to Supabase
     try{
@@ -809,7 +817,6 @@ async function downloadExcel(){
 </script>
 </body>
 </html>
-
 
 
 
