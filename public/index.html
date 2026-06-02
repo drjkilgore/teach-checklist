@@ -9,7 +9,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <style>
 :root{
   --navy:#002E5D;--crimson:#8B0000;--sky:#12A7E6;--light:#F5F5F5;
@@ -540,213 +539,170 @@ function buildEmailText(){
   return lines.filter(l=>l!==undefined).join('\n');
 }
 
-// ── BUILD PDF IN BROWSER ──────────────────────────────────
-async function buildPDF(){
-  // pdf-lib exposes itself as window.PDFLib when loaded via script tag
-  const lib = window.PDFLib;
-  if(!lib || !lib.PDFDocument){
-    throw new Error('pdf-lib not available. Check CDN load.');
-  }
-  console.log('buildPDF: PDFLib available, PDFDocument=', typeof lib.PDFDocument);
-  const PDFDocument = lib.PDFDocument;
-  const rgb = lib.rgb;
-  // Use string literals for fonts - more reliable than StandardFonts enum across CDN versions
-  const FONT_REGULAR = 'Helvetica';
-  const FONT_BOLD    = 'Helvetica-Bold';
-
+// ── BUILD HTML EMAIL ─────────────────────────────────────
+function buildHTMLEmail(){
   const s = STATES[selState];
   const name = document.getElementById('resName').value;
   const sid  = document.getElementById('stuId').value;
+  const coach = document.getElementById('coachEmail').value;
   const date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
 
-  const NAVY    = rgb(0, 0.18, 0.365);
-  const CRIMSON = rgb(0.545, 0, 0);
-  const WHITE   = rgb(1,1,1);
-  const BLACK   = rgb(0,0,0);
-  const GRAY    = rgb(0.77,0.77,0.77);
-  const LGRAY   = rgb(0.96,0.96,0.96);
-
-  const pdfDoc = await PDFDocument.create();
-  console.log('buildPDF: created doc OK');
-
-  // Embed fonts using string names (works across all pdf-lib CDN versions)
-  const font     = await pdfDoc.embedFont(FONT_REGULAR);
-  const fontBold = await pdfDoc.embedFont(FONT_BOLD);
-  console.log('buildPDF: fonts embedded OK, font=', typeof font, 'fontBold=', typeof fontBold);
-
-  // Test draw immediately to confirm drawing works
-  const testPage = pdfDoc.addPage([612, 792]);
-  try {
-    testPage.drawText('TEST', {x: 100, y: 700, size: 24, font: fontBold, color: rgb(0,0,0)});
-    testPage.drawRectangle({x: 50, y: 650, width: 200, height: 30, color: rgb(0, 0.18, 0.365)});
-    console.log('buildPDF: test draw OK');
-  } catch(e) {
-    console.error('buildPDF: test draw FAILED:', e);
-    throw e;
+  function ck(id){ return cbStates[id] ? '&#10003;' : '&#9744;'; }
+  function row(id, label){
+    const checked = cbStates[id];
+    return `<tr><td style="padding:4px 8px;width:28px;text-align:center;font-size:16px;color:${checked?'#002E5D':'#aaa'}">${ck(id)}</td><td style="padding:4px 8px;font-size:13px;color:${checked?'#1a1a1a':'#666'};${checked?'':'text-decoration:none'}">${label.replace(/<[^>]+>/g,'')}</td></tr>`;
   }
-  pdfDoc.removePage(0); // remove test page
-
-  const PW=612, PH=792, ML=40, MR=40;
-  const CW = PW-ML-MR;
-
-  let page = pdfDoc.addPage([PW,PH]);
-  let y = PH-40;
-
-  function newPage(){ page=pdfDoc.addPage([PW,PH]); y=PH-40; }
-  function checkY(n=20){ if(y<60+n) newPage(); }
-
-  // word-wrap drawText, returns new y
-  function drawText(text,x,yy,{size=10,fontRef=font,color=BLACK,maxWidth=CW}={}){
-    const words=String(text).split(' ');
-    let line='', lineY=yy;
-    for(const word of words){
-      const test=line?line+' '+word:word;
-      if(fontRef.widthOfTextAtSize(test,size)>maxWidth&&line){
-        page.drawText(line,{x,y:lineY,size,font:fontRef,color});
-        lineY-=size+3; line=word;
-      } else { line=test; }
-    }
-    if(line) page.drawText(line,{x,y:lineY,size,font:fontRef,color});
-    return lineY-(size+3);
+  function subRows(items){
+    return items.map(s=>`<tr><td></td><td style="padding:2px 8px 2px 24px;font-size:12px;color:#888">– ${s}</td></tr>`).join('');
+  }
+  function sectionHead(num, title){
+    return `<tr><td colspan="2" style="background:#002E5D;color:#fff;padding:8px 12px;font-size:13px;font-weight:700;letter-spacing:0.5px">${num}. ${title.toUpperCase()}</td></tr>`;
+  }
+  function twoColSection(l_num,l_title,l_items, r_num,r_title,r_items){
+    const leftRows = l_items.map((item,i)=> row(`chk_${l_num}_${i}`, item.text||item) + (item.subs?subRows(item.subs):'')).join('');
+    const rightRows = r_items.map((item,i)=> row(`chk_${r_num}_${i}`, item.text||item) + (item.subs?subRows(item.subs):'')).join('');
+    return `
+    <tr><td colspan="2" style="padding:0">
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
+        <tr>
+          <td width="50%" valign="top" style="padding-right:8px">
+            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e8e8e8;border-radius:4px;overflow:hidden">
+              <tr><td colspan="2" style="background:#002E5D;color:#fff;padding:7px 10px;font-size:12px;font-weight:700">${l_num}. ${l_title.toUpperCase()}</td></tr>
+              ${leftRows}
+            </table>
+          </td>
+          <td width="50%" valign="top" style="padding-left:8px">
+            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e8e8e8;border-radius:4px;overflow:hidden">
+              <tr><td colspan="2" style="background:#002E5D;color:#fff;padding:7px 10px;font-size:12px;font-weight:700">${r_num}. ${r_title.toUpperCase()}</td></tr>
+              ${rightRows}
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td></tr>`;
   }
 
-  function drawCheckbox(checked,x,yy){
-    page.drawRectangle({x,y:yy-1,width:9,height:9,borderColor:BLACK,borderWidth:0.8,color:WHITE});
-    if(checked) page.drawText('X',{x:x+1.5,y:yy,size:8,font:fontBold,color:CRIMSON});
-  }
+  const s1items = ["All courses were completed and met the minimum 3.0 score requirement","All courses have been logged in the learning management system","A transcript request can be processed at the resident's request"];
+  const s2items = ["The Teacher Proficiency Assessment (TPA) scores (3) are recorded in the Status Report","The Family Conferences Self-Assessment has been recorded in the system","The Professionalism Self-Assessment has been recorded in the system","The Fall Assessment for Planning and Teaching has been recorded in the system","The Spring Assessment for Planning and Teaching has been recorded in the system"];
+  if(!s.noMentor) s2items.push("Mentor Assessment has been recorded in the system.");
+  const s5items = [{text:"Confirm that the program balance is paid in full",subs:["Advisor Portal > Contract Tool > Payment Info","Intern Portal > Payments > Program Fees > Remaining Balance"]}];
+  const s6nc = selState==='NC'?'Regional or National Accreditation Confirmed':'Regional Accreditation Confirmed';
 
-  function sectionHeader(num,title,yy){
-    checkY(28);
-    page.drawRectangle({x:ML,y:yy-16,width:CW,height:20,color:NAVY});
-    page.drawText(`${num}. ${title}`,{x:ML+8,y:yy-12,size:10,font:fontBold,color:WHITE});
-    return yy-26;
-  }
+  const total = Object.keys(cbStates).length;
+  const checked = Object.values(cbStates).filter(Boolean).length;
+  const pct = total ? Math.round(checked/total*100) : 0;
 
-  function checkItem(id,labelText,indentX=ML+4){
-    checkY(18);
-    drawCheckbox(cbStates[id]===true, indentX, y);
-    const clean=labelText.replace(/<[^>]+>/g,'');
-    const ny=drawText(clean, indentX+14, y, {size:9, maxWidth:CW-(indentX-ML)-18});
-    y=Math.min(y-13,ny);
-  }
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:20px 0">
+<tr><td align="center">
+<table width="620" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
 
-  function subItem(text){
-    checkY(14);
-    page.drawText('•',{x:ML+28,y,size:8,font,color:NAVY});
-    const ny=drawText(text,ML+38,y,{size:8,color:rgb(0.33,0.33,0.33),maxWidth:CW-38});
-    y=Math.min(y-11,ny);
-  }
+  <!-- HEADER -->
+  <tr><td style="background:#002E5D;padding:20px 28px">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td>
+          <div style="font-size:28px;font-weight:900;line-height:1;color:#fff">
+            <span style="color:#C5C5C5">#</span>TEACH
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px;font-weight:300">Resident Completion Checklist</div>
+        </td>
+        <td align="right" style="font-size:10px;color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.2);padding:4px 10px;border-radius:20px;white-space:nowrap">CAEP ACCREDITED</td>
+      </tr>
+    </table>
+  </td></tr>
 
-  // Header bar
-  page.drawRectangle({x:0,y:PH-72,width:PW,height:72,color:NAVY});
-  page.drawText('#',{x:200,y:PH-44,size:28,font:fontBold,color:GRAY});
-  page.drawText('TEACH',{x:222,y:PH-44,size:28,font:fontBold,color:WHITE});
-  page.drawText('Resident',{x:ML,y:PH-30,size:14,font:fontBold,color:WHITE});
-  page.drawText('Completion',{x:ML,y:PH-46,size:14,font:fontBold,color:WHITE});
-  page.drawText('Checklist',{x:ML,y:PH-62,size:14,font:fontBold,color:WHITE});
-  page.drawText('Confidential – Internal Use Only',{x:ML,y:PH-84,size:9,font:fontBold,color:BLACK});
-  y=PH-104;
+  <!-- RESIDENT INFO BAR -->
+  <tr><td style="background:#F5F5F5;border-bottom:2px solid #002E5D;padding:14px 28px">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="font-size:13px;color:#555">
+          <strong style="color:#002E5D">Resident:</strong> ${name}
+          ${sid ? `&nbsp;&nbsp;<strong style="color:#002E5D">Student ID:</strong> ${sid}` : ''}
+        </td>
+        <td align="right" style="font-size:13px;color:#555">
+          <strong style="color:#002E5D">State:</strong> ${selState} — ${s.name}
+          &nbsp;&nbsp;<strong style="color:#002E5D">Date:</strong> ${date}
+        </td>
+      </tr>
+    </table>
+  </td></tr>
 
-  // Resident info
-  page.drawText('Resident Information',{x:ML,y,size:11,font:fontBold,color:NAVY}); y-=16;
-  page.drawText('Name:',{x:ML,y,size:10,font:fontBold,color:BLACK});
-  page.drawText(name||'',{x:ML+36,y,size:10,font,color:BLACK});
-  page.drawLine({start:{x:ML+36,y:y-2},end:{x:ML+280,y:y-2},thickness:0.5,color:BLACK});
-  if(sid){ page.drawText('Student ID:',{x:ML+300,y,size:10,font:fontBold,color:BLACK}); page.drawText(sid,{x:ML+360,y,size:10,font,color:BLACK}); }
-  y-=8;
-  page.drawText(`Date: ${date}`,{x:ML,y,size:9,font,color:GRAY}); y-=16;
+  <!-- COMPLETION STATUS -->
+  <tr><td style="padding:14px 28px;border-bottom:1px solid #eee">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="font-size:13px;color:#555">
+          <strong style="color:#002E5D">Completion Status:</strong>
+          ${checked} of ${total} items completed (${pct}%)
+        </td>
+        <td align="right">
+          <span style="background:${pct===100?'#002E5D':'#8B0000'};color:#fff;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700">
+            ${pct===100?'COMPLETE':'IN PROGRESS'}
+          </span>
+        </td>
+      </tr>
+      <tr><td colspan="2" style="padding-top:8px">
+        <div style="background:#e8e8e8;border-radius:3px;height:6px;overflow:hidden">
+          <div style="background:#002E5D;height:6px;width:${pct}%;border-radius:3px"></div>
+        </div>
+      </td></tr>
+    </table>
+  </td></tr>
 
-  // Section 1
-  y=sectionHeader(1,'Coursework (Coach)',y);
-  checkItem('chk_1_0','All courses were completed and met the minimum 3.0 score requirement');
-  checkItem('chk_1_1','All courses have been logged in the learning management system');
-  checkItem('chk_1_2',"A transcript request can be processed at the resident's request");
-  y-=4;
+  <!-- CHECKLIST BODY -->
+  <tr><td style="padding:20px 28px">
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e8e8e8;border-radius:6px;overflow:hidden">
+      ${sectionHead(1,'Coursework (Coach)')}
+      ${s1items.map((item,i)=>row(`chk_1_${i}`,item)).join('')}
+      ${sectionHead(2,'#TEACH Assessments (Coach)')}
+      ${s2items.map((item,i)=>row(`chk_2_${i}`,item)).join('')}
+      ${sectionHead(3,'State Assessments and Requirements')}
+      ${s.s3.map((item,i)=>row(`chk_3_${i}`,item.text||item)+(item.subs?subRows(item.subs):'')).join('')}
+      ${sectionHead(4,'Documentation and Conversations')}
+      ${s.s4.map((item,i)=>row(`chk_4_${i}`,item.text||item)+(item.subs?subRows(item.subs):'')).join('')}
+    </table>
 
-  // Section 2
-  y=sectionHeader(2,'#TEACH Assessments (Coach)',y);
-  checkItem('chk_2_0','The Teacher Proficiency Assessment (TPA) scores (3) are recorded in the Status Report');
-  checkItem('chk_2_1','The Family Conferences Self-Assessment has been recorded in the system');
-  checkItem('chk_2_2','The Professionalism Self-Assessment has been recorded in the system');
-  checkItem('chk_2_3','The Fall Assessment for Planning and Teaching has been recorded in the system');
-  checkItem('chk_2_4','The Spring Assessment for Planning and Teaching has been recorded in the system');
-  if(!s.noMentor) checkItem('chk_2_5','Mentor Assessment has been recorded in the system.');
-  y-=4;
+    <div style="height:12px"></div>
 
-  // Section 3
-  y=sectionHeader(3,'State Assessments and Requirements',y);
-  s.s3.forEach((item,i)=>{ checkItem(`chk_3_${i}`,item.text||item); if(item.subs) item.subs.forEach(sub=>subItem(sub)); });
-  y-=4;
+    <!-- SECTIONS 5-10 TWO COLUMN -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
+      ${twoColSection(5,'Check Financial Standing',s5items, 6,'Official Transcripts',['Official Transcripts on file',s6nc])}
+      <tr><td colspan="2" style="height:10px"></td></tr>
+      ${twoColSection(7,'Background Checks',[s.bgCheck], 8,s.s8lbl,s.s8)}
+      <tr><td colspan="2" style="height:10px"></td></tr>
+      ${twoColSection(9,s.s9lbl,[s.s9item], 10,'Completion Certificate',['Request to send formal Completion Certificate via Parchment sent to processor.'])}
+    </table>
+  </td></tr>
 
-  // Section 4
-  y=sectionHeader(4,'Documentation and Conversations',y);
-  s.s4.forEach((item,i)=>{ checkItem(`chk_4_${i}`,item.text||item); if(item.subs) item.subs.forEach(sub=>subItem(sub)); });
-  y-=8;
+  <!-- FOOTER -->
+  <tr><td style="background:#002E5D;padding:14px 28px">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="font-size:11px;color:rgba(255,255,255,0.5)">Confidential – Internal Use Only</td>
+        <td align="right" style="font-size:11px;color:rgba(255,255,255,0.5)">Submitted by: ${coach}</td>
+      </tr>
+    </table>
+  </td></tr>
 
-  // Divider
-  checkY(8);
-  page.drawLine({start:{x:ML,y},end:{x:ML+CW,y},thickness:0.5,color:GRAY}); y-=12;
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
 
-  // Sections 5-10 two column
-  const colW=(CW-16)/2, col2X=ML+colW+16;
-  function twoColSec(ln,lt,li,rn,rt,ri){
-    checkY(80);
-    const startY=y;
-    page.drawText(`${ln}. ${lt}`,{x:ML,y:startY,size:10,font:fontBold,color:NAVY});
-    let ly=startY-14;
-    li.forEach((item,i)=>{
-      drawCheckbox(cbStates[`chk_${ln}_${i}`]===true,ML+2,ly);
-      const ny=drawText((item.text||item).replace(/<[^>]+>/g,''),ML+16,ly,{size:8.5,maxWidth:colW-20});
-      ly=Math.min(ly-13,ny);
-      if(item.subs) item.subs.forEach(sub=>{ page.drawText('•',{x:ML+20,y:ly,size:7,font,color:NAVY}); const ny2=drawText(sub,ML+28,ly,{size:7.5,color:rgb(0.33,0.33,0.33),maxWidth:colW-32}); ly=Math.min(ly-11,ny2); });
-    });
-    page.drawText(`${rn}. ${rt}`,{x:col2X,y:startY,size:10,font:fontBold,color:NAVY});
-    let ry=startY-14;
-    ri.forEach((item,i)=>{
-      drawCheckbox(cbStates[`chk_${rn}_${i}`]===true,col2X+2,ry);
-      const ny=drawText((item.text||item).replace(/<[^>]+>/g,''),col2X+16,ry,{size:8.5,maxWidth:colW-20});
-      ry=Math.min(ry-13,ny);
-      if(item.subs) item.subs.forEach(sub=>{ page.drawText('•',{x:col2X+20,y:ry,size:7,font,color:NAVY}); const ny2=drawText(sub,col2X+28,ry,{size:7.5,color:rgb(0.33,0.33,0.33),maxWidth:colW-32}); ry=Math.min(ry-11,ny2); });
-    });
-    y=Math.min(ly,ry)-12;
-    checkY(8);
-    page.drawLine({start:{x:ML,y},end:{x:ML+CW,y},thickness:0.3,color:LGRAY}); y-=10;
-  }
-
-  const s5=[{text:'Confirm that the program balance is paid in full',subs:['Advisor Portal > Contract Tool > Payment Info','Intern Portal > Payments > Program Fees > Remaining Balance']}];
-  const s6nc=selState==='NC'?'Regional or National Accreditation Confirmed':'Regional Accreditation Confirmed';
-  twoColSec(5,'Check Financial Standing',s5, 6,'Official Transcripts',['Official Transcripts on file',s6nc]);
-  twoColSec(7,'Background Checks',[s.bgCheck], 8,s.s8lbl,s.s8);
-  twoColSec(9,s.s9lbl,[s.s9item], 10,'Completion Certificate',['Request to send formal Completion Certificate via Parchment sent to processor.']);
-
-  // Footer on all pages
-  pdfDoc.getPages().forEach((p,idx)=>{
-    p.drawRectangle({x:0,y:0,width:PW,height:26,color:NAVY});
-    p.drawText('#TEACH Resident Completion Checklist  –  Confidential – Internal Use Only',{x:ML,y:8,size:7.5,font,color:rgb(0.8,0.8,0.8)});
-    p.drawText(`Page ${idx+1} of ${pdfDoc.getPageCount()}`,{x:PW-80,y:8,size:7.5,font,color:rgb(0.8,0.8,0.8)});
-  });
-
-  const pdfBytes = await pdfDoc.save();
-  console.log('PDF bytes length:', pdfBytes.length, '— should be > 20000');
-
-  // Chunked base64 encoding (safe for large binary data)
-  let binary = '';
-  const chunkSize = 8192;
-  for(let i = 0; i < pdfBytes.length; i += chunkSize){
-    const chunk = pdfBytes.subarray(i, i + chunkSize);
-    binary += String.fromCharCode(...chunk);
-  }
-  const b64 = btoa(binary);
-  console.log('PDF base64 length:', b64.length, '— should be > 26000');
-  // Return raw base64 only — EmailJS does NOT want the data:...;base64, prefix
-  return b64;
+  return html;
 }
 
 // ── SUBMIT ────────────────────────────────────────────────
 async function submitForm(){
   const btn=document.getElementById('submitBtn');
-  btn.disabled=true; btn.textContent='Generating PDF…';
-  showToast('Generating completed checklist PDF…','sending',20000);
+  btn.disabled=true; btn.textContent='Sending…';
+  showToast('Sending email…','sending',15000);
 
   const s=STATES[selState];
   const name=document.getElementById('resName').value;
@@ -756,88 +712,49 @@ async function submitForm(){
   const total=Object.keys(cbStates).length;
   const checkedCount=Object.values(cbStates).filter(Boolean).length;
   const subject=`#TEACH Completion Checklist — ${name}${sid?' ('+sid+')':''} — ${selState}`;
-  const message=buildEmailText();
+  const htmlBody=buildHTMLEmail();
+  const textBody=buildEmailText();
   const date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
 
-  // 1. Generate filled PDF checklist
-  let pdfDataUrl = null;
-  try {
-    console.log('STEP 1: Generating PDF...');
-    pdfDataUrl = await buildPDF();
-    console.log('STEP 1 OK: PDF base64 length=', pdfDataUrl ? pdfDataUrl.length : 0);
-    if(pdfDataUrl && pdfDataUrl.length < 20000){
-      console.warn('STEP 1 WARNING: PDF seems too small (', pdfDataUrl.length, 'chars) — pdf-lib may not be generating correctly');
-    } else {
-      console.log('STEP 1: PDF size looks good ✓');
-    }
-    btn.textContent='Sending…';
-    showToast('Sending email with PDF attached…','sending',20000);
-  } catch(e) {
-    console.error('STEP 1 FAILED: PDF generation error:', e);
-    showToast('PDF generation failed, sending text only…','sending',10000);
-  }
-
-  // 2. Convert uploaded files to base64
-  console.log('STEP 2: Processing', files.length, 'uploaded files');
+  // Convert uploaded files to base64
   const attachments=[];
-
-  // Add the generated checklist PDF first
-  if(pdfDataUrl){
-    const pdfName=`TEACH_Checklist_${selState}_${name.replace(/\s+/g,'_')}.pdf`;
-    attachments.push({ name: pdfName, data: pdfDataUrl });
-    console.log('STEP 2: Added PDF checklist as attachment[0]:', pdfName);
-  }
-
-  // Add user-uploaded files
   for(const f of files){
     try{
       const dataUrl=await fileToBase64(f);
       attachments.push({ name: f.name, data: dataUrl });
-      console.log('STEP 2: Added uploaded file:', f.name, 'size=', dataUrl.length);
-    }catch(e){ console.error('STEP 2 FAILED: File read error for', f.name, e); }
+      console.log('Attachment added:', f.name, 'size=', dataUrl.length);
+    }catch(e){ console.warn('File read error:',f.name, e); }
   }
-
-  console.log('STEP 2 DONE: Total attachments=', attachments.length, attachments.map(a=>a.name));
+  console.log('Total attachments:', attachments.length);
 
   try{
-    // Build params — attachments must be an array of {name, data} objects
-    // where data is a base64 data URL (e.g. "data:application/pdf;base64,...")
     const params = {
       to_email:      recip,
       cc_email:      coach,
       subject,
-      message,
+      message:       htmlBody,
+      message_text:  textBody,
       resident_name: name,
       student_id:    sid||'N/A',
       state:         `${selState} — ${s.name}`,
       date,
       checked_count: String(checkedCount),
       total_items:   String(total),
-      // Spread individual attachment slots for EmailJS template variables
-      'attachments[0].name': attachments[0] ? attachments[0].name : '',
-      'attachments[0].data': attachments[0] ? attachments[0].data : '',
-      'attachments[1].name': attachments[1] ? attachments[1].name : '',
-      'attachments[1].data': attachments[1] ? attachments[1].data : '',
-      'attachments[2].name': attachments[2] ? attachments[2].name : '',
-      'attachments[2].data': attachments[2] ? attachments[2].data : '',
-      'attachments[3].name': attachments[3] ? attachments[3].name : '',
-      'attachments[3].data': attachments[3] ? attachments[3].data : '',
-      'attachments[4].name': attachments[4] ? attachments[4].name : '',
-      'attachments[4].data': attachments[4] ? attachments[4].data : '',
+      'attachments[0].name': attachments[0]?attachments[0].name:'',
+      'attachments[0].data': attachments[0]?attachments[0].data:'',
+      'attachments[1].name': attachments[1]?attachments[1].name:'',
+      'attachments[1].data': attachments[1]?attachments[1].data:'',
+      'attachments[2].name': attachments[2]?attachments[2].name:'',
+      'attachments[2].data': attachments[2]?attachments[2].data:'',
+      'attachments[3].name': attachments[3]?attachments[3].name:'',
+      'attachments[3].data': attachments[3]?attachments[3].data:'',
+      'attachments[4].name': attachments[4]?attachments[4].name:'',
+      'attachments[4].data': attachments[4]?attachments[4].data:'',
     };
-
-    // Also pass full array in case EmailJS supports it natively
-    if(attachments.length > 0){
-      params.attachments = attachments;
-    }
-
-    console.log('STEP 3: Calling emailjs.send with', Object.keys(params).length, 'params');
-    console.log('STEP 3: attachment[0].name =', params['attachments[0].name']);
-    console.log('STEP 3: attachment[0].data length =', params['attachments[0].data'].length);
+    if(attachments.length>0) params.attachments=attachments;
 
     await emailjs.send(EJS_SI, EJS_TI, params);
-    console.log('STEP 3 OK: emailjs.send succeeded');
-    showToast('✓ Email sent with completed PDF checklist!','success');
+    showToast('✓ Email sent successfully!','success');
 
     // Save to Supabase
     try{
