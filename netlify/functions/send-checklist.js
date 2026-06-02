@@ -1,3 +1,4 @@
+
 const https = require('https');
 
 function sendGridRequest(apiKey, payload) {
@@ -64,8 +65,8 @@ exports.handler = async (event) => {
       from: { email: fromEmail, name: fromName },
       reply_to: { email: coachEmail },
       content: [
-        { type: 'text/html', value: htmlBody },
         { type: 'text/plain', value: textBody },
+        { type: 'text/html',  value: htmlBody },
       ],
     };
 
