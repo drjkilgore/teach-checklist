@@ -1,36 +1,76 @@
-
 const https = require('https');
 
-function sendGridRequest(apiKey, payload) {
+// ── HTTPS helper ──────────────────────────────────────────
+function httpsPost(hostname, path, headers, body) {
   return new Promise((resolve, reject) => {
-    const body = JSON.stringify(payload);
-    const options = {
-      hostname: 'api.sendgrid.com',
-      path: '/v3/mail/send',
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(body),
-      },
-    };
-    const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => resolve({ status: res.statusCode, body: data }));
+    const bodyStr = typeof body === 'string' ? body : JSON.stringify(body);
+    const req = https.request({
+      hostname, path, method: 'POST',
+      headers: { ...headers, 'Content-Length': Buffer.byteLength(bodyStr) },
+    }, (res) => {
+      const chunks = [];
+      res.on('data', chunk => chunks.push(chunk));
+      res.on('end', () => resolve({
+        status: res.statusCode,
+        body: Buffer.concat(chunks),
+        headers: res.headers,
+      }));
     });
     req.on('error', reject);
-    req.write(body);
+    req.write(bodyStr);
     req.end();
   });
 }
 
+// ── HTML → PDF via PDFShift ───────────────────────────────
+async function htmlToPDF(html, apiKey) {
+  const payload = JSON.stringify({
+    source: html,
+    format: 'Letter',
+    margin: { top: '10mm', bottom: '10mm', left: '10mm', right: '10mm' },
+  });
+
+  const auth = Buffer.from(`api:${apiKey}`).toString('base64');
+  const result = await httpsPost(
+    'api.pdfshift.io',
+    '/v3/convert/pdf',
+    {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/json',
+    },
+    payload
+  );
+
+  if (result.status !== 200) {
+    throw new Error(`PDFShift error ${result.status}: ${result.body.toString()}`);
+  }
+
+  // Return as base64 string
+  return result.body.toString('base64');
+}
+
+// ── SendGrid send ─────────────────────────────────────────
+async function sendEmail(apiKey, payload) {
+  const result = await httpsPost(
+    'api.sendgrid.com',
+    '/v3/mail/send',
+    {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    payload
+  );
+  return result;
+}
+
+// ── Supabase ──────────────────────────────────────────────
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 );
 
+// ── MAIN HANDLER ──────────────────────────────────────────
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -47,12 +87,46 @@ exports.handler = async (event) => {
       checkedItems, fileNames,
     } = data;
 
-    const apiKey = process.env.SENDGRID_API_KEY;
+    const sgKey    = process.env.SENDGRID_API_KEY;
     const fromEmail = process.env.SEND_FROM_EMAIL;
-    const fromName = process.env.SEND_FROM_NAME || '#TEACH Checklist System';
+    const fromName  = process.env.SEND_FROM_NAME || '#TEACH Checklist System';
+    const pdfKey   = process.env.PDFSHIFT_API_KEY;
 
-    if (!apiKey || !fromEmail) {
-      throw new Error('SendGrid not configured. Set SENDGRID_API_KEY and SEND_FROM_EMAIL in Netlify env vars.');
+    if (!sgKey || !fromEmail) {
+      throw new Error('SendGrid not configured.');
+    }
+
+    // Build attachments list
+    const attachments = [];
+
+    // 1. Generate PDF from HTML if PDFShift is configured
+    if (pdfKey) {
+      try {
+        console.log('Generating PDF via PDFShift...');
+        const pdfBase64 = await htmlToPDF(htmlBody, pdfKey);
+        const safeName = (residentName || 'Resident').replace(/\s+/g, '_');
+        attachments.push({
+          content:     pdfBase64,
+          filename:    `TEACH_Checklist_${state}_${safeName}.pdf`,
+          type:        'application/pdf',
+          disposition: 'attachment',
+        });
+        console.log('PDF generated OK, size:', pdfBase64.length);
+      } catch (e) {
+        console.error('PDF generation failed (continuing without PDF):', e.message);
+      }
+    }
+
+    // 2. Add uploaded files
+    for (const f of fileAttachments) {
+      if (f.data && f.name) {
+        attachments.push({
+          content:     f.data,
+          filename:    f.name,
+          type:        f.type || 'application/octet-stream',
+          disposition: 'attachment',
+        });
+      }
     }
 
     // Build SendGrid payload
@@ -62,50 +136,48 @@ exports.handler = async (event) => {
         cc: [{ email: coachEmail }],
         subject: emailSubject,
       }],
-      from: { email: fromEmail, name: fromName },
+      from:     { email: fromEmail, name: fromName },
       reply_to: { email: coachEmail },
-      content: [
+      content:  [
         { type: 'text/plain', value: textBody },
         { type: 'text/html',  value: htmlBody },
       ],
     };
 
-    // Add attachments — SendGrid handles all file types perfectly
-    if (fileAttachments.length > 0) {
-      payload.attachments = fileAttachments.map(f => ({
-        content: f.data,          // raw base64, no prefix needed
-        filename: f.name,
-        type: f.type || 'application/octet-stream',
-        disposition: 'attachment',
-      }));
+    if (attachments.length > 0) {
+      payload.attachments = attachments;
     }
 
-    const result = await sendGridRequest(apiKey, payload);
-    console.log('SendGrid response:', result.status, result.body);
+    const sgResult = await sendEmail(sgKey, payload);
+    console.log('SendGrid status:', sgResult.status);
 
-    if (result.status < 200 || result.status >= 300) {
-      throw new Error(`SendGrid error ${result.status}: ${result.body}`);
+    if (sgResult.status < 200 || sgResult.status >= 300) {
+      throw new Error(`SendGrid error ${sgResult.status}: ${sgResult.body.toString()}`);
     }
 
     // Save to Supabase
     await supabase.from('checklist_submissions').insert([{
-      state, state_name: stateName,
-      resident_name: residentName,
-      student_id: studentId || null,
-      coach_email: coachEmail,
+      state,
+      state_name:      stateName,
+      resident_name:   residentName,
+      student_id:      studentId || null,
+      coach_email:     coachEmail,
       recipient_email: recipientEmail,
-      checked_items: checkedItems || {},
-      total_items: totalItems || 0,
-      checked_count: checkedCount || 0,
-      file_names: fileNames || null,
-      email_subject: emailSubject,
-      form_body: textBody,
+      checked_items:   checkedItems || {},
+      total_items:     totalItems || 0,
+      checked_count:   checkedCount || 0,
+      file_names:      fileNames || null,
+      email_subject:   emailSubject,
+      form_body:       textBody,
     }]);
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ success: true }),
+      body: JSON.stringify({
+        success: true,
+        pdfAttached: pdfKey ? true : false,
+      }),
     };
 
   } catch (err) {
