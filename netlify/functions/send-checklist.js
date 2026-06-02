@@ -24,11 +24,17 @@ function httpsPost(hostname, path, headers, body) {
 
 // ── HTML → PDF via PDFShift ───────────────────────────────
 async function htmlToPDF(html, apiKey) {
+  // Make the email fill the full page width by removing the centered max-width container
+  const fullWidthHtml = html
+    .replace('width="620"', 'width="100%"')
+    .replace('max-width:620px', 'max-width:100%')
+    .replace('<td align="center">', '<td>')
+    .replace('background:#f5f5f5;padding:20px 0', 'background:#ffffff;padding:0');
+
   const payload = JSON.stringify({
-    source: html,
+    source: fullWidthHtml,
     format: 'Letter',
-    margin: { top: '5mm', bottom: '5mm', left: '5mm', right: '5mm' },
-    zoom: 0.72,
+    margin: { top: '8mm', bottom: '8mm', left: '8mm', right: '8mm' },
   });
 
   const auth = Buffer.from(`api:${apiKey}`).toString('base64');
@@ -203,4 +209,5 @@ exports.handler = async (event) => {
     };
   }
 };
+
 
