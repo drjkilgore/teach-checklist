@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -576,6 +574,18 @@ async function buildPDF(){
   const fontBold = await pdfDoc.embedFont(FONT_BOLD);
   console.log('buildPDF: fonts embedded OK, font=', typeof font, 'fontBold=', typeof fontBold);
 
+  // Test draw immediately to confirm drawing works
+  const testPage = pdfDoc.addPage([612, 792]);
+  try {
+    testPage.drawText('TEST', {x: 100, y: 700, size: 24, font: fontBold, color: rgb(0,0,0)});
+    testPage.drawRectangle({x: 50, y: 650, width: 200, height: 30, color: rgb(0, 0.18, 0.365)});
+    console.log('buildPDF: test draw OK');
+  } catch(e) {
+    console.error('buildPDF: test draw FAILED:', e);
+    throw e;
+  }
+  pdfDoc.removePage(0); // remove test page
+
   const PW=612, PH=792, ML=40, MR=40;
   const CW = PW-ML-MR;
 
@@ -895,5 +905,6 @@ async function downloadExcel(){
 </script>
 </body>
 </html>
+
 
 
