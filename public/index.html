@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,73 +20,50 @@
 html{scroll-behavior:smooth}
 body{font-family:var(--font);background:var(--light);color:var(--ink);font-size:15px;line-height:1.6}
 
+/* HEADER */
 .site-header{background:var(--navy);padding:0 2rem;height:68px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .hlogo{display:flex;align-items:center;gap:14px}
-.lt{display:flex;align-items:baseline;font-family:var(--font);font-weight:800;font-size:30px;letter-spacing:-.5px;line-height:1}
+.lt{font-family:var(--font);font-weight:800;font-size:28px;letter-spacing:-.5px;line-height:1}
 .lh{color:var(--silver)}.lw{color:var(--white)}
-.ld{width:1px;height:30px;background:rgba(255,255,255,.2)}
-.ls{font-size:12px;font-weight:300;color:rgba(255,255,255,.65);line-height:1.35;letter-spacing:.2px}
-.caep{font-size:11px;font-weight:600;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.2);padding:5px 12px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}
-.help-link{font-size:13px;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;border:1px solid rgba(255,255,255,.25);padding:5px 14px;border-radius:20px;background:none;font-family:var(--font);letter-spacing:.3px;margin-right:10px;text-decoration:none}
-.help-link:hover{color:#fff;border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.08)}
+.ld{width:1px;height:28px;background:rgba(255,255,255,.2)}
+.ls{font-size:12px;font-weight:300;color:rgba(255,255,255,.65);line-height:1.35}
+.header-right{display:flex;align-items:center;gap:10px}
+.header-coach{font-size:13px;color:rgba(255,255,255,.7);font-weight:400}
+.header-coach strong{color:var(--white)}
+.help-link{font-size:12px;font-weight:600;color:rgba(255,255,255,.75);cursor:pointer;border:1px solid rgba(255,255,255,.25);padding:5px 12px;border-radius:20px;background:none;font-family:var(--font);text-decoration:none}
+.help-link:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+.logout-btn{font-size:12px;font-weight:600;color:rgba(255,255,255,.6);cursor:pointer;border:1px solid rgba(255,255,255,.15);padding:5px 12px;border-radius:20px;background:none;font-family:var(--font)}
+.logout-btn:hover{color:#fff;border-color:rgba(255,255,255,.4)}
 
-/* HELP MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
-.modal-overlay.open{display:flex}
-.modal{background:var(--white);border-radius:var(--rl);max-width:680px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
-.modal-header{background:var(--navy);padding:20px 28px;display:flex;align-items:center;justify-content:space-between;border-radius:var(--rl) var(--rl) 0 0;position:sticky;top:0}
-.modal-header h2{font-size:18px;font-weight:800;color:var(--white)}
-.modal-header .hash{color:var(--silver)}
-.modal-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:22px;cursor:pointer;line-height:1;padding:0}
-.modal-close:hover{color:#fff}
-.modal-body{padding:28px}
-.modal-section{margin-bottom:1.75rem}
-.modal-section:last-child{margin-bottom:0}
-.modal-section h3{font-size:14px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--light);display:flex;align-items:center;gap:8px}
-.modal-section h3 .icon{font-size:16px}
-.modal-section p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:8px}
-.modal-section p:last-child{margin-bottom:0}
-.step-list{list-style:none;padding:0;counter-reset:steps}
-.step-list li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--light);font-size:14px;color:var(--ink);line-height:1.5}
-.step-list li:last-child{border-bottom:none}
-.step-num{background:var(--crimson);color:#fff;font-size:11px;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.info-card{background:var(--light);border-radius:var(--r);padding:12px 14px}
-.info-card strong{display:block;font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-.info-card span{font-size:13px;color:var(--muted)}
-.tip-box{background:#EBF5FB;border:1px solid #B3DEF5;border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--muted);line-height:1.6;margin-top:10px}
-.tip-box strong{color:var(--navy)}
-@media(max-width:500px){.info-grid{grid-template-columns:1fr}}
-
+/* LAYOUT */
 .wrap{max-width:860px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
 
+/* AUTH SCREEN */
+.auth-wrap{max-width:440px;margin:3rem auto}
+.auth-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:1.5rem}
+.auth-tab{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.auth-tab.active{color:var(--navy);border-bottom-color:var(--navy)}
+
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);padding:1.5rem;margin-bottom:1.25rem;box-shadow:var(--sh)}
+.card-title{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);margin-bottom:1.25rem;padding-bottom:12px;border-bottom:2px solid var(--light);display:flex;align-items:center;gap:10px}
+.ct-bar{width:4px;height:18px;background:var(--crimson);border-radius:2px;flex-shrink:0}
+
+/* STEP TRACK */
 .step-track{display:flex;align-items:center;margin-bottom:2rem;overflow-x:auto;padding-bottom:2px}
 .step-node{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.step-num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:2px solid var(--border);color:var(--silver);background:var(--white);transition:all .2s;flex-shrink:0}
+.step-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:2px solid var(--border);color:var(--silver);background:var(--white);transition:all .2s;flex-shrink:0}
 .step-num.active{background:var(--crimson);border-color:var(--crimson);color:var(--white)}
 .step-num.done{background:var(--navy);border-color:var(--navy);color:var(--white)}
 .step-lbl{font-size:12px;font-weight:600;color:var(--silver);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
 .step-lbl.active{color:var(--crimson)}.step-lbl.done{color:var(--navy)}
-.step-line{flex:1;min-width:20px;height:1px;background:var(--border);margin:0 8px}
-
+.step-line{flex:1;min-width:16px;height:1px;background:var(--border);margin:0 6px}
 .prog-wrap{display:flex;align-items:center;gap:12px;margin-bottom:2rem}
 .prog-bar{flex:1;height:4px;background:var(--border);border-radius:4px;overflow:hidden}
 .prog-fill{height:100%;background:var(--crimson);border-radius:4px;transition:width .4s ease}
 .prog-pct{font-size:12px;font-weight:700;color:var(--crimson);min-width:36px;text-align:right}
 
-.card{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);padding:1.5rem;margin-bottom:1.25rem;box-shadow:var(--sh)}
-.card-title{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);margin-bottom:1.25rem;padding-bottom:12px;border-bottom:2px solid var(--light);display:flex;align-items:center;gap:10px}
-.ct-bar{width:4px;height:18px;background:var(--crimson);border-radius:2px;flex-shrink:0}
-
-.state-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-.state-btn{background:var(--white);border:2px solid var(--border);border-radius:var(--rl);padding:16px 8px 12px;cursor:pointer;text-align:center;transition:all .15s;color:var(--ink)}
-.state-btn:hover{border-color:var(--sky);transform:translateY(-2px);box-shadow:var(--shl)}
-.state-btn.selected{border-color:var(--navy);background:var(--navy);color:var(--white)}
-.sc{font-size:22px;font-weight:800;line-height:1;margin-bottom:6px}
-.sn{font-size:11px;font-weight:400;opacity:.7;line-height:1.3}
-
-
-
+/* FORM */
 .fg{margin-bottom:1.25rem}
 .fl{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);margin-bottom:7px}
 .freq{color:var(--crimson);margin-left:2px}
@@ -98,7 +74,11 @@ input::placeholder{color:var(--silver)}
 .em{font-size:12px;color:var(--crimson);margin-top:5px;display:none}
 .em.show{display:block}
 .fhint{font-size:12px;color:var(--muted);margin-top:5px}
+.state-multi{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px}
+.state-cb-btn{border:1.5px solid var(--border);border-radius:var(--r);padding:8px 4px;text-align:center;cursor:pointer;font-size:13px;font-weight:700;color:var(--ink);background:var(--white);transition:all .15s}
+.state-cb-btn.sel{background:var(--navy);border-color:var(--navy);color:var(--white)}
 
+/* CHECKLIST */
 .cl-section{margin-bottom:1.5rem}
 .cl-head{font-size:13px;font-weight:700;color:var(--white);background:var(--navy);padding:8px 14px;border-radius:var(--r);margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .cl-head .num{background:var(--crimson);color:var(--white);font-size:11px;font-weight:800;padding:1px 7px;border-radius:10px;flex-shrink:0}
@@ -112,17 +92,25 @@ input::placeholder{color:var(--silver)}
 .cl-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .cl-col-head{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px;padding:6px 10px;background:var(--light);border-radius:var(--r);margin-bottom:6px}
 
-.upload-zone{border:2px dashed var(--border);border-radius:var(--rl);padding:2rem;text-align:center;cursor:pointer;transition:all .15s;background:var(--light);margin-bottom:12px}
+/* DRAFT BANNER */
+.draft-banner{background:#EBF5FB;border:1.5px solid var(--sky);border-radius:var(--r);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:1.25rem;flex-wrap:wrap}
+.draft-banner p{font-size:13px;color:var(--navy);flex:1}
+.draft-banner strong{font-weight:700}
+.draft-actions{display:flex;gap:8px}
+.draft-saved-toast{background:#E8F5E9;border:1px solid #A5D6A7;border-radius:var(--r);padding:8px 14px;font-size:13px;color:#2E7D32;display:none;margin-bottom:10px}
+.draft-saved-toast.show{display:block}
+
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--border);border-radius:var(--rl);padding:1.75rem;text-align:center;cursor:pointer;transition:all .15s;background:var(--light);margin-bottom:12px}
 .upload-zone:hover{border-color:var(--sky);background:#EBF5FB}
 .upload-zone p{font-size:13px;color:var(--muted);margin-top:8px}
-.upload-zone strong{color:var(--navy)}
-.upload-icon{font-size:32px;display:block}
+.upload-icon{font-size:30px;display:block}
 .file-list{display:flex;flex-direction:column;gap:6px}
-.file-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--light);border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--ink)}
+.file-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--light);border:1px solid var(--border);border-radius:var(--r);font-size:13px}
 .fsz{color:var(--silver);font-size:11px;margin-left:auto;margin-right:6px}
-.rmf{background:none;border:none;color:var(--crimson);cursor:pointer;font-size:18px;line-height:1;opacity:.7;padding:0}
-.rmf:hover{opacity:1}
+.rmf{background:none;border:none;color:var(--crimson);cursor:pointer;font-size:18px;line-height:1;padding:0}
 
+/* SUMMARY */
 .sum-row{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;padding:9px 0;border-bottom:1px solid var(--light);font-size:14px}
 .sum-row:last-child{border-bottom:none}
 .sk{color:var(--muted);flex-shrink:0}.sv{font-weight:600;color:var(--navy);text-align:right}
@@ -132,23 +120,30 @@ input::placeholder{color:var(--silver)}
 .info-box{padding:12px 14px;background:#EBF5FB;border:1px solid #B3DEF5;border-radius:var(--r);font-size:13px;color:var(--muted);line-height:1.6}
 .info-box strong{color:var(--navy)}
 
-.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;gap:12px}
-.btn{padding:10px 24px;border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:700;letter-spacing:.3px;cursor:pointer;border:1.5px solid var(--border);background:var(--white);color:var(--navy);transition:all .15s;text-transform:uppercase}
+/* BUTTONS */
+.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;gap:12px;flex-wrap:wrap}
+.btn{padding:10px 22px;border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:700;letter-spacing:.3px;cursor:pointer;border:1.5px solid var(--border);background:var(--white);color:var(--navy);transition:all .15s;text-transform:uppercase}
 .btn:hover{background:var(--light);border-color:var(--navy)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .btn-primary{background:var(--navy);border-color:var(--navy);color:var(--white)}
 .btn-primary:hover{background:#001e3d;border-color:#001e3d}
 .btn-crimson{background:var(--crimson);border-color:var(--crimson);color:var(--white)}
-.btn-crimson:hover{background:#6b0000;border-color:#6b0000}
+.btn-crimson:hover{background:#6b0000}
 .btn-sky{background:var(--sky);border-color:var(--sky);color:var(--white)}
 .btn-sky:hover{background:#0e8ec4}
+.btn-outline{background:transparent;border-color:var(--sky);color:var(--sky)}
+.btn-outline:hover{background:#EBF5FB}
+.btn-full{width:100%;padding:12px;font-size:14px}
 
-.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:var(--rl);font-size:14px;font-weight:600;color:var(--white);box-shadow:var(--shl);z-index:9999;display:none;max-width:340px;line-height:1.4}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:var(--rl);font-size:14px;font-weight:600;color:#fff;box-shadow:var(--shl);z-index:9999;display:none;max-width:340px;line-height:1.4}
 .toast.show{display:block}
 .toast.success{background:var(--navy)}
 .toast.error{background:var(--crimson)}
 .toast.sending{background:var(--sky)}
+.toast.info{background:#555}
 
+/* DONE */
 .done-screen{text-align:center;padding:2.5rem 1rem}
 .done-icon{font-size:52px;display:block;margin-bottom:1.25rem;animation:pop .4s ease}
 @keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
@@ -156,23 +151,35 @@ input::placeholder{color:var(--silver)}
 .done-screen p{font-size:14px;color:var(--muted);margin-bottom:4px}
 .done-actions{display:flex;gap:12px;justify-content:center;margin-top:1.75rem;flex-wrap:wrap}
 
-.dl-panel{background:var(--light);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem;margin-top:1.5rem}
-.dl-panel h3{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
-.dl-panel p{font-size:13px;color:var(--muted);margin-bottom:1rem}
-.tok-row{display:flex;gap:8px}
-.tok-row input{flex:1;width:auto}
+/* HELP MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:var(--rl);max-width:660px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal-header{background:var(--navy);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;border-radius:var(--rl) var(--rl) 0 0;position:sticky;top:0}
+.modal-header h2{font-size:16px;font-weight:700;color:var(--white)}
+.modal-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;cursor:pointer;line-height:1;padding:0}
+.modal-close:hover{color:#fff}
+.modal-body{padding:24px}
+.modal-section{margin-bottom:1.5rem}
+.modal-section h3{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;padding-bottom:7px;border-bottom:2px solid var(--light)}
+.modal-section p{font-size:13.5px;color:var(--muted);line-height:1.7;margin-bottom:7px}
+.step-list{list-style:none;padding:0}
+.step-list li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--light);font-size:13.5px;color:var(--ink);line-height:1.5}
+.step-list li:last-child{border-bottom:none}
+.snum{background:var(--crimson);color:#fff;font-size:11px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
 
-.site-footer{background:var(--navy);padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between;margin-top:4rem}
-.footer-brand{font-size:16px;font-weight:800;color:var(--white)}
-.footer-brand .fh{color:var(--silver)}
-.footer-meta{font-size:11px;color:rgba(255,255,255,.45)}
+/* FOOTER */
+.site-footer{background:var(--navy);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;margin-top:4rem}
+.footer-brand{font-size:15px;font-weight:800;color:var(--white)}
+.fh{color:var(--silver)}
+.footer-meta{font-size:11px;color:rgba(255,255,255,.4)}
 
 @media(max-width:640px){
-  .state-grid{grid-template-columns:repeat(3,1fr)}
-  .two-col,.cl-two-col,.ejs-grid{grid-template-columns:1fr}
+  .state-grid,.state-multi{grid-template-columns:repeat(3,1fr)}
+  .two-col,.cl-two-col{grid-template-columns:1fr}
   .site-header{padding:0 1rem}
   .wrap{padding:1.5rem 1rem 3rem}
-  .caep,.ld,.ls{display:none}
+  .ld,.ls{display:none}
   .step-lbl{display:none}
 }
 </style>
@@ -185,239 +192,269 @@ input::placeholder{color:var(--silver)}
     <div class="ld"></div>
     <div class="ls">Resident Completion<br>Checklist System</div>
   </div>
-  <div style="display:flex;align-items:center;gap:8px">
-    <button class="help-link" onclick="document.getElementById('helpModal').classList.add('open')">? How it Works</button>
-    <div class="caep">CAEP Accredited</div>
+  <div class="header-right">
+    <span class="header-coach" id="headerCoach" style="display:none"></span>
+    <button class="help-link" onclick="document.getElementById('helpModal').classList.add('open')">? Help</button>
+    <button class="logout-btn" id="logoutBtn" style="display:none" onclick="logout()">Sign Out</button>
   </div>
 </header>
 
-<div class="wrap">
-  <div class="step-track">
-    <div class="step-node"><div class="step-num active" id="sn1">1</div><span class="step-lbl active" id="sl1">State</span></div>
-    <div class="step-line"></div>
-    <div class="step-node"><div class="step-num" id="sn2">2</div><span class="step-lbl" id="sl2">Resident</span></div>
-    <div class="step-line"></div>
-    <div class="step-node"><div class="step-num" id="sn3">3</div><span class="step-lbl" id="sl3">Checklist</span></div>
-    <div class="step-line"></div>
-    <div class="step-node"><div class="step-num" id="sn4">4</div><span class="step-lbl" id="sl4">Documents</span></div>
-    <div class="step-line"></div>
-    <div class="step-node"><div class="step-num" id="sn5">5</div><span class="step-lbl" id="sl5">Submit</span></div>
-  </div>
-  <div class="prog-wrap">
-    <div class="prog-bar"><div class="prog-fill" id="pFill" style="width:20%"></div></div>
-    <div class="prog-pct" id="pPct">20%</div>
-  </div>
+<div class="wrap" id="mainWrap">
 
-  <!-- STEP 1 -->
-  <div id="step1">
-    <div class="card">
-      <div class="card-title"><span class="ct-bar"></span>Select State</div>
-      <div class="state-grid" id="stateGrid"></div>
+  <!-- ═══════════════════════════════ -->
+  <!-- AUTH SCREEN                     -->
+  <!-- ═══════════════════════════════ -->
+  <div id="authScreen" class="auth-wrap">
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div style="font-size:32px;font-weight:900;color:var(--navy)"><span style="color:var(--silver)">#</span>TEACH</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px">Resident Completion Checklist System</div>
     </div>
-    <div class="btn-row"><span></span><button class="btn btn-primary" id="s1next" onclick="goStep(2)" disabled>Next →</button></div>
-  </div>
-
-  <!-- STEP 2 -->
-  <div id="step2" style="display:none">
-
-
-
     <div class="card">
-      <div class="card-title"><span class="ct-bar"></span>Resident Information</div>
-      <div class="two-col">
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="loginTab" onclick="showAuthTab('login')">Sign In</div>
+        <div class="auth-tab" id="signupTab" onclick="showAuthTab('signup')">Request Access</div>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="loginForm">
         <div class="fg">
-          <label class="fl" for="resName">Resident Full Name<span class="freq">*</span></label>
-          <input type="text" id="resName" placeholder="First Last">
-          <div class="em" id="nameErr">Name is required.</div>
+          <label class="fl">Email</label>
+          <input type="email" id="loginEmail" placeholder="coach@organization.com" onkeydown="if(event.key==='Enter')doLogin()">
         </div>
         <div class="fg">
-          <label class="fl" for="stuId">Student ID</label>
-          <input type="text" id="stuId" placeholder="e.g. 123456">
+          <label class="fl">Password</label>
+          <input type="password" id="loginPwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div class="em" id="loginErr"></div>
+        <button class="btn btn-primary btn-full" onclick="doLogin()">Sign In</button>
+        <div style="text-align:center;margin-top:12px">
+          <button onclick="showAuthTab('reset')" style="background:none;border:none;color:var(--sky);font-size:13px;cursor:pointer;font-family:var(--font)">Forgot password?</button>
         </div>
       </div>
-      <div class="fg">
-        <label class="fl" for="coachEmail">Your Email (Coach)<span class="freq">*</span></label>
-        <input type="email" id="coachEmail" placeholder="coach@organization.com">
-        <div class="em" id="coachErr">Valid email required.</div>
-        <div class="fhint">A copy of the completed checklist will be CC'd to you automatically.</div>
+
+      <!-- SIGNUP FORM -->
+      <div id="signupForm" style="display:none">
+        <div class="fg">
+          <label class="fl">Full Name<span class="freq">*</span></label>
+          <input type="text" id="signupName" placeholder="Your full name">
+        </div>
+        <div class="fg">
+          <label class="fl">Email<span class="freq">*</span></label>
+          <input type="email" id="signupEmail" placeholder="coach@organization.com">
+        </div>
+        <div class="fg">
+          <label class="fl">Password<span class="freq">*</span></label>
+          <input type="password" id="signupPwd" placeholder="Choose a password (min 8 chars)">
+        </div>
+        <div class="fg">
+          <label class="fl">States you coach<span class="freq">*</span></label>
+          <div class="state-multi" id="signupStates">
+            <div class="state-cb-btn" data-state="AL" onclick="toggleSignupState(this)">AL</div>
+            <div class="state-cb-btn" data-state="AZ" onclick="toggleSignupState(this)">AZ</div>
+            <div class="state-cb-btn" data-state="IN" onclick="toggleSignupState(this)">IN</div>
+            <div class="state-cb-btn" data-state="MI" onclick="toggleSignupState(this)">MI</div>
+            <div class="state-cb-btn" data-state="NC" onclick="toggleSignupState(this)">NC</div>
+          </div>
+        </div>
+        <div class="em" id="signupErr"></div>
+        <button class="btn btn-primary btn-full" onclick="doSignup()">Request Access</button>
+        <div class="fhint" style="text-align:center;margin-top:10px">An admin will review and approve your account.</div>
       </div>
-      <div class="fg">
-        <label class="fl" for="recipEmail">Send Completed Form To<span class="freq">*</span></label>
-        <input type="email" id="recipEmail" placeholder="advisor@organization.com">
-        <div class="em" id="recipErr">Valid email required.</div>
+
+      <!-- RESET FORM -->
+      <div id="resetForm" style="display:none">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Enter your email and we'll send you a password reset link.</p>
+        <div class="fg">
+          <label class="fl">Email</label>
+          <input type="email" id="resetEmail" placeholder="coach@organization.com">
+        </div>
+        <div class="em" id="resetErr"></div>
+        <button class="btn btn-primary btn-full" onclick="doResetRequest()">Send Reset Link</button>
+        <div style="text-align:center;margin-top:12px">
+          <button onclick="showAuthTab('login')" style="background:none;border:none;color:var(--sky);font-size:13px;cursor:pointer;font-family:var(--font)">← Back to sign in</button>
+        </div>
+      </div>
+
+      <!-- RESET PASSWORD FORM (shown when ?reset=token in URL) -->
+      <div id="resetPwdForm" style="display:none">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Enter your new password below.</p>
+        <div class="fg">
+          <label class="fl">New Password</label>
+          <input type="password" id="newPwd" placeholder="New password (min 8 chars)">
+        </div>
+        <div class="fg">
+          <label class="fl">Confirm Password</label>
+          <input type="password" id="confirmPwd" placeholder="Confirm new password">
+        </div>
+        <div class="em" id="resetPwdErr"></div>
+        <button class="btn btn-primary btn-full" onclick="doResetPassword()">Set New Password</button>
       </div>
     </div>
-    <div class="btn-row">
-      <button class="btn" onclick="goStep(1)">← Back</button>
-      <button class="btn btn-primary" onclick="validateStep2()">Next →</button>
-    </div>
   </div>
 
-  <!-- STEP 3 -->
-  <div id="step3" style="display:none">
-    <div class="card">
-      <div class="card-title" id="clTitle"><span class="ct-bar"></span>Checklist</div>
-      <div id="clBody"></div>
-    </div>
-    <div class="btn-row">
-      <button class="btn" onclick="goStep(2)">← Back</button>
-      <button class="btn btn-primary" onclick="goStep(4)">Next →</button>
-    </div>
-  </div>
+  <!-- ═══════════════════════════════ -->
+  <!-- CHECKLIST APP (shown after login) -->
+  <!-- ═══════════════════════════════ -->
+  <div id="appScreen" style="display:none">
 
-  <!-- STEP 4 -->
-  <div id="step4" style="display:none">
-    <div class="card">
-      <div class="card-title"><span class="ct-bar"></span>Supporting Documents</div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:1.25rem">These will be attached to the email along with the completed checklist. Requires EmailJS Personal plan or higher.</p>
-      <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileIn').click()">
-        <span class="upload-icon">📎</span>
-        <p><strong>Click to browse</strong> or drag and drop files here</p>
-        <p style="font-size:11px;margin-top:4px">PDF, JPG, PNG, DOCX accepted</p>
+    <div class="step-track">
+      <div class="step-node"><div class="step-num active" id="sn1">1</div><span class="step-lbl active" id="sl1">Resident</span></div>
+      <div class="step-line"></div>
+      <div class="step-node"><div class="step-num" id="sn2">2</div><span class="step-lbl" id="sl2">Checklist</span></div>
+      <div class="step-line"></div>
+      <div class="step-node"><div class="step-num" id="sn3">3</div><span class="step-lbl" id="sl3">Documents</span></div>
+      <div class="step-line"></div>
+      <div class="step-node"><div class="step-num" id="sn4">4</div><span class="step-lbl" id="sl4">Submit</span></div>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-bar"><div class="prog-fill" id="pFill" style="width:25%"></div></div>
+      <div class="prog-pct" id="pPct">25%</div>
+    </div>
+
+    <!-- STEP 1: RESIDENT INFO -->
+    <div id="step1">
+      <div class="card">
+        <div class="card-title"><span class="ct-bar"></span>Resident Information</div>
+
+        <!-- Draft lookup -->
+        <div style="background:var(--light);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:1.25rem">
+          <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px">Resume a saved draft</div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="draftLookupId" placeholder="Enter Student ID to resume draft" style="flex:1;width:auto">
+            <button class="btn btn-outline" style="white-space:nowrap" onclick="lookupDraft()">Load Draft</button>
+          </div>
+          <div class="em" id="draftLookupErr" style="margin-top:6px"></div>
+        </div>
+
+        <div class="two-col">
+          <div class="fg">
+            <label class="fl">Resident Full Name<span class="freq">*</span></label>
+            <input type="text" id="resName" placeholder="First Last">
+            <div class="em" id="nameErr">Name is required.</div>
+          </div>
+          <div class="fg">
+            <label class="fl">Student ID<span class="freq">*</span></label>
+            <input type="text" id="stuId" placeholder="e.g. 123456">
+            <div class="em" id="stuIdErr">Student ID is required to save drafts.</div>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="fl">Send Completed Form To<span class="freq">*</span></label>
+          <input type="email" id="recipEmail" placeholder="advisor@organization.com">
+          <div class="em" id="recipErr">Valid email required.</div>
+          <div class="fhint">A copy is automatically sent to your coach email.</div>
+        </div>
+        <!-- State display (locked to coach's states) -->
+        <div class="fg" id="stateDisplay"></div>
       </div>
-      <input type="file" id="fileIn" multiple style="display:none" onchange="handleFiles(this.files)">
-      <div class="file-list" id="fileList"></div>
+      <div class="btn-row">
+        <span></span>
+        <button class="btn btn-primary" onclick="validateStep1()">Next →</button>
+      </div>
     </div>
-    <div class="btn-row">
-      <button class="btn" onclick="goStep(3)">← Back</button>
-      <button class="btn btn-primary" onclick="goStep(5)">Review & Submit →</button>
-    </div>
-  </div>
 
-  <!-- STEP 5 -->
-  <div id="step5" style="display:none">
-    <div class="card">
-      <div class="card-title"><span class="ct-bar"></span>Review Summary</div>
-      <div id="sumBody"></div>
-    </div>
-    <div class="card">
-      <div class="card-title" style="font-size:13px"><span class="ct-bar"></span>Delivery</div>
-      <div class="sum-row"><span class="sk">Send to</span><span class="sv" id="sumRecip">—</span></div>
-      <div class="sum-row"><span class="sk">Coach CC</span><span class="sv" id="sumCoach">—</span></div>
-      <div class="sum-row"><span class="sk">Attachments</span><span class="sv" id="sumFiles">—</span></div>
-    </div>
-    <div class="info-box">
-      <strong>What gets sent:</strong> The completed checklist text and all uploaded documents are sent directly via EmailJS — no Outlook required. The email goes to the recipient with you CC'd automatically.
-    </div>
-    <div class="btn-row">
-      <button class="btn" onclick="goStep(4)">← Back</button>
-      <button class="btn btn-crimson" id="submitBtn" onclick="submitForm()">✓ Submit & Send Email</button>
-    </div>
-  </div>
-
-  <!-- DONE -->
-  <div id="stepDone" style="display:none">
-    <div class="card">
-      <div class="done-screen">
-        <span class="done-icon">✅</span>
-        <h2>Checklist Submitted!</h2>
-        <p id="dl1"></p>
-        <p id="dl2"></p>
-        <p style="font-size:12px;margin-top:4px;color:var(--silver)">Record saved to database.</p>
-        <div class="done-actions">
-          <button class="btn btn-primary" onclick="startOver()">Start New Checklist</button>
+    <!-- STEP 2: CHECKLIST -->
+    <div id="step2" style="display:none">
+      <div class="draft-saved-toast" id="draftSavedToast">✓ Draft saved. Resume any time using Student ID: <strong id="draftSavedId"></strong></div>
+      <div class="card">
+        <div class="card-title" id="clTitle"><span class="ct-bar"></span>Checklist</div>
+        <div id="clBody"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="goStep(1)">← Back</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline" onclick="saveDraft()">💾 Save Draft</button>
+          <button class="btn btn-primary" onclick="goStep(3)">Next →</button>
         </div>
       </div>
     </div>
-    <div class="dl-panel">
-      <h3>📊 Download All Submissions (Excel)</h3>
-      <p>Enter your download token to export every submission record as an Excel file.</p>
-      <div class="tok-row">
-        <input type="password" id="dlToken" placeholder="Enter download token">
-        <button class="btn btn-sky" onclick="downloadExcel()">Download .xlsx</button>
+
+    <!-- STEP 3: DOCUMENTS -->
+    <div id="step3" style="display:none">
+      <div class="card">
+        <div class="card-title"><span class="ct-bar"></span>Supporting Documents</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:1.25rem">Attach transcripts, evaluations, certifications, background checks, or any other required documents.</p>
+        <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileIn').click()">
+          <span class="upload-icon">📎</span>
+          <p><strong>Click to browse</strong> or drag and drop</p>
+          <p style="font-size:11px;margin-top:4px">PDF, JPG, PNG, DOCX accepted</p>
+        </div>
+        <input type="file" id="fileIn" multiple style="display:none" onchange="handleFiles(this.files)">
+        <div class="file-list" id="fileList"></div>
       </div>
-      <div class="em" id="tokErr" style="margin-top:6px">Invalid token or error fetching records.</div>
+      <div class="btn-row">
+        <button class="btn" onclick="goStep(2)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(4)">Review & Submit →</button>
+      </div>
     </div>
 
-    <!-- ADMIN PANEL -->
-    <div class="dl-panel" style="margin-top:1rem">
-      <h3>🔐 Admin — Manage Submissions</h3>
-      <p>Enter your admin token to view and delete submissions.</p>
-      <div class="tok-row" style="margin-bottom:10px">
-        <input type="password" id="adminToken" placeholder="Enter admin token">
-        <button class="btn btn-primary" onclick="loadAdminTable()">Load Submissions</button>
+    <!-- STEP 4: REVIEW -->
+    <div id="step4" style="display:none">
+      <div class="card">
+        <div class="card-title"><span class="ct-bar"></span>Review Summary</div>
+        <div id="sumBody"></div>
       </div>
-      <div class="em" id="adminErr" style="margin-top:6px"></div>
-      <div id="adminTable" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <span id="adminCount" style="font-size:13px;color:var(--muted)"></span>
-          <button class="btn btn-crimson" style="font-size:12px;padding:6px 14px" onclick="deleteAll()">Delete All</button>
-        </div>
-        <div style="overflow-x:auto;border:1px solid var(--border);border-radius:var(--r)">
-          <table style="width:100%;border-collapse:collapse;font-size:12px" id="adminRows"></table>
-        </div>
-        <p style="font-size:11px;color:var(--silver);margin-top:8px">Check boxes next to entries you want to delete, then click Delete Selected.</p>
-        <button class="btn btn-crimson" style="margin-top:8px;font-size:12px;padding:6px 14px" onclick="deleteSelected()">Delete Selected</button>
+      <div class="card">
+        <div class="card-title" style="font-size:13px"><span class="ct-bar"></span>Delivery</div>
+        <div class="sum-row"><span class="sk">Send to</span><span class="sv" id="sumRecip">—</span></div>
+        <div class="sum-row"><span class="sk">Coach CC</span><span class="sv" id="sumCoach">—</span></div>
+        <div class="sum-row"><span class="sk">Attachments</span><span class="sv" id="sumFiles">—</span></div>
+      </div>
+      <div class="info-box"><strong>What gets sent:</strong> A formatted HTML checklist email plus a PDF version automatically attached. Any uploaded documents are also included.</div>
+      <div class="btn-row">
+        <button class="btn" onclick="goStep(3)">← Back</button>
+        <button class="btn btn-crimson" id="submitBtn" onclick="submitForm()">✓ Submit & Send</button>
       </div>
     </div>
-  </div>
-</div>
+
+    <!-- DONE -->
+    <div id="stepDone" style="display:none">
+      <div class="card">
+        <div class="done-screen">
+          <span class="done-icon">✅</span>
+          <h2>Checklist Submitted!</h2>
+          <p id="dl1"></p><p id="dl2"></p>
+          <p style="font-size:12px;margin-top:4px;color:var(--silver)">Record saved to database. Draft deleted.</p>
+          <div class="done-actions">
+            <button class="btn btn-primary" onclick="startNew()">Start New Checklist</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end appScreen -->
+</div><!-- end wrap -->
 
 <!-- HELP MODAL -->
 <div class="modal-overlay" id="helpModal" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="modal">
     <div class="modal-header">
-      <h2><span class="hash">#</span>TEACH Resident Completion Checklist — Overview &amp; Guide</h2>
+      <h2>#TEACH Resident Completion Checklist — Guide</h2>
       <button class="modal-close" onclick="document.getElementById('helpModal').classList.remove('open')">✕</button>
     </div>
     <div class="modal-body">
-
       <div class="modal-section">
-        <h3><span class="icon">📋</span>What This App Does</h3>
-        <p>The <strong>#TEACH Resident Completion Checklist</strong> is a digital tool for coaches to document and submit a resident's program completion requirements. It generates a formatted checklist specific to each state, delivers it by email to the appropriate parties, and keeps a running record of all submissions.</p>
-        <p>The app supports five states — <strong>Alabama, Arizona, Indiana, Michigan, and North Carolina</strong> — each with their own state-specific requirements, license types, and documentation standards.</p>
+        <h3>What This App Does</h3>
+        <p>This tool lets coaches document and submit a resident's program completion requirements. It generates a state-specific checklist, delivers it by email as a formatted PDF, and keeps a permanent record of all submissions.</p>
       </div>
-
       <div class="modal-section">
-        <h3><span class="icon">👣</span>How to Complete a Checklist</h3>
+        <h3>How to Complete a Checklist</h3>
         <ol class="step-list">
-          <li><span class="step-num">1</span><div><strong>Select State</strong> — Choose the state where the resident completed their program. Each state has unique requirements in Sections 3, 4, 7, 8, and 9.</div></li>
-          <li><span class="step-num">2</span><div><strong>Resident Information</strong> — Enter the resident's full name, student ID (optional), your email as coach, and the email address the completed form should be sent to (e.g. advisor or program director).</div></li>
-          <li><span class="step-num">3</span><div><strong>Complete the Checklist</strong> — Work through all 10 sections and check each item that has been completed. Sections 1 and 2 are the same for all states. Sections 3–4 and 7–9 vary by state.</div></li>
-          <li><span class="step-num">4</span><div><strong>Upload Documents</strong> — Attach any supporting documents such as transcripts, evaluations, background check confirmations, certifications, or assessment score reports. All attached files will be included in the email.</div></li>
-          <li><span class="step-num">5</span><div><strong>Review &amp; Submit</strong> — Review the summary, confirm the recipient email, and click Submit. The system will email the completed checklist as a formatted PDF along with any uploaded attachments. A copy is automatically sent to the coach.</div></li>
+          <li><span class="snum">1</span><div><strong>Resident Info</strong> — Enter the resident's name, Student ID, and the recipient email. Student ID is required to save and resume drafts.</div></li>
+          <li><span class="snum">2</span><div><strong>Checklist</strong> — Check each completed item. Use <em>Save Draft</em> to save progress and come back later. The resident can resume using their Student ID.</div></li>
+          <li><span class="snum">3</span><div><strong>Documents</strong> — Attach supporting files (transcripts, evaluations, certifications). All files are included in the email.</div></li>
+          <li><span class="snum">4</span><div><strong>Submit</strong> — Review and submit. A PDF checklist is auto-generated and emailed to the recipient with you CC'd.</div></li>
         </ol>
       </div>
-
       <div class="modal-section">
-        <h3><span class="icon">📧</span>What Gets Sent</h3>
-        <p>When you submit, two things are delivered by email:</p>
-        <div class="info-grid">
-          <div class="info-card">
-            <strong>Email Body</strong>
-            <span>A formatted HTML version of the completed checklist showing all checked and unchecked items, resident info, state, and date.</span>
-          </div>
-          <div class="info-card">
-            <strong>PDF Attachment</strong>
-            <span>A PDF version of the same checklist — ready to download and upload directly into the resident's CRM portal.</span>
-          </div>
-          <div class="info-card">
-            <strong>Uploaded Files</strong>
-            <span>All documents you attach (transcripts, evaluations, etc.) are included as additional attachments in the same email.</span>
-          </div>
-          <div class="info-card">
-            <strong>CC to Coach</strong>
-            <span>The coach's email is automatically CC'd on every submission so you always have a copy in your inbox.</span>
-          </div>
-        </div>
+        <h3>Saving & Resuming Drafts</h3>
+        <p>Click <strong>Save Draft</strong> on the checklist step at any time. The draft is tied to the resident's Student ID. To resume, enter the Student ID in the "Resume a saved draft" box on Step 1.</p>
+        <p>Drafts are saved indefinitely until the checklist is submitted. Admins and coaches can see all open drafts in the Admin Panel.</p>
       </div>
-
       <div class="modal-section">
-        <h3><span class="icon">📊</span>Submission Records</h3>
-        <p>Every submission is automatically saved to the database. You can download a full Excel export or manage submissions at any time by visiting the <strong>Admin Panel</strong>.</p>
-        <div class="tip-box">
-          <strong>Admin Panel:</strong> Go to <strong>/admin</strong> on this site (e.g. <em>your-site.netlify.app/admin</em>) and enter your admin token to view all submissions, search by resident name, filter by state, delete test entries, and download the Excel report.
-        </div>
+        <h3>Admin Panel</h3>
+        <p>Go to <strong>/admin</strong> on this site to manage submissions, view open drafts, manage coach accounts, and download Excel reports. Your access is limited to your assigned states.</p>
       </div>
-
-      <div class="modal-section">
-        <h3><span class="icon">💡</span>Tips</h3>
-        <p>• You do not need to check every box to submit — partial submissions are allowed and the email will clearly show which items are complete and which are not.</p>
-        <p>• The checklist automatically uses the correct state-specific requirements based on the state you select — you do not need to make any adjustments.</p>
-        <p>• Uploaded files can be any format — PDF, Word, image, Excel. There is no strict file type restriction.</p>
-        <p>• If you need to resubmit, simply start a new checklist. Each submission is saved independently.</p>
-      </div>
-
     </div>
   </div>
 </div>
@@ -430,6 +467,12 @@ input::placeholder{color:var(--silver)}
 </footer>
 
 <script>
+// ── CONSTANTS ─────────────────────────────────────────────
+const EJS_PK = 'tYiIe0TECODvMI9SP';
+const EJS_SI = 'service_9zriilf';
+const EJS_TI = 'template_ufka8zi';
+emailjs.init(EJS_PK);
+
 // ── STATE DATA ────────────────────────────────────────────
 const STATES={
   AL:{name:"Alabama",s8lbl:"Completion Letter Sent",s9lbl:"Professional License",s9item:"Applied for Professional Educator Certificate",bgCheck:"Background Checks on file - FBI and ASBI",
@@ -454,80 +497,312 @@ const STATES={
     s8:["Form V sent to Resident","Program Completion Letter sent to Resident"],noMentor:true}
 };
 
-let selState=null, files=[], cbStates={};
+// ── SESSION ───────────────────────────────────────────────
+let coach = null;
+let sessionToken = null;
+let selState = null;
+let files = [];
+let cbStates = {};
+let currentDraftId = null;
 
-// ── EMAILJS — hardcoded, no setup needed ─────────────────
-const EJS_PK = 'tYiIe0TECODvMI9SP';
-const EJS_SI = 'service_9zriilf';
-const EJS_TI = 'template_ufka8zi';
-emailjs.init(EJS_PK);
+function saveSession(token, coachData) {
+  sessionToken = token;
+  coach = coachData;
+  localStorage.setItem('teach_token', token);
+  localStorage.setItem('teach_coach', JSON.stringify(coachData));
+}
 
-// ── TOAST ─────────────────────────────────────────────────
-function showToast(msg,type='success',dur=4000){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast show '+type;
-  setTimeout(()=>{t.className='toast';},dur);
+function clearSession() {
+  sessionToken = null; coach = null;
+  localStorage.removeItem('teach_token');
+  localStorage.removeItem('teach_coach');
+}
+
+async function checkSession() {
+  const token = localStorage.getItem('teach_token');
+  if (!token) return false;
+  const res = await callAuth('verify', { token });
+  if (res.success) {
+    sessionToken = token;
+    coach = res.coach;
+    return true;
+  }
+  clearSession();
+  return false;
 }
 
 // ── INIT ──────────────────────────────────────────────────
-(function init(){
-  const grid=document.getElementById('stateGrid');
-  Object.entries(STATES).forEach(([code,s])=>{
-    const btn=document.createElement('button');
-    btn.className='state-btn';
-    btn.innerHTML=`<div class="sc">${code}</div><div class="sn">${s.name}</div>`;
-    btn.onclick=()=>{
-      document.querySelectorAll('.state-btn').forEach(b=>b.classList.remove('selected'));
-      btn.classList.add('selected'); selState=code;
-      document.getElementById('s1next').disabled=false;
-    };
-    grid.appendChild(btn);
-  });
-  const dz=document.getElementById('dropZone');
-  dz.addEventListener('dragover',e=>{e.preventDefault();dz.style.borderColor='var(--sky)';});
-  dz.addEventListener('dragleave',()=>{dz.style.borderColor='';});
-  dz.addEventListener('drop',e=>{e.preventDefault();dz.style.borderColor='';handleFiles(e.dataTransfer.files);});
+(async function init() {
+  // Check for password reset token in URL
+  const params = new URLSearchParams(window.location.search);
+  const resetToken = params.get('reset');
+  if (resetToken) {
+    showAuthTab('resetpwd');
+    window._resetToken = resetToken;
+    return;
+  }
+
+  const valid = await checkSession();
+  if (valid) {
+    showApp();
+  } else {
+    document.getElementById('authScreen').style.display = 'block';
+    document.getElementById('appScreen').style.display = 'none';
+  }
+
+  // Drag & drop
+  const dz = document.getElementById('dropZone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor='var(--sky)'; });
+  dz.addEventListener('dragleave', () => { dz.style.borderColor=''; });
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.style.borderColor=''; handleFiles(e.dataTransfer.files); });
 })();
 
+// ── AUTH HELPERS ──────────────────────────────────────────
+async function callAuth(action, params) {
+  const res = await fetch('/.netlify/functions/coach-auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, ...params })
+  });
+  return res.json();
+}
+
+function showAuthTab(tab) {
+  document.getElementById('loginForm').style.display   = tab==='login'    ? 'block' : 'none';
+  document.getElementById('signupForm').style.display  = tab==='signup'   ? 'block' : 'none';
+  document.getElementById('resetForm').style.display   = tab==='reset'    ? 'block' : 'none';
+  document.getElementById('resetPwdForm').style.display= tab==='resetpwd' ? 'block' : 'none';
+  document.getElementById('loginTab').classList.toggle('active', tab==='login');
+  document.getElementById('signupTab').classList.toggle('active', tab==='signup');
+}
+
+function toggleSignupState(el) {
+  el.classList.toggle('sel');
+}
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pwd   = document.getElementById('loginPwd').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.classList.remove('show');
+  if (!email || !pwd) { errEl.textContent='Please enter email and password.'; errEl.classList.add('show'); return; }
+
+  const res = await callAuth('login', { email, password: pwd });
+  if (!res.success) { errEl.textContent=res.error; errEl.classList.add('show'); return; }
+
+  saveSession(res.token, res.coach);
+  showApp();
+}
+
+async function doSignup() {
+  const name   = document.getElementById('signupName').value.trim();
+  const email  = document.getElementById('signupEmail').value.trim();
+  const pwd    = document.getElementById('signupPwd').value;
+  const states = Array.from(document.querySelectorAll('#signupStates .state-cb-btn.sel')).map(el=>el.dataset.state);
+  const errEl  = document.getElementById('signupErr');
+  errEl.classList.remove('show');
+
+  if (!name||!email||!pwd||!states.length) {
+    errEl.textContent='Please fill in all fields and select at least one state.'; errEl.classList.add('show'); return;
+  }
+  if (pwd.length < 8) {
+    errEl.textContent='Password must be at least 8 characters.'; errEl.classList.add('show'); return;
+  }
+
+  const res = await callAuth('signup', { name, email, password: pwd, states });
+  if (!res.success) { errEl.textContent=res.error; errEl.classList.add('show'); return; }
+  showToast(res.message || 'Account request submitted. You will be notified when approved.', 'success', 6000);
+  showAuthTab('login');
+}
+
+async function doResetRequest() {
+  const email = document.getElementById('resetEmail').value.trim();
+  const errEl = document.getElementById('resetErr');
+  errEl.classList.remove('show');
+  if (!email) { errEl.textContent='Please enter your email.'; errEl.classList.add('show'); return; }
+  const res = await callAuth('reset_request', { email });
+  showToast(res.message || 'Reset link sent.', 'success', 5000);
+  showAuthTab('login');
+}
+
+async function doResetPassword() {
+  const pwd     = document.getElementById('newPwd').value;
+  const confirm = document.getElementById('confirmPwd').value;
+  const errEl   = document.getElementById('resetPwdErr');
+  errEl.classList.remove('show');
+  if (pwd.length < 8) { errEl.textContent='Password must be at least 8 characters.'; errEl.classList.add('show'); return; }
+  if (pwd !== confirm) { errEl.textContent='Passwords do not match.'; errEl.classList.add('show'); return; }
+
+  const res = await callAuth('reset_password', { token: window._resetToken, password: pwd });
+  if (!res.success) { errEl.textContent=res.error; errEl.classList.add('show'); return; }
+  showToast('Password reset successfully. Please sign in.', 'success', 5000);
+  history.replaceState({}, '', '/');
+  showAuthTab('login');
+}
+
+function logout() {
+  clearSession();
+  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('authScreen').style.display = 'block';
+  document.getElementById('headerCoach').style.display = 'none';
+  document.getElementById('logoutBtn').style.display = 'none';
+  showAuthTab('login');
+}
+
+// ── SHOW APP ──────────────────────────────────────────────
+function showApp() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+  document.getElementById('headerCoach').style.display = 'inline';
+  document.getElementById('headerCoach').innerHTML = `<strong>${coach.name}</strong> · ${coach.states.join(', ')}`;
+  document.getElementById('logoutBtn').style.display = 'inline';
+
+  // If coach has only one state, auto-select it
+  if (coach.states.length === 1) {
+    selState = coach.states[0];
+  }
+
+  // Show state display
+  renderStateDisplay();
+  goStep(1);
+}
+
+function renderStateDisplay() {
+  const el = document.getElementById('stateDisplay');
+  if (coach.states.length === 1) {
+    el.innerHTML = `<label class="fl">State</label><div style="padding:10px 14px;background:var(--navy);color:#fff;border-radius:var(--r);font-weight:700;font-size:14px;display:inline-block">${coach.states[0]} — ${STATES[coach.states[0]].name}</div>`;
+  } else {
+    // Multiple states — let them pick
+    el.innerHTML = `<label class="fl">Select State<span class="freq">*</span></label>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px">
+      ${coach.states.map(st=>`<div class="state-cb-btn${selState===st?' sel':''}" onclick="selectState('${st}',this)" style="padding:14px 8px;text-align:center;border-radius:var(--rl)">
+        <div style="font-size:20px;font-weight:800;line-height:1;margin-bottom:4px">${st}</div>
+        <div style="font-size:11px;opacity:.7">${STATES[st].name}</div>
+      </div>`).join('')}
+    </div>
+    <div class="em" id="stateErr" style="margin-top:6px">Please select a state.</div>`;
+  }
+}
+
+function selectState(code, el) {
+  selState = code;
+  document.querySelectorAll('#stateDisplay .state-cb-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// ── DRAFT ─────────────────────────────────────────────────
+async function lookupDraft() {
+  const studentId = document.getElementById('draftLookupId').value.trim();
+  const errEl = document.getElementById('draftLookupErr');
+  errEl.classList.remove('show');
+  if (!studentId) { errEl.textContent='Please enter a Student ID.'; errEl.classList.add('show'); return; }
+
+  showToast('Looking up draft…', 'info', 3000);
+  const res = await fetch('/.netlify/functions/draft', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ action:'load', token:sessionToken, studentId })
+  }).then(r=>r.json());
+
+  if (!res.success) { errEl.textContent=res.error; errEl.classList.add('show'); return; }
+  if (!res.draft)   { errEl.textContent='No draft found for that Student ID.'; errEl.classList.add('show'); return; }
+
+  const d = res.draft;
+  // Populate form from draft
+  document.getElementById('resName').value   = d.resident_name || '';
+  document.getElementById('stuId').value     = d.student_id || '';
+  document.getElementById('recipEmail').value = d.recipient_email || '';
+  selState = d.state;
+  currentDraftId = d.id;
+  renderStateDisplay();
+  // Re-select state button if needed
+  const stateBtn = document.querySelector(`#stateDisplay .state-cb-btn[onclick*="${d.state}"]`);
+  if (stateBtn) stateBtn.classList.add('sel');
+
+  showToast(`Draft loaded for ${d.resident_name||d.student_id}`, 'success');
+
+  // Move to checklist and restore checked items
+  buildChecklist();
+  if (d.form_data && d.form_data.checked) {
+    Object.entries(d.form_data.checked).forEach(([id, val]) => {
+      cbStates[id] = val;
+      const cb = document.getElementById(id);
+      if (cb) cb.checked = val;
+    });
+  }
+  goStep(2, true); // skip rebuild
+}
+
+async function saveDraft() {
+  const studentId = document.getElementById('stuId').value.trim();
+  const resName   = document.getElementById('resName').value.trim();
+  if (!studentId) { showToast('Please enter a Student ID before saving a draft.', 'error', 4000); return; }
+  if (!selState)  { showToast('Please select a state before saving a draft.', 'error', 4000); return; }
+
+  const res = await fetch('/.netlify/functions/draft', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      action:'save', token:sessionToken,
+      studentId, state:selState, stateName:STATES[selState].name,
+      residentName:resName,
+      coachEmail:coach.email,
+      recipientEmail: document.getElementById('recipEmail').value.trim(),
+      formData:{ checked: cbStates }
+    })
+  }).then(r=>r.json());
+
+  if (!res.success) { showToast('Save failed: '+res.error, 'error'); return; }
+  currentDraftId = res.draftId;
+  document.getElementById('draftSavedId').textContent = studentId;
+  document.getElementById('draftSavedToast').classList.add('show');
+  setTimeout(()=>document.getElementById('draftSavedToast').classList.remove('show'), 6000);
+}
+
 // ── NAVIGATION ────────────────────────────────────────────
-function goStep(n){
-  ['step1','step2','step3','step4','step5','stepDone'].forEach(id=>{
+function goStep(n, skipBuild) {
+  ['step1','step2','step3','step4','stepDone'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
   });
-  document.getElementById(n<=5?`step${n}`:'stepDone').style.display='block';
-  const pct=Math.min(Math.round((n/5)*100),100);
-  document.getElementById('pFill').style.width=pct+'%';
-  document.getElementById('pPct').textContent=pct+'%';
-  for(let i=1;i<=5;i++){
+  document.getElementById(`step${n<=4?n:'Done'}`).style.display='block';
+  const pct = Math.round((n/4)*100);
+  document.getElementById('pFill').style.width=Math.min(pct,100)+'%';
+  document.getElementById('pPct').textContent=Math.min(pct,100)+'%';
+  for(let i=1;i<=4;i++){
     const sn=document.getElementById(`sn${i}`), sl=document.getElementById(`sl${i}`);
+    if(!sn||!sl) continue;
     sn.className='step-num'+(i<n?' done':i===n?' active':'');
     sl.className='step-lbl'+(i<n?' done':i===n?' active':'');
     sn.textContent=i<n?'✓':i;
   }
-  if(n===3) buildChecklist();
-  if(n===5) buildSummary();
+  if(n===2 && !skipBuild) buildChecklist();
+  if(n===4) buildSummary();
   window.scrollTo(0,0);
 }
 
-// ── VALIDATE STEP 2 ───────────────────────────────────────
-function validateStep2(){
-  const name=document.getElementById('resName').value.trim();
-  const coach=document.getElementById('coachEmail').value.trim();
-  const recip=document.getElementById('recipEmail').value.trim();
-  const re=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  let ok=true;
+// ── VALIDATE STEP 1 ───────────────────────────────────────
+function validateStep1() {
+  const name   = document.getElementById('resName').value.trim();
+  const stuId  = document.getElementById('stuId').value.trim();
+  const recip  = document.getElementById('recipEmail').value.trim();
+  const re     = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  let ok = true;
   document.getElementById('nameErr').classList.toggle('show',!name); if(!name) ok=false;
-  document.getElementById('coachErr').classList.toggle('show',!re.test(coach)); if(!re.test(coach)) ok=false;
+  document.getElementById('stuIdErr').classList.toggle('show',!stuId); if(!stuId) ok=false;
   document.getElementById('recipErr').classList.toggle('show',!re.test(recip)); if(!re.test(recip)) ok=false;
-  if(ok) goStep(3);
+  if(coach.states.length>1 && !selState) {
+    document.getElementById('stateErr').classList.add('show'); ok=false;
+  }
+  if(ok) goStep(2);
 }
 
 // ── BUILD CHECKLIST ───────────────────────────────────────
-function buildChecklist(){
-  const s=STATES[selState]; cbStates={};
-  const body=document.getElementById('clBody'), title=document.getElementById('clTitle');
-  title.innerHTML=`<span class="ct-bar"></span>${selState} — ${s.name}`;
-  body.innerHTML='';
+function buildChecklist() {
+  if (!selState) return;
+  const s = STATES[selState];
+  cbStates = {};
+  const body  = document.getElementById('clBody');
+  const title = document.getElementById('clTitle');
+  title.innerHTML = `<span class="ct-bar"></span>${selState} — ${s.name}`;
+  body.innerHTML = '';
 
   function mkCB(id,html){
     cbStates[id]=false;
@@ -539,19 +814,19 @@ function buildChecklist(){
   }
   function mkSubs(items){
     const ul=document.createElement('ul'); ul.className='sub-list';
-    items.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; ul.appendChild(li); });
+    items.forEach(t=>{const li=document.createElement('li'); li.textContent=t; ul.appendChild(li);});
     return ul;
   }
   function sec(num,ttl,items){
-    const s2=document.createElement('div'); s2.className='cl-section';
+    const sec=document.createElement('div'); sec.className='cl-section';
     const h=document.createElement('div'); h.className='cl-head';
-    h.innerHTML=`<span class="num">${num}</span>${ttl}`; s2.appendChild(h);
+    h.innerHTML=`<span class="num">${num}</span>${ttl}`; sec.appendChild(h);
     items.forEach((item,i)=>{
       const id=`chk_${num}_${i}`;
-      s2.appendChild(mkCB(id,item.text||item));
-      if(item.subs) s2.appendChild(mkSubs(item.subs));
+      sec.appendChild(mkCB(id,item.text||item));
+      if(item.subs) sec.appendChild(mkSubs(item.subs));
     });
-    return s2;
+    return sec;
   }
   function twoCol(la,lt,li,ra,rt,ri){
     const wrap=document.createElement('div'); wrap.className='cl-two-col';
@@ -587,38 +862,20 @@ function buildChecklist(){
 function fileToBase64(file){
   return new Promise((res,rej)=>{
     const r=new FileReader();
-    r.onload=()=>{
-      // EmailJS needs just the base64 part, not the data:...;base64, prefix
-      const base64 = r.result.split(',')[1];
-      res(base64);
-    };
-    r.onerror=rej;
-    r.readAsDataURL(file);
+    r.onload=()=>res(r.result.split(',')[1]);
+    r.onerror=rej; r.readAsDataURL(file);
   });
 }
-
 function getMimeType(filename){
-  const ext = filename.split('.').pop().toLowerCase();
-  const types = {
-    'pdf':  'application/pdf',
-    'doc':  'application/msword',
-    'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'png':  'image/png',
-    'jpg':  'image/jpeg',
-    'jpeg': 'image/jpeg',
-    'gif':  'image/gif',
-    'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'xls':  'application/vnd.ms-excel',
-    'txt':  'text/plain',
-  };
-  return types[ext] || 'application/octet-stream';
+  const ext=filename.split('.').pop().toLowerCase();
+  const types={'pdf':'application/pdf','doc':'application/msword','docx':'application/vnd.openxmlformats-officedocument.wordprocessingml.document','png':'image/png','jpg':'image/jpeg','jpeg':'image/jpeg','xlsx':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','txt':'text/plain'};
+  return types[ext]||'application/octet-stream';
 }
 function handleFiles(fl){
   Array.from(fl).forEach(f=>{
     files.push(f);
     const item=document.createElement('div'); item.className='file-item';
-    const kb=(f.size/1024).toFixed(0);
-    item.innerHTML=`<span>📄</span><span>${f.name}</span><span class="fsz">${kb} KB</span><button class="rmf" onclick="rmFile('${f.name}',this.parentElement)">×</button>`;
+    item.innerHTML=`<span>📄</span><span>${f.name}</span><span class="fsz">${(f.size/1024).toFixed(0)} KB</span><button class="rmf" onclick="rmFile('${f.name}',this.parentElement)">×</button>`;
     document.getElementById('fileList').appendChild(item);
   });
 }
@@ -627,194 +884,49 @@ function rmFile(name,el){ files=files.filter(f=>f.name!==name); el.remove(); }
 // ── SUMMARY ───────────────────────────────────────────────
 function buildSummary(){
   const s=STATES[selState], body=document.getElementById('sumBody'); body.innerHTML='';
-  const total=Object.keys(cbStates).length, checked=Object.values(cbStates).filter(Boolean).length;
-  const pct=total?Math.round(checked/total*100):0;
-  [['State',`${selState} — ${s.name}`],['Resident',document.getElementById('resName').value||'—'],['Student ID',document.getElementById('stuId').value||'N/A'],['Items completed',`${checked} / ${total} (${pct}%)`]].forEach(([k,v])=>{
+  const total=Object.keys(cbStates).length, checked=Object.values(cbStates).filter(Boolean).length, pct=total?Math.round(checked/total*100):0;
+  [['State',`${selState} — ${s.name}`],['Resident',document.getElementById('resName').value||'—'],['Student ID',document.getElementById('stuId').value||'—'],['Items completed',`${checked} / ${total} (${pct}%)`]].forEach(([k,v])=>{
     const r=document.createElement('div'); r.className='sum-row';
-    r.innerHTML=`<span class="sk">${k}</span><span class="sv">${v}</span>`;
-    body.appendChild(r);
+    r.innerHTML=`<span class="sk">${k}</span><span class="sv">${v}</span>`; body.appendChild(r);
   });
   const bar=document.createElement('div'); bar.className='comp-bar';
   bar.innerHTML=`<div class="comp-fill" style="width:${pct}%"></div>`; body.appendChild(bar);
-  if(checked<total){ const w=document.createElement('div'); w.className='warn-box'; w.textContent=`${total-checked} item(s) unchecked. You may still submit.`; body.appendChild(w); }
+  if(checked<total){const w=document.createElement('div');w.className='warn-box';w.textContent=`${total-checked} item(s) unchecked. You may still submit.`;body.appendChild(w);}
   document.getElementById('sumRecip').textContent=document.getElementById('recipEmail').value||'—';
-  document.getElementById('sumCoach').textContent=document.getElementById('coachEmail').value||'—';
-  document.getElementById('sumFiles').textContent=files.length?`Completed checklist + ${files.map(f=>f.name).join(', ')}`:'Completed checklist only';
+  document.getElementById('sumCoach').textContent=coach.email||'—';
+  document.getElementById('sumFiles').textContent=files.length?files.map(f=>f.name).join(', '):'None';
 }
 
-// ── BUILD EMAIL TEXT ──────────────────────────────────────
-function buildEmailText(){
+// ── HTML EMAIL BUILDER ────────────────────────────────────
+function buildHTMLEmail(){
   const s=STATES[selState], name=document.getElementById('resName').value, sid=document.getElementById('stuId').value;
   const date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  function ck(id){ return cbStates[id]?'[X]':'[ ]'; }
-  const lines=[
-    `#TEACH RESIDENT COMPLETION CHECKLIST — ${selState} (${s.name})`,
-    `Confidential – Internal Use Only`, `Date: ${date}`, '',
-    `RESIDENT INFORMATION`, `Name: ${name}`, sid?`Student ID: ${sid}`:'', '',
-    '1. COURSEWORK (COACH)',
-    `${ck('chk_1_0')} All courses were completed and met the minimum 3.0 score requirement`,
-    `${ck('chk_1_1')} All courses have been logged in the learning management system`,
-    `${ck('chk_1_2')} A transcript request can be processed at the resident's request`, '',
-    '2. #TEACH ASSESSMENTS (COACH)',
-    `${ck('chk_2_0')} The Teacher Proficiency Assessment (TPA) scores (3) are recorded in the Status Report`,
-    `${ck('chk_2_1')} The Family Conferences Self-Assessment has been recorded in the system`,
-    `${ck('chk_2_2')} The Professionalism Self-Assessment has been recorded in the system`,
-    `${ck('chk_2_3')} The Fall Assessment for Planning and Teaching has been recorded in the system`,
-    `${ck('chk_2_4')} The Spring Assessment for Planning and Teaching has been recorded in the system`,
-    ...(!s.noMentor?[`${ck('chk_2_5')} Mentor Assessment has been recorded in the system.`]:[]), '',
-    '3. STATE ASSESSMENTS AND REQUIREMENTS',
-    ...s.s3.flatMap((item,i)=>[`${ck('chk_3_'+i)} ${(item.text||item).replace(/<[^>]+>/g,'')}`, ...(item.subs||[]).map(sub=>`    • ${sub}`)]), '',
-    '4. DOCUMENTATION AND CONVERSATIONS',
-    ...s.s4.flatMap((item,i)=>[`${ck('chk_4_'+i)} ${(item.text||item).replace(/<[^>]+>/g,'')}`, ...(item.subs||[]).map(sub=>`    • ${sub}`)]), '',
-    '5. CHECK FINANCIAL STANDING',
-    `${ck('chk_5_0')} Confirm that the program balance is paid in full`,
-    `    • Advisor Portal > Contract Tool > Payment Info`,
-    `    • Intern Portal > Payments > Program Fees > Remaining Balance`, '',
-    '6. OFFICIAL TRANSCRIPTS',
-    `${ck('chk_6_0')} Official Transcripts on file`,
-    `${ck('chk_6_1')} ${selState==='NC'?'Regional or National Accreditation Confirmed':'Regional Accreditation Confirmed'}`, '',
-    '7. BACKGROUND CHECKS', `${ck('chk_7_0')} ${s.bgCheck}`, '',
-    `8. ${s.s8lbl.toUpperCase()}`, ...s.s8.map((t,i)=>`${ck('chk_8_'+i)} ${t}`), '',
-    `9. ${s.s9lbl.toUpperCase()}`, `${ck('chk_9_0')} ${s.s9item}`, '',
-    '10. COMPLETION CERTIFICATE',
-    `${ck('chk_10_0')} Request to send formal Completion Certificate via Parchment sent to processor.`, '',
-    ...(files.length?['ATTACHED DOCUMENTS',...files.map(f=>`  • ${f.name}`), '']:[]),
-    '---', `Submitted: ${date}`, `Coach: ${document.getElementById('coachEmail').value}`
-  ];
-  return lines.filter(l=>l!==undefined).join('\n');
+  function ck(id){return cbStates[id]?'&#10003;':'&#9744;';}
+  function row(id,label){const checked=cbStates[id];return`<tr><td style="padding:2px 6px;width:24px;text-align:center;font-size:16px;color:${checked?'#002E5D':'#aaa'}">${ck(id)}</td><td style="padding:2px 6px;font-size:12px;color:${checked?'#1a1a1a':'#666'}">${label.replace(/<[^>]+>/g,'')}</td></tr>`;}
+  function subRows(items){return items.map(s=>`<tr><td></td><td style="padding:1px 6px 1px 20px;font-size:11px;color:#888">– ${s}</td></tr>`).join('');}
+  function sHead(num,title){return`<tr><td colspan="2" style="background:#002E5D;color:#fff;padding:5px 10px;font-size:12px;font-weight:700">${num}. ${title.toUpperCase()}</td></tr>`;}
+  function twoColSec(ln,lt,li,rn,rt,ri){
+    const lRows=li.map((item,i)=>row(`chk_${ln}_${i}`,item.text||item)+(item.subs?subRows(item.subs):'')).join('');
+    const rRows=ri.map((item,i)=>row(`chk_${rn}_${i}`,item.text||item)+(item.subs?subRows(item.subs):'')).join('');
+    return`<tr><td colspan="2"><table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse"><tr><td width="50%" valign="top" style="padding-right:6px"><table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e8e8e8"><tr><td colspan="2" style="background:#002E5D;color:#fff;padding:4px 8px;font-size:11px;font-weight:700">${ln}. ${lt.toUpperCase()}</td></tr>${lRows}</table></td><td width="50%" valign="top" style="padding-left:6px"><table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e8e8e8"><tr><td colspan="2" style="background:#002E5D;color:#fff;padding:4px 8px;font-size:11px;font-weight:700">${rn}. ${rt.toUpperCase()}</td></tr>${rRows}</table></td></tr></table></td></tr>`;
+  }
+  const s1=["All courses were completed and met the minimum 3.0 score requirement","All courses have been logged in the learning management system","A transcript request can be processed at the resident's request"];
+  const s2i=["The Teacher Proficiency Assessment (TPA) scores (3) are recorded in the Status Report","The Family Conferences Self-Assessment has been recorded in the system","The Professionalism Self-Assessment has been recorded in the system","The Fall Assessment for Planning and Teaching has been recorded in the system","The Spring Assessment for Planning and Teaching has been recorded in the system"];
+  if(!s.noMentor)s2i.push("Mentor Assessment has been recorded in the system.");
+  const s5=[{text:"Confirm that the program balance is paid in full",subs:["Advisor Portal > Contract Tool > Payment Info","Intern Portal > Payments > Program Fees > Remaining Balance"]}];
+  const s6nc=selState==='NC'?'Regional or National Accreditation Confirmed':'Regional Accreditation Confirmed';
+  return`<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif"><table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:16px 0"><tr><td align="center"><table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)"><tr><td style="background:#002E5D;padding:12px 20px"><table width="100%" cellpadding="0" cellspacing="0"><tr><td><div style="font-size:22px;font-weight:900;color:#fff"><span style="color:#C5C5C5">#</span>TEACH</div><div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px">Resident Completion Checklist</div></td><td align="right" style="font-size:9px;color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.2);padding:3px 8px;border-radius:20px;white-space:nowrap">CAEP ACCREDITED</td></tr></table></td></tr><tr><td style="background:#F5F5F5;border-bottom:2px solid #002E5D;padding:8px 20px"><table width="100%" cellpadding="0" cellspacing="0"><tr><td style="font-size:12px;color:#555"><strong style="color:#002E5D">Resident:</strong> ${name}${sid?` &nbsp;<strong style="color:#002E5D">ID:</strong> ${sid}`:''}</td><td align="right" style="font-size:12px;color:#555"><strong style="color:#002E5D">State:</strong> ${selState} — ${s.name} &nbsp;<strong style="color:#002E5D">Date:</strong> ${date}</td></tr></table></td></tr><tr><td style="padding:12px 20px"><table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e8e8e8;border-radius:4px;overflow:hidden">${sHead(1,'Coursework (Coach)')}${s1.map((item,i)=>row(`chk_1_${i}`,item)).join('')}${sHead(2,'#TEACH Assessments (Coach)')}${s2i.map((item,i)=>row(`chk_2_${i}`,item)).join('')}${sHead(3,'State Assessments and Requirements')}${s.s3.map((item,i)=>row(`chk_3_${i}`,item.text||item)+(item.subs?subRows(item.subs):'')).join('')}${sHead(4,'Documentation and Conversations')}${s.s4.map((item,i)=>row(`chk_4_${i}`,item.text||item)+(item.subs?subRows(item.subs):'')).join('')}</table><div style="height:8px"></div><table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">${twoColSec(5,'Check Financial Standing',s5,6,'Official Transcripts',["Official Transcripts on file",s6nc])}<tr><td colspan="2" style="height:6px"></td></tr>${twoColSec(7,'Background Checks',[s.bgCheck],8,s.s8lbl,s.s8)}<tr><td colspan="2" style="height:6px"></td></tr>${twoColSec(9,s.s9lbl,[s.s9item],10,'Completion Certificate',["Request to send formal Completion Certificate via Parchment sent to processor."])}</table></td></tr><tr><td style="background:#002E5D;padding:8px 20px"><table width="100%" cellpadding="0" cellspacing="0"><tr><td style="font-size:10px;color:rgba(255,255,255,0.5)">Confidential – Internal Use Only</td><td align="right" style="font-size:10px;color:rgba(255,255,255,0.5)">Coach: ${coach.email}</td></tr></table></td></tr></table></td></tr></table></body></html>`;
 }
 
-// ── BUILD HTML EMAIL ─────────────────────────────────────
-function buildHTMLEmail(){
-  const s = STATES[selState];
-  const name = document.getElementById('resName').value;
-  const sid  = document.getElementById('stuId').value;
-  const coach = document.getElementById('coachEmail').value;
-  const date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-
-  function ck(id){ return cbStates[id] ? '&#10003;' : '&#9744;'; }
-  function row(id, label){
-    const checked = cbStates[id];
-    return `<tr><td style="padding:2px 6px;width:24px;text-align:center;font-size:16px;color:${checked?'#002E5D':'#aaa'}">${ck(id)}</td><td style="padding:2px 6px;font-size:12px;color:${checked?'#1a1a1a':'#666'};${checked?'':'text-decoration:none'}">${label.replace(/<[^>]+>/g,'')}</td></tr>`;
-  }
-  function subRows(items){
-    return items.map(s=>`<tr><td></td><td style="padding:1px 6px 1px 20px;font-size:11px;color:#888">– ${s}</td></tr>`).join('');
-  }
-  function sectionHead(num, title){
-    return `<tr><td colspan="2" style="background:#002E5D;color:#fff;padding:5px 10px;font-size:12px;font-weight:700;letter-spacing:0.5px">${num}. ${title.toUpperCase()}</td></tr>`;
-  }
-  function twoColSection(l_num,l_title,l_items, r_num,r_title,r_items){
-    const leftRows = l_items.map((item,i)=> row(`chk_${l_num}_${i}`, item.text||item) + (item.subs?subRows(item.subs):'')).join('');
-    const rightRows = r_items.map((item,i)=> row(`chk_${r_num}_${i}`, item.text||item) + (item.subs?subRows(item.subs):'')).join('');
-    return `
-    <tr><td colspan="2" style="padding:0">
-      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
-        <tr>
-          <td width="50%" valign="top" style="padding-right:8px">
-            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e8e8e8;border-radius:4px;overflow:hidden">
-              <tr><td colspan="2" style="background:#002E5D;color:#fff;padding:4px 8px;font-size:11px;font-weight:700">${l_num}. ${l_title.toUpperCase()}</td></tr>
-              ${leftRows}
-            </table>
-          </td>
-          <td width="50%" valign="top" style="padding-left:8px">
-            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e8e8e8;border-radius:4px;overflow:hidden">
-              <tr><td colspan="2" style="background:#002E5D;color:#fff;padding:4px 8px;font-size:11px;font-weight:700">${r_num}. ${r_title.toUpperCase()}</td></tr>
-              ${rightRows}
-            </table>
-          </td>
-        </tr>
-      </table>
-    </td></tr>`;
-  }
-
-  const s1items = ["All courses were completed and met the minimum 3.0 score requirement","All courses have been logged in the learning management system","A transcript request can be processed at the resident's request"];
-  const s2items = ["The Teacher Proficiency Assessment (TPA) scores (3) are recorded in the Status Report","The Family Conferences Self-Assessment has been recorded in the system","The Professionalism Self-Assessment has been recorded in the system","The Fall Assessment for Planning and Teaching has been recorded in the system","The Spring Assessment for Planning and Teaching has been recorded in the system"];
-  if(!s.noMentor) s2items.push("Mentor Assessment has been recorded in the system.");
-  const s5items = [{text:"Confirm that the program balance is paid in full",subs:["Advisor Portal > Contract Tool > Payment Info","Intern Portal > Payments > Program Fees > Remaining Balance"]}];
-  const s6nc = selState==='NC'?'Regional or National Accreditation Confirmed':'Regional Accreditation Confirmed';
-
-  const html = `
-<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:20px 0">
-<tr><td align="center">
-<table width="620" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
-
-  <!-- HEADER -->
-  <tr><td style="background:#002E5D;padding:12px 20px">
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td>
-          <div style="font-size:22px;font-weight:900;line-height:1;color:#fff">
-            <span style="color:#C5C5C5">#</span>TEACH
-          </div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px;font-weight:300">Resident Completion Checklist</div>
-        </td>
-        <td align="right" style="font-size:10px;color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.2);padding:4px 10px;border-radius:20px;white-space:nowrap">CAEP ACCREDITED</td>
-      </tr>
-    </table>
-  </td></tr>
-
-  <!-- RESIDENT INFO BAR -->
-  <tr><td style="background:#F5F5F5;border-bottom:2px solid #002E5D;padding:8px 20px">
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td style="font-size:13px;color:#555">
-          <strong style="color:#002E5D">Resident:</strong> ${name}
-          ${sid ? `&nbsp;&nbsp;<strong style="color:#002E5D">Student ID:</strong> ${sid}` : ''}
-        </td>
-        <td align="right" style="font-size:13px;color:#555">
-          <strong style="color:#002E5D">State:</strong> ${selState} — ${s.name}
-          &nbsp;&nbsp;<strong style="color:#002E5D">Date:</strong> ${date}
-        </td>
-      </tr>
-    </table>
-  </td></tr>
-
-  <!-- CHECKLIST BODY -->
-  <tr><td style="padding:12px 20px">
-    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e8e8e8;border-radius:6px;overflow:hidden">
-      ${sectionHead(1,'Coursework (Coach)')}
-      ${s1items.map((item,i)=>row(`chk_1_${i}`,item)).join('')}
-      ${sectionHead(2,'#TEACH Assessments (Coach)')}
-      ${s2items.map((item,i)=>row(`chk_2_${i}`,item)).join('')}
-      ${sectionHead(3,'State Assessments and Requirements')}
-      ${s.s3.map((item,i)=>row(`chk_3_${i}`,item.text||item)+(item.subs?subRows(item.subs):'')).join('')}
-      ${sectionHead(4,'Documentation and Conversations')}
-      ${s.s4.map((item,i)=>row(`chk_4_${i}`,item.text||item)+(item.subs?subRows(item.subs):'')).join('')}
-    </table>
-
-    <div style="height:4px"></div>
-
-    <!-- SECTIONS 5-10 TWO COLUMN -->
-    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
-      ${twoColSection(5,'Check Financial Standing',s5items, 6,'Official Transcripts',['Official Transcripts on file',s6nc])}
-      <tr><td colspan="2" style="height:4px"></td></tr>
-      ${twoColSection(7,'Background Checks',[s.bgCheck], 8,s.s8lbl,s.s8)}
-      <tr><td colspan="2" style="height:4px"></td></tr>
-      ${twoColSection(9,s.s9lbl,[s.s9item], 10,'Completion Certificate',['Request to send formal Completion Certificate via Parchment sent to processor.'])}
-    </table>
-  </td></tr>
-
-  <!-- FOOTER -->
-  <tr><td style="background:#002E5D;padding:8px 20px">
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td style="font-size:11px;color:rgba(255,255,255,0.5)">Confidential – Internal Use Only</td>
-        <td align="right" style="font-size:11px;color:rgba(255,255,255,0.5)">Submitted by: ${coach}</td>
-      </tr>
-    </table>
-  </td></tr>
-
-</table>
-</td></tr>
-</table>
-</body>
-</html>`;
-
-  return html;
+function buildTextBody(){
+  const s=STATES[selState], name=document.getElementById('resName').value, sid=document.getElementById('stuId').value;
+  const date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  function ck(id){return cbStates[id]?'[X]':'[ ]';}
+  const lines=[`#TEACH RESIDENT COMPLETION CHECKLIST — ${selState} (${s.name})`,`Confidential – Internal Use Only`,`Date: ${date}`,'',`Name: ${name}`,sid?`Student ID: ${sid}`:'',''];
+  lines.push('1. COURSEWORK (COACH)');
+  ['All courses were completed and met the minimum 3.0 score requirement','All courses have been logged in the learning management system',"A transcript request can be processed at the resident's request"].forEach((t,i)=>lines.push(`${ck('chk_1_'+i)} ${t}`));
+  lines.push('');
+  return lines.join('\n');
 }
 
 // ── SUBMIT ────────────────────────────────────────────────
@@ -826,196 +938,68 @@ async function submitForm(){
   const s=STATES[selState];
   const name=document.getElementById('resName').value;
   const sid=document.getElementById('stuId').value;
-  const coach=document.getElementById('coachEmail').value;
   const recip=document.getElementById('recipEmail').value;
   const total=Object.keys(cbStates).length;
   const checkedCount=Object.values(cbStates).filter(Boolean).length;
   const subject=`#TEACH Completion Checklist — ${name}${sid?' ('+sid+')':''} — ${selState}`;
   const htmlBody=buildHTMLEmail();
-  const textBody=buildEmailText();
-  const date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const textBody=buildTextBody();
 
-  // Convert uploaded files to base64
   const fileAttachments=[];
   for(const f of files){
-    try{
-      const b64=await fileToBase64(f);
-      const mime=getMimeType(f.name);
-      fileAttachments.push({ name:f.name, data:b64, type:mime });
-      console.log('File ready:', f.name, mime, b64.length+'chars');
-    }catch(e){ console.warn('File error:',f.name,e); }
+    try{ const b64=await fileToBase64(f); fileAttachments.push({name:f.name,data:b64,type:getMimeType(f.name)}); }catch(e){console.warn(e);}
   }
 
   try{
-    const res = await fetch('/.netlify/functions/send-checklist', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        state: selState, stateName: s.name,
-        residentName: name, studentId: sid||null,
-        coachEmail: coach, recipientEmail: recip,
-        checkedCount, totalItems: total,
-        fileAttachments,
-        emailSubject: subject,
-        htmlBody, textBody,
-        checkedItems: cbStates,
-        fileNames: files.map(f=>f.name).join(', ')||null,
+    const res=await fetch('/.netlify/functions/send-checklist',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        state:selState, stateName:s.name, residentName:name, studentId:sid,
+        coachEmail:coach.email, recipientEmail:recip,
+        checkedCount, totalItems:total, fileAttachments,
+        emailSubject:subject, htmlBody, textBody,
+        checkedItems:cbStates, fileNames:files.map(f=>f.name).join(', ')||null,
       })
     });
+    const result=await res.json();
+    if(!result.success) throw new Error(result.error||'Send failed');
 
-    const result = await res.json();
-    if(!result.success) throw new Error(result.error||'Unknown error');
-
-    const pdfMsg = result.pdfGenerated
-      ? ' PDF checklist attached.'
-      : result.pdfError
-        ? ` (PDF error: ${result.pdfError})`
-        : ' (No PDF — check PDFSHIFT_API_KEY)';
-
-    showToast('✓ Email sent!' + pdfMsg, 'success', 8000);
-
-    // Save to Supabase
-    try{
-      await fetch('/.netlify/functions/save-submission',{
+    // Delete draft if one exists
+    if(currentDraftId){
+      await fetch('/.netlify/functions/draft',{
         method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          state:selState, stateName:s.name, residentName:name, studentId:sid||null,
-          coachEmail:coach, recipientEmail:recip, checkedItems:cbStates,
-          totalItems:total, checkedCount, fileNames:files.map(f=>f.name).join(', ')||null,
-          emailSubject:subject, formBody:message
-        })
-      });
-    }catch(e){ console.warn('DB save:',e); }
+        body:JSON.stringify({action:'delete',token:sessionToken,draftId:currentDraftId})
+      }).catch(()=>{});
+    }
 
-    document.getElementById('dl1').textContent=`Email sent to: ${recip}`;
-    document.getElementById('dl2').textContent=`Copy sent to: ${coach}`;
-    goStep(6);
+    const pdfMsg=result.pdfGenerated?' PDF attached.':result.pdfError?' (PDF: '+result.pdfError+')':'';
+    showToast('✓ Submitted!'+pdfMsg,'success',5000);
+    document.getElementById('dl1').textContent=`Sent to: ${recip}`;
+    document.getElementById('dl2').textContent=`Coach copy: ${coach.email}`;
+    goStep(5);
 
   }catch(err){
-    console.error('Send error:',err);
+    console.error(err);
     showToast('Error: '+(err.message||'Send failed'),'error',8000);
-    btn.disabled=false; btn.textContent='✓ Submit & Send Email';
+    btn.disabled=false; btn.textContent='✓ Submit & Send';
   }
 }
 
-// ── START OVER ────────────────────────────────────────────
-function startOver(){
-  selState=null; files=[]; cbStates={};
-  ['resName','stuId','coachEmail','recipEmail','dlToken'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+function startNew(){
+  files=[]; cbStates={}; currentDraftId=null;
+  ['resName','stuId','recipEmail','draftLookupId'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('fileList').innerHTML='';
-  document.querySelectorAll('.state-btn').forEach(b=>b.classList.remove('selected'));
-  document.getElementById('s1next').disabled=true;
-  document.getElementById('tokErr').classList.remove('show');
-  const sb=document.getElementById('submitBtn');
-  if(sb){ sb.disabled=false; sb.textContent='✓ Submit & Send Email'; }
+  document.getElementById('draftLookupErr').classList.remove('show');
+  if(coach.states.length>1) selState=null;
+  renderStateDisplay();
   goStep(1);
 }
 
-// ── EXCEL DOWNLOAD ────────────────────────────────────────
-async function downloadExcel(){
-  const token=document.getElementById('dlToken').value.trim();
-  const errEl=document.getElementById('tokErr'); errEl.classList.remove('show');
-  if(!token){ errEl.textContent='Please enter your download token.'; errEl.classList.add('show'); return; }
-  try{
-    const res=await fetch(`/.netlify/functions/get-submissions?token=${encodeURIComponent(token)}`);
-    if(!res.ok) throw new Error('Unauthorized');
-    const rows=await res.json();
-    if(!Array.isArray(rows)) throw new Error('Invalid data');
-    const wb=XLSX.utils.book_new();
-    const wsData=[
-      ['Submitted At','State','State Name','Resident Name','Student ID','Coach Email','Recipient Email','Checked','Total','% Complete','Files','Subject'],
-      ...rows.map(r=>[r.submitted_at?new Date(r.submitted_at).toLocaleString():'',r.state||'',r.state_name||'',r.resident_name||'',r.student_id||'',r.coach_email||'',r.recipient_email||'',r.checked_count||0,r.total_items||0,r.total_items?Math.round((r.checked_count/r.total_items)*100)+'%':'—',r.file_names||'',r.email_subject||''])
-    ];
-    const ws=XLSX.utils.aoa_to_sheet(wsData);
-    ws['!cols']=[20,6,14,22,10,26,26,8,8,10,30,36].map(w=>({wch:w}));
-    XLSX.utils.book_append_sheet(wb,ws,'Submissions');
-    const stCt={};
-    rows.forEach(r=>{ stCt[r.state]=(stCt[r.state]||0)+1; });
-    const ws2=XLSX.utils.aoa_to_sheet([['State','Count'],...Object.entries(stCt).sort((a,b)=>b[1]-a[1]),[]   ,['Total',rows.length]]);
-    ws2['!cols']=[{wch:16},{wch:10}];
-    XLSX.utils.book_append_sheet(wb,ws2,'By State');
-    XLSX.writeFile(wb,`TEACH_Submissions_${new Date().toISOString().slice(0,10)}.xlsx`);
-  }catch(e){ errEl.textContent='Error: '+e.message; errEl.classList.add('show'); }
-}// ── ADMIN PANEL ───────────────────────────────────────────
-async function loadAdminTable(){
-  const token = document.getElementById('adminToken').value.trim();
-  const errEl = document.getElementById('adminErr');
-  errEl.classList.remove('show'); errEl.textContent='';
-
-  if(!token){ errEl.textContent='Please enter your admin token.'; errEl.classList.add('show'); return; }
-
-  try{
-    const res = await fetch(`/.netlify/functions/get-submissions?token=${encodeURIComponent(token)}`);
-    if(!res.ok) throw new Error('Invalid token');
-    const rows = await res.json();
-    if(!Array.isArray(rows)) throw new Error('Invalid data');
-
-    document.getElementById('adminCount').textContent = `${rows.length} submission${rows.length!==1?'s':''} in database`;
-    document.getElementById('adminTable').style.display = 'block';
-
-    const hdr = '<thead><tr style="background:var(--light);border-bottom:1px solid var(--border)">'
-      + '<th style="padding:6px 8px"><input type="checkbox" id="checkAll" onchange="toggleAll(this)"></th>'
-      + '<th style="padding:6px 8px;text-align:left;font-weight:600;color:#002E5D">Date</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-weight:600;color:#002E5D">Resident</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-weight:600;color:#002E5D">State</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-weight:600;color:#002E5D">Coach</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-weight:600;color:#002E5D">Complete</th>'
-      + '</tr></thead>';
-
-    const body = '<tbody>' + rows.map(r => {
-      const dt = r.submitted_at ? new Date(r.submitted_at).toLocaleDateString() : '';
-      const nm = (r.resident_name||'—') + (r.student_id?' ('+r.student_id+')':'');
-      const pct = r.total_items ? Math.round((r.checked_count/r.total_items)*100)+'%' : '—';
-      return '<tr style="border-bottom:1px solid #F5F5F5">'
-        + '<td style="padding:5px 8px"><input type="checkbox" class="admin-cb" value="'+r.id+'"></td>'
-        + '<td style="padding:5px 8px;color:#555">'+dt+'</td>'
-        + '<td style="padding:5px 8px;font-weight:500;color:#002E5D">'+nm+'</td>'
-        + '<td style="padding:5px 8px">'+( r.state||'—')+'</td>'
-        + '<td style="padding:5px 8px;color:#555">'+(r.coach_email||'—')+'</td>'
-        + '<td style="padding:5px 8px">'+pct+'</td>'
-        + '</tr>';
-    }).join('') + '</tbody>';
-
-    table.innerHTML = hdr + body;
-  }catch(e){
-    errEl.textContent='Error: '+e.message; errEl.classList.add('show');
-  }
-}
-
-function toggleAll(cb){
-  document.querySelectorAll('.admin-cb').forEach(c=>c.checked=cb.checked);
-}
-
-async function deleteSelected(){
-  const token = document.getElementById('adminToken').value.trim();
-  const checked = Array.from(document.querySelectorAll('.admin-cb:checked')).map(c=>c.value);
-  if(!checked.length){ showToast('No submissions selected.','error',3000); return; }
-  if(!confirm(`Delete ${checked.length} selected submission${checked.length!==1?'s':''}? This cannot be undone.`)) return;
-  await doDelete(token, checked);
-}
-
-async function deleteAll(){
-  const token = document.getElementById('adminToken').value.trim();
-  const count = document.querySelectorAll('.admin-cb').length;
-  if(!confirm(`Delete ALL ${count} submissions? This cannot be undone.`)) return;
-  await doDelete(token, 'ALL');
-}
-
-async function doDelete(token, ids){
-  const errEl = document.getElementById('adminErr');
-  try{
-    const res = await fetch(`/.netlify/functions/delete-submissions?token=${encodeURIComponent(token)}`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ ids })
-    });
-    const result = await res.json();
-    if(!result.success) throw new Error(result.error||'Delete failed');
-    showToast('✓ Deleted successfully','success');
-    loadAdminTable(); // refresh
-  }catch(e){
-    errEl.textContent='Delete error: '+e.message; errEl.classList.add('show');
-  }
+// ── TOAST ─────────────────────────────────────────────────
+function showToast(msg,type='success',dur=4000){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+type;
+  setTimeout(()=>t.className='toast',dur);
 }
 </script>
 </body>
