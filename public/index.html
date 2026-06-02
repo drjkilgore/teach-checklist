@@ -462,11 +462,31 @@ function buildChecklist(){
 function fileToBase64(file){
   return new Promise((res,rej)=>{
     const r=new FileReader();
-    // EmailJS needs raw base64 without the "data:...;base64," prefix
-    r.onload=()=>res(r.result.split(',')[1]);
+    r.onload=()=>{
+      // EmailJS needs just the base64 part, not the data:...;base64, prefix
+      const base64 = r.result.split(',')[1];
+      res(base64);
+    };
     r.onerror=rej;
     r.readAsDataURL(file);
   });
+}
+
+function getMimeType(filename){
+  const ext = filename.split('.').pop().toLowerCase();
+  const types = {
+    'pdf':  'application/pdf',
+    'doc':  'application/msword',
+    'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'png':  'image/png',
+    'jpg':  'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'gif':  'image/gif',
+    'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'xls':  'application/vnd.ms-excel',
+    'txt':  'text/plain',
+  };
+  return types[ext] || 'application/octet-stream';
 }
 function handleFiles(fl){
   Array.from(fl).forEach(f=>{
@@ -588,10 +608,6 @@ function buildHTMLEmail(){
   const s5items = [{text:"Confirm that the program balance is paid in full",subs:["Advisor Portal > Contract Tool > Payment Info","Intern Portal > Payments > Program Fees > Remaining Balance"]}];
   const s6nc = selState==='NC'?'Regional or National Accreditation Confirmed':'Regional Accreditation Confirmed';
 
-  const total = Object.keys(cbStates).length;
-  const checked = Object.values(cbStates).filter(Boolean).length;
-  const pct = total ? Math.round(checked/total*100) : 0;
-
   const html = `
 <!DOCTYPE html>
 <html>
@@ -629,28 +645,6 @@ function buildHTMLEmail(){
           &nbsp;&nbsp;<strong style="color:#002E5D">Date:</strong> ${date}
         </td>
       </tr>
-    </table>
-  </td></tr>
-
-  <!-- COMPLETION STATUS -->
-  <tr><td style="padding:14px 28px;border-bottom:1px solid #eee">
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td style="font-size:13px;color:#555">
-          <strong style="color:#002E5D">Completion Status:</strong>
-          ${checked} of ${total} items completed (${pct}%)
-        </td>
-        <td align="right">
-          <span style="background:${pct===100?'#002E5D':'#8B0000'};color:#fff;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700">
-            ${pct===100?'COMPLETE':'IN PROGRESS'}
-          </span>
-        </td>
-      </tr>
-      <tr><td colspan="2" style="padding-top:8px">
-        <div style="background:#e8e8e8;border-radius:3px;height:6px;overflow:hidden">
-          <div style="background:#002E5D;height:6px;width:${pct}%;border-radius:3px"></div>
-        </div>
-      </td></tr>
     </table>
   </td></tr>
 
@@ -720,9 +714,10 @@ async function submitForm(){
   const attachments=[];
   for(const f of files){
     try{
-      const dataUrl=await fileToBase64(f);
-      attachments.push({ name: f.name, data: dataUrl });
-      console.log('Attachment added:', f.name, 'size=', dataUrl.length);
+      const b64=await fileToBase64(f);
+      const mime=getMimeType(f.name);
+      attachments.push({ name: f.name, data: b64, type: mime });
+      console.log('Attachment:', f.name, mime, b64.length, 'chars');
     }catch(e){ console.warn('File read error:',f.name, e); }
   }
   console.log('Total attachments:', attachments.length);
