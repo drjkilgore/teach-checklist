@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -551,7 +552,10 @@ async function buildPDF(){
   console.log('buildPDF: PDFLib available, PDFDocument=', typeof lib.PDFDocument);
   const PDFDocument = lib.PDFDocument;
   const rgb = lib.rgb;
-  const StandardFonts = lib.StandardFonts;
+  // Use string literals for fonts - more reliable than StandardFonts enum across CDN versions
+  const FONT_REGULAR = 'Helvetica';
+  const FONT_BOLD    = 'Helvetica-Bold';
+
   const s = STATES[selState];
   const name = document.getElementById('resName').value;
   const sid  = document.getElementById('stuId').value;
@@ -565,8 +569,12 @@ async function buildPDF(){
   const LGRAY   = rgb(0.96,0.96,0.96);
 
   const pdfDoc = await PDFDocument.create();
-  const font     = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  console.log('buildPDF: created doc OK');
+
+  // Embed fonts using string names (works across all pdf-lib CDN versions)
+  const font     = await pdfDoc.embedFont(FONT_REGULAR);
+  const fontBold = await pdfDoc.embedFont(FONT_BOLD);
+  console.log('buildPDF: fonts embedded OK, font=', typeof font, 'fontBold=', typeof fontBold);
 
   const PW=612, PH=792, ML=40, MR=40;
   const CW = PW-ML-MR;
@@ -887,6 +895,5 @@ async function downloadExcel(){
 </script>
 </body>
 </html>
-
 
 
