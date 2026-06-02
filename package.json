@@ -1,10 +1,8 @@
 {
   "name": "teach-completion-checklist",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "#TEACH Resident Completion Checklist App",
-  "scripts": {
-    "dev": "netlify dev"
-  },
+  "scripts": { "dev": "netlify dev" },
   "dependencies": {
     "@netlify/functions": "^2.0.0",
     "@supabase/supabase-js": "^2.39.0"
