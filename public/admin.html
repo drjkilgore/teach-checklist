@@ -141,7 +141,7 @@ tr:hover td{background:#fafafa}
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th><input type="checkbox" id="subCheckAll" onchange="toggleAll('sub-cb',this)"></th><th>Date</th><th>Resident</th><th>ID</th><th>State</th><th>Coach</th><th>Recipient</th><th>Complete</th><th>Files</th></tr></thead>
+          <thead><tr><th><input type="checkbox" id="subCheckAll" onchange="toggleAll('sub-cb',this)"></th><th>Date</th><th>Resident</th><th>ID</th><th>State</th><th>Coach</th><th>Recipient</th><th>Complete</th><th>Files</th><th>Docs</th></tr></thead>
           <tbody id="subBody"></tbody>
         </table>
       </div>
@@ -229,6 +229,22 @@ tr:hover td{background:#fafafa}
       <div style="display:flex;gap:8px;margin-top:1rem">
         <button class="btn btn-primary" style="flex:1" onclick="saveCoachEdit()">Save Changes</button>
         <button class="btn" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DOCS MODAL -->
+<div class="modal-overlay" id="docsModal" onclick="if(event.target===this)document.getElementById('docsModal').classList.remove('open')">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h3 id="docsModalTitle">Stored Documents</h3>
+      <button class="modal-x" onclick="document.getElementById('docsModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Download links expire after 1 hour. Refresh this panel to generate new links.</p>
+      <div id="docsModalBody">
+        <div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:13px">Loading files…</div>
       </div>
     </div>
   </div>
@@ -354,7 +370,11 @@ function renderSubTable(rows){
     const pct=r.total_items?Math.round((r.checked_count/r.total_items)*100):0;
     const badge=pct===100?`<span class="badge b-complete">100%</span>`:`<span class="badge b-partial">${pct}%</span>`;
     const files=r.file_names?`📎 ${r.file_names.split(',').length}`:'—';
-    return`<tr><td><input type="checkbox" class="sub-cb" value="${r.id}"></td><td style="color:var(--muted);white-space:nowrap">${dt}</td><td style="font-weight:600;color:var(--navy)">${r.resident_name||'—'}</td><td style="color:var(--muted)">${r.student_id||'—'}</td><td><strong>${r.state||'—'}</strong></td><td style="font-size:12px;color:var(--muted)">${r.coach_email||'—'}</td><td style="font-size:12px;color:var(--muted)">${r.recipient_email||'—'}</td><td>${badge}</td><td style="font-size:12px">${files}</td></tr>`;
+    const hasStorage = r.storage_paths && r.storage_paths.length > 0;
+    const docsBtn = hasStorage
+      ? `<button class="btn btn-sky btn-sm" onclick="showDocs('${r.id}','${(r.resident_name||'').replace(/'/g,'')}')" style="white-space:nowrap">📁 ${r.storage_paths.length} file${r.storage_paths.length!==1?'s':''}</button>`
+      : '<span style="font-size:11px;color:var(--silver)">—</span>';
+    return`<tr><td><input type="checkbox" class="sub-cb" value="${r.id}"></td><td style="color:var(--muted);white-space:nowrap">${dt}</td><td style="font-weight:600;color:var(--navy)">${r.resident_name||'—'}</td><td style="color:var(--muted)">${r.student_id||'—'}</td><td><strong>${r.state||'—'}</strong></td><td style="font-size:12px;color:var(--muted)">${r.coach_email||'—'}</td><td style="font-size:12px;color:var(--muted)">${r.recipient_email||'—'}</td><td>${badge}</td><td style="font-size:12px">${files}</td><td>${docsBtn}</td></tr>`;
   }).join('');
 }
 
@@ -508,6 +528,48 @@ function downloadExcel(){
   }
   XLSX.writeFile(wb,`TEACH_Data_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
+
+// ── DOCUMENT REPOSITORY ───────────────────────────────────
+async function showDocs(submissionId, residentName) {
+  document.getElementById('docsModalTitle').textContent = `Documents — ${residentName || 'Resident'}`;
+  document.getElementById('docsModalBody').innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:13px">Loading files…</div>';
+  document.getElementById('docsModal').classList.add('open');
+
+  try {
+    const res = await fetch('/.netlify/functions/get-files', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: sessionToken, submissionId })
+    });
+    const result = await res.json();
+    if (!result.success) throw new Error(result.error || 'Failed to load files');
+
+    const files = result.files || [];
+    if (!files.length) {
+      document.getElementById('docsModalBody').innerHTML = '<p style="text-align:center;color:var(--muted);font-size:13px;padding:1rem">No stored files found for this submission.</p>';
+      return;
+    }
+
+    document.getElementById('docsModalBody').innerHTML = files.map(f => {
+      const icon = f.name.endsWith('.pdf') ? '📄' : f.name.match(/\.(jpg|jpeg|png|gif)$/i) ? '🖼️' : f.name.match(/\.(doc|docx)$/i) ? '📝' : '📎';
+      const dlBtn = f.url
+        ? `<a href="${f.url}" target="_blank" download="${f.name}" class="btn btn-sky btn-sm" style="text-decoration:none">⬇ Download</a>`
+        : `<span style="font-size:11px;color:var(--crimson)">Unavailable</span>`;
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--light)">
+        <span style="font-size:20px">${icon}</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:var(--navy)">${f.name}</div>
+          <div style="font-size:11px;color:var(--muted)">${f.path}</div>
+        </div>
+        ${dlBtn}
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    document.getElementById('docsModalBody').innerHTML = `<p style="color:var(--crimson);font-size:13px">Error: ${e.message}</p>`;
+  }
+}
 </script>
 </body>
 </html>
+
