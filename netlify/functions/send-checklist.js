@@ -186,7 +186,9 @@ exports.handler = async (event) => {
     const sgPayload = {
       personalizations: [{
         to: [{ email: recipientEmail }],
-        cc: [{ email: coachEmail }],
+        ...(coachEmail.toLowerCase() !== recipientEmail.toLowerCase() && {
+          cc: [{ email: coachEmail }]
+        }),
         subject: emailSubject,
       }],
       from:     { email: fromEmail, name: fromName },
