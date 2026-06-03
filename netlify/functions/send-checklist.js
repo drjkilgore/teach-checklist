@@ -1,4 +1,11 @@
+
 const https = require('https');
+const { createClient } = require('@supabase/supabase-js');
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
 
 // ── HTTPS helper ──────────────────────────────────────────
 function httpsPost(hostname, path, headers, body) {
@@ -13,7 +20,6 @@ function httpsPost(hostname, path, headers, body) {
       res.on('end', () => resolve({
         status: res.statusCode,
         body: Buffer.concat(chunks),
-        headers: res.headers,
       }));
     });
     req.on('error', reject);
@@ -24,7 +30,6 @@ function httpsPost(hostname, path, headers, body) {
 
 // ── HTML → PDF via PDFShift ───────────────────────────────
 async function htmlToPDF(html, apiKey) {
-  // Make the email fill the full page width by removing the centered max-width container
   const fullWidthHtml = html
     .replace('width="620"', 'width="100%"')
     .replace('max-width:620px', 'max-width:100%')
@@ -39,43 +44,48 @@ async function htmlToPDF(html, apiKey) {
 
   const auth = Buffer.from(`api:${apiKey}`).toString('base64');
   const result = await httpsPost(
-    'api.pdfshift.io',
-    '/v3/convert/pdf',
-    {
-      'Authorization': `Basic ${auth}`,
-      'Content-Type': 'application/json',
-    },
+    'api.pdfshift.io', '/v3/convert/pdf',
+    { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/json' },
     payload
   );
 
   console.log('PDFShift response status:', result.status);
   if (result.status !== 200) {
-    throw new Error(`PDFShift error ${result.status}: ${result.body.toString().substring(0,200)}`);
+    throw new Error(`PDFShift error ${result.status}: ${result.body.toString().substring(0, 200)}`);
   }
+  return result.body; // Buffer
+}
 
-  return result.body.toString('base64');
+// ── Upload file to Supabase Storage ──────────────────────
+async function uploadToStorage(fileBuffer, storagePath, mimeType) {
+  const { data, error } = await supabase.storage
+    .from('checklist-files')
+    .upload(storagePath, fileBuffer, {
+      contentType: mimeType,
+      upsert: true, // overwrite if resubmitted
+    });
+
+  if (error) throw new Error(`Storage upload failed: ${error.message}`);
+  return data.path;
+}
+
+// ── Generate signed URL for a stored file ────────────────
+async function getSignedUrl(storagePath, expiresIn = 3600) {
+  const { data, error } = await supabase.storage
+    .from('checklist-files')
+    .createSignedUrl(storagePath, expiresIn);
+  if (error) return null;
+  return data.signedUrl;
 }
 
 // ── SendGrid send ─────────────────────────────────────────
 async function sendEmail(apiKey, payload) {
-  const result = await httpsPost(
-    'api.sendgrid.com',
-    '/v3/mail/send',
-    {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
+  return await httpsPost(
+    'api.sendgrid.com', '/v3/mail/send',
+    { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
     payload
   );
-  return result;
 }
-
-// ── Supabase ──────────────────────────────────────────────
-const { createClient } = require('@supabase/supabase-js');
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
 
 // ── MAIN HANDLER ──────────────────────────────────────────
 exports.handler = async (event) => {
@@ -99,43 +109,69 @@ exports.handler = async (event) => {
     const fromName  = process.env.SEND_FROM_NAME || '#TEACH Checklist System';
     const pdfKey    = process.env.PDFSHIFT_API_KEY;
 
-    console.log('ENV CHECK — SENDGRID_API_KEY:', sgKey ? 'SET' : 'MISSING');
-    console.log('ENV CHECK — SEND_FROM_EMAIL:', fromEmail || 'MISSING');
-    console.log('ENV CHECK — PDFSHIFT_API_KEY:', pdfKey ? 'SET' : 'MISSING');
+    console.log('ENV — SENDGRID:', sgKey ? 'SET' : 'MISSING');
+    console.log('ENV — FROM_EMAIL:', fromEmail || 'MISSING');
+    console.log('ENV — PDFSHIFT:', pdfKey ? 'SET' : 'MISSING');
 
-    if (!sgKey || !fromEmail) {
-      throw new Error('SendGrid not configured.');
-    }
+    if (!sgKey || !fromEmail) throw new Error('SendGrid not configured.');
 
-    // Build attachments list
-    const attachments = [];
+    // ── Safe folder name for storage ───────────────────
+    const safeName  = (residentName || 'Unknown').replace(/[^a-zA-Z0-9_\-]/g, '_');
+    const safeId    = (studentId || 'NOID').replace(/[^a-zA-Z0-9_\-]/g, '_');
+    const timestamp = new Date().toISOString().slice(0, 10);
+    const folder    = `${state}/${safeName}_${safeId}_${timestamp}`;
 
-    // 1. Generate PDF from HTML if PDFShift is configured
+    // ── 1. Generate PDF ────────────────────────────────
+    let pdfBuffer   = null;
     let pdfGenerated = false;
-    let pdfError = null;
+    let pdfError    = null;
+    let pdfStoragePath = null;
+
     if (pdfKey) {
       try {
-        console.log('PDFShift: starting generation, HTML length:', htmlBody.length);
-        const pdfBase64 = await htmlToPDF(htmlBody, pdfKey);
-        console.log('PDFShift: success, PDF base64 length:', pdfBase64.length);
-        const safeName = (residentName || 'Resident').replace(/\s+/g, '_');
-        attachments.push({
-          content:     pdfBase64,
-          filename:    `TEACH_Checklist_${state}_${safeName}.pdf`,
-          type:        'application/pdf',
-          disposition: 'attachment',
-        });
+        console.log('PDFShift: generating PDF...');
+        pdfBuffer = await htmlToPDF(htmlBody, pdfKey);
+        console.log('PDFShift: success, bytes:', pdfBuffer.length);
         pdfGenerated = true;
-        console.log('PDFShift: attachment added OK');
+
+        // Upload PDF to storage
+        pdfStoragePath = `${folder}/TEACH_Checklist_${state}_${safeName}.pdf`;
+        await uploadToStorage(pdfBuffer, pdfStoragePath, 'application/pdf');
+        console.log('Storage: PDF uploaded to', pdfStoragePath);
       } catch (e) {
         pdfError = e.message;
-        console.error('PDFShift FAILED:', e.message);
+        console.error('PDF error:', e.message);
       }
-    } else {
-      console.log('PDFShift: skipped — PDFSHIFT_API_KEY not set');
     }
 
-    // 2. Add uploaded files
+    // ── 2. Upload user-uploaded files to storage ───────
+    const storedFiles = [];
+    for (const f of fileAttachments) {
+      if (!f.data || !f.name) continue;
+      try {
+        const fileBuffer = Buffer.from(f.data, 'base64');
+        const safeFname  = f.name.replace(/[^a-zA-Z0-9_\-\.]/g, '_');
+        const filePath   = `${folder}/${safeFname}`;
+        await uploadToStorage(fileBuffer, filePath, f.type || 'application/octet-stream');
+        storedFiles.push({ name: f.name, path: filePath, type: f.type });
+        console.log('Storage: uploaded', filePath);
+      } catch (e) {
+        console.warn('Storage upload failed for', f.name, e.message);
+      }
+    }
+
+    // ── 3. Build SendGrid email ────────────────────────
+    const attachments = [];
+
+    if (pdfBuffer) {
+      attachments.push({
+        content:     pdfBuffer.toString('base64'),
+        filename:    `TEACH_Checklist_${state}_${safeName}.pdf`,
+        type:        'application/pdf',
+        disposition: 'attachment',
+      });
+    }
+
     for (const f of fileAttachments) {
       if (f.data && f.name) {
         attachments.push({
@@ -147,8 +183,7 @@ exports.handler = async (event) => {
       }
     }
 
-    // Build SendGrid payload
-    const payload = {
+    const sgPayload = {
       personalizations: [{
         to: [{ email: recipientEmail }],
         cc: [{ email: coachEmail }],
@@ -156,25 +191,27 @@ exports.handler = async (event) => {
       }],
       from:     { email: fromEmail, name: fromName },
       reply_to: { email: coachEmail },
-      content:  [
+      content: [
         { type: 'text/plain', value: textBody },
         { type: 'text/html',  value: htmlBody },
       ],
     };
 
-    if (attachments.length > 0) {
-      payload.attachments = attachments;
-    }
+    if (attachments.length > 0) sgPayload.attachments = attachments;
 
-    const sgResult = await sendEmail(sgKey, payload);
+    const sgResult = await sendEmail(sgKey, sgPayload);
     console.log('SendGrid status:', sgResult.status);
 
     if (sgResult.status < 200 || sgResult.status >= 300) {
       throw new Error(`SendGrid error ${sgResult.status}: ${sgResult.body.toString()}`);
     }
 
-    // Save to Supabase
-    await supabase.from('checklist_submissions').insert([{
+    // ── 4. Save to Supabase database ───────────────────
+    const allStoredPaths = [];
+    if (pdfStoragePath) allStoredPaths.push(pdfStoragePath);
+    storedFiles.forEach(f => allStoredPaths.push(f.path));
+
+    const { error: dbError } = await supabase.from('checklist_submissions').insert([{
       state,
       state_name:      stateName,
       resident_name:   residentName,
@@ -184,10 +221,14 @@ exports.handler = async (event) => {
       checked_items:   checkedItems || {},
       total_items:     totalItems || 0,
       checked_count:   checkedCount || 0,
-      file_names:      fileNames || null,
+      file_names:      fileAttachments.map(f => f.name).join(', ') || null,
       email_subject:   emailSubject,
       form_body:       textBody,
+      storage_folder:  folder,
+      storage_paths:   allStoredPaths,
     }]);
+
+    if (dbError) console.warn('DB insert error:', dbError.message);
 
     return {
       statusCode: 200,
@@ -196,7 +237,8 @@ exports.handler = async (event) => {
         success: true,
         pdfGenerated,
         pdfError,
-        attachmentCount: attachments.length,
+        storedFileCount: allStoredPaths.length,
+        storageFolder: folder,
       }),
     };
 
