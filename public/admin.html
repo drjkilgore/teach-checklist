@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -200,7 +199,7 @@ tr:hover td{background:#fafafa}
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>Name</th><th>Email</th><th>States</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+          <thead><tr><th style="min-width:160px">Name</th><th style="min-width:200px">Email</th><th style="min-width:160px">States</th><th style="min-width:80px">Role</th><th style="min-width:90px">Status</th><th style="min-width:90px">Joined</th><th style="min-width:220px">Actions</th></tr></thead>
           <tbody id="coachBody"></tbody>
         </table>
       </div>
@@ -518,8 +517,8 @@ function renderCoachTable(rows){
     const statusBadge=`<span class="badge b-${c.status}">${c.status}</span>`;
     const roleBadge=`<span class="badge b-${c.role}">${c.role}</span>`;
     return`<tr>
-      <td style="font-weight:600;color:var(--navy)">${c.name}</td>
-      <td style="font-size:12px;color:var(--muted)">${c.email}</td>
+      <td style="font-weight:600;color:var(--navy);white-space:nowrap">${c.name}</td>
+      <td style="font-size:12px;color:var(--muted);white-space:nowrap">${c.email}</td>
       <td><span style="font-size:12px">${(c.states||[]).join(', ')||'—'}</span></td>
       <td>${roleBadge}</td>
       <td>${statusBadge}</td>
