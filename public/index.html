@@ -724,16 +724,81 @@ function showApp() {
   document.getElementById('headerCoach').innerHTML = `<strong>${coach.name}</strong> · ${coach.states.join(', ')}`;
   document.getElementById('logoutBtn').style.display = 'inline';
 
-  // If coach has only one state, auto-select it
-  if (coach.states.length === 1) {
-    selState = coach.states[0];
+  if (coach.states.length === 1) selState = coach.states[0];
+  renderStateDisplay();
+
+  // Check if admin opened a draft from the admin panel
+  const adminDraft = sessionStorage.getItem('admin_open_draft');
+  if (adminDraft) {
+    sessionStorage.removeItem('admin_open_draft');
+    try {
+      const d = JSON.parse(adminDraft);
+      // Check admin has access to this state
+      if (coach.role === 'admin' || coach.states.includes(d.state)) {
+        goStep(1);
+        // Small delay so DOM is ready
+        setTimeout(() => loadAdminDraft(d), 300);
+        return;
+      }
+    } catch(e) { console.warn('Admin draft parse error:', e); }
   }
 
-  renderStateDisplay();
   goStep(1);
-
-  // Load drafts and show picker if any exist
   loadDraftList();
+}
+
+// ── LOAD DRAFT OPENED FROM ADMIN PANEL ───────────────────
+async function loadAdminDraft(d) {
+  showToast(`Loading draft for ${d.residentName || d.studentId}…`, 'info', 4000);
+
+  try {
+    const res = await fetch('/.netlify/functions/draft', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'load', token: sessionToken, studentId: d.studentId })
+    }).then(r => r.json());
+
+    if (!res.success || !res.draft) {
+      // Draft not found via API — still populate from the data we have
+      document.getElementById('resName').value    = d.residentName || '';
+      document.getElementById('stuId').value      = d.studentId    || '';
+      selState     = d.state;
+      currentDraftId = d.draftId;
+      renderStateDisplay();
+      showToast('Draft info loaded — checklist data unavailable.', 'info', 4000);
+      return;
+    }
+
+    const draft = res.draft;
+    document.getElementById('resName').value    = draft.resident_name   || '';
+    document.getElementById('stuId').value      = draft.student_id      || '';
+    document.getElementById('recipEmail').value = draft.recipient_email || '';
+    selState       = draft.state;
+    currentDraftId = draft.id;
+    renderStateDisplay();
+    buildChecklist();
+
+    // Restore checked items
+    if (draft.form_data && draft.form_data.checked) {
+      Object.entries(draft.form_data.checked).forEach(([id, val]) => {
+        cbStates[id] = val;
+        const cb = document.getElementById(id);
+        if (cb) cb.checked = val;
+      });
+    }
+
+    // Show a banner so admin knows whose draft they're editing
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:#FFF8E1;border:1.5px solid #F9A825;border-radius:6px;padding:10px 14px;margin-bottom:1rem;font-size:13px;color:#333';
+    banner.innerHTML = `⚠️ <strong>Admin override:</strong> You are editing a draft originally created by <strong>${d.coachEmail || 'another coach'}</strong>. Changes will be saved under your account.`;
+    document.getElementById('step2').insertBefore(banner, document.getElementById('step2').firstChild);
+
+    showToast(`Draft loaded — ${draft.resident_name || draft.student_id}`, 'success');
+    goStep(2, true);
+
+  } catch(e) {
+    showToast('Error loading draft: ' + e.message, 'error');
+    loadDraftList();
+  }
 }
 
 function renderStateDisplay() {
