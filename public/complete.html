@@ -162,11 +162,16 @@ const STATES={
     s8:["Form V sent to Resident","Program Completion Letter sent to Resident"],noMentor:true}
 };
 
-const COACH_ITEMS = new Set([
-  'chk_1_0','chk_1_1','chk_1_2',
-  'chk_2_0','chk_2_1','chk_2_2','chk_2_3','chk_2_4','chk_2_5',
-  'chk_4_2',
-]);
+const COACH_S4_INDEX = { AL: 0, AZ: 0, IN: 1, MI: 2, NC: 2 };
+
+function getCoachItems(state) {
+  const s4idx = COACH_S4_INDEX[state] ?? 2;
+  return new Set([
+    'chk_1_0','chk_1_1','chk_1_2',
+    'chk_2_0','chk_2_1','chk_2_2','chk_2_3','chk_2_4','chk_2_5',
+    `chk_4_${s4idx}`,
+  ]);
+}
 
 let submission = null;
 let cbStates   = {};
@@ -247,7 +252,7 @@ function buildChecklist(s, coachChecked){
   body.innerHTML = '';
 
   function mkCB(id, html){
-    const isCoach    = COACH_ITEMS.has(id);
+    const isCoach    = getCoachItems(submission.state).has(id);
     const wasChecked = coachChecked[id] === true;
     cbStates[id]     = wasChecked;
 
