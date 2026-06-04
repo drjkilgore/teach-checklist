@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -430,7 +429,7 @@ input::placeholder{color:var(--silver)}
         <div class="sum-row"><span class="sk">Coach CC</span><span class="sv" id="sumCoach">—</span></div>
         <div class="sum-row"><span class="sk">Attachments</span><span class="sv" id="sumFiles">—</span></div>
       </div>
-      <div class="info-box"><strong>What gets sent:</strong> A formatted HTML checklist email plus a PDF version automatically attached. Any uploaded documents are also included.</div>
+      <div class="info-box"><strong>Two-stage workflow:</strong> You are completing Stage 1 (coach portion). The advisor items are grayed out — the recipient will complete those via a secure link sent in the email. Once they finish, a final PDF is generated and emailed back to you automatically.</div>
       <div class="btn-row">
         <button class="btn" onclick="goStep(3)">← Back</button>
         <button class="btn btn-crimson" id="submitBtn" onclick="submitForm()">✓ Submit & Send</button>
@@ -442,9 +441,9 @@ input::placeholder{color:var(--silver)}
       <div class="card">
         <div class="done-screen">
           <span class="done-icon">✅</span>
-          <h2>Checklist Submitted!</h2>
+          <h2>Stage 1 Complete!</h2>
           <p id="dl1"></p><p id="dl2"></p>
-          <p style="font-size:12px;margin-top:4px;color:var(--silver)">Record saved to database. Draft deleted.</p>
+          <p style="font-size:12px;margin-top:4px;color:var(--silver)">The advisor has been sent a secure link to complete their portion. You'll receive the final PDF by email when they're done.</p>
           <div class="done-actions">
             <button class="btn btn-primary" onclick="startNew()">Start New Checklist</button>
           </div>
@@ -463,28 +462,58 @@ input::placeholder{color:var(--silver)}
       <button class="modal-close" onclick="document.getElementById('helpModal').classList.remove('open')">✕</button>
     </div>
     <div class="modal-body">
+
       <div class="modal-section">
         <h3>What This App Does</h3>
-        <p>This tool lets coaches document and submit a resident's program completion requirements. It generates a state-specific checklist, delivers it by email as a formatted PDF, and keeps a permanent record of all submissions.</p>
+        <p>The <strong>#TEACH Resident Completion Checklist</strong> is a two-stage digital tool for documenting and finalizing a resident's program completion. The instructional coach completes Stage 1, and the advisor or program processor completes Stage 2 via a secure link. Once both stages are done, a final PDF is generated and emailed to all parties.</p>
+        <p>The app supports five states — <strong>Alabama, Arizona, Indiana, Michigan, and North Carolina</strong> — each with their own state-specific requirements.</p>
       </div>
+
       <div class="modal-section">
-        <h3>How to Complete a Checklist</h3>
+        <h3>Two-Stage Workflow Overview</h3>
+        <p><strong>Stage 1 — Instructional Coach</strong> (you): Complete your assigned items and submit. A secure link is automatically emailed to the recipient for Stage 2.</p>
+        <p><strong>Stage 2 — Advisor / Processor</strong>: They click the link in their email, review what you checked, complete the remaining items, and submit. The final PDF is generated and emailed back to you automatically.</p>
+      </div>
+
+      <div class="modal-section">
+        <h3>Coach Items (Stage 1 — Your Responsibility)</h3>
+        <p>As the instructional coach, you are responsible for checking the following items only. Everything else is grayed out and labeled <strong>ADVISOR</strong> — those will be completed by the recipient in Stage 2.</p>
         <ol class="step-list">
-          <li><span class="snum">1</span><div><strong>Resident Info</strong> — Enter the resident's name, Student ID, and the recipient email. Student ID is required to save and resume drafts.</div></li>
-          <li><span class="snum">2</span><div><strong>Checklist</strong> — Check each completed item. Use <em>Save Draft</em> to save progress and come back later. The resident can resume using their Student ID.</div></li>
-          <li><span class="snum">3</span><div><strong>Documents</strong> — Attach supporting files (transcripts, evaluations, certifications). All files are included in the email.</div></li>
-          <li><span class="snum">4</span><div><strong>Submit</strong> — Review and submit. A PDF checklist is auto-generated and emailed to the recipient with you CC'd.</div></li>
+          <li><span class="snum">1</span><div><strong>Section 1 — Coursework (all 3 items):</strong> Courses completed with 3.0+, logged in LMS, transcript request available.</div></li>
+          <li><span class="snum">2</span><div><strong>Section 2 — #TEACH Assessments (all 5 items):</strong> TPA scores, Family Conferences, Professionalism, Fall and Spring Assessments recorded.</div></li>
+          <li><span class="snum">4</span><div><strong>Section 4, Item 3 only — Final Coaching Conversation:</strong> The final coaching conversation has been recorded in the CRM system.</div></li>
+        </ol>
+        <p>All other items in Sections 3, 4, 5, 6, 7, 8, 9, and 10 are completed by the advisor in Stage 2.</p>
+      </div>
+
+      <div class="modal-section">
+        <h3>How to Complete a Checklist (Step by Step)</h3>
+        <ol class="step-list">
+          <li><span class="snum">1</span><div><strong>Resident Info</strong> — Enter the resident's name, Student ID, and the advisor/processor email address. Student ID is required to save drafts.</div></li>
+          <li><span class="snum">2</span><div><strong>Checklist</strong> — Check your three sections. Advisor items are grayed out — leave them. Use <em>Save Draft</em> to save progress and return later.</div></li>
+          <li><span class="snum">3</span><div><strong>Documents</strong> — Attach any supporting files. These are sent to the advisor along with the checklist.</div></li>
+          <li><span class="snum">4</span><div><strong>Submit (Stage 1)</strong> — The advisor receives an email with your completed items and a secure <em>Complete Your Portion</em> button.</div></li>
+          <li><span class="snum">5</span><div><strong>Advisor completes Stage 2</strong> — They use the link to finish the checklist. When done, a final PDF is generated and emailed back to you automatically.</div></li>
         </ol>
       </div>
+
       <div class="modal-section">
         <h3>Saving & Resuming Drafts</h3>
-        <p>Click <strong>Save Draft</strong> on the checklist step at any time. The draft is tied to the resident's Student ID. To resume, enter the Student ID in the "Resume a saved draft" box on Step 1.</p>
-        <p>Drafts are saved indefinitely until the checklist is submitted. Admins and coaches can see all open drafts in the Admin Panel.</p>
+        <p>Click <strong>Save Draft</strong> on the checklist step at any time. The draft is tied to the resident's Student ID. To resume, click <strong>View Saved Drafts</strong> on Step 1 or enter the Student ID in the resume box. Drafts are saved indefinitely until the checklist is submitted.</p>
       </div>
+
+      <div class="modal-section">
+        <h3>What Gets Sent</h3>
+        <p><strong>Stage 1 email (to advisor):</strong> Your completed items are shown in the email body for reference, plus a secure link to complete their portion. Any uploaded documents are attached.</p>
+        <p><strong>Stage 2 email (back to coach):</strong> The fully completed checklist as an HTML email, plus a PDF attachment of the final checklist. Sent to the coach with a CC to the advisor.</p>
+        <p>All files are also stored permanently in the document repository and accessible from the Admin Panel regardless of who leaves the organization.</p>
+      </div>
+
       <div class="modal-section">
         <h3>Admin Panel</h3>
-        <p>Go to <strong>/admin</strong> on this site to manage submissions, view open drafts, manage coach accounts, and download Excel reports. Your access is limited to your assigned states.</p>
+        <p>Go to <strong>/admin</strong> on this site to manage submissions, view open drafts, manage coach accounts, download Excel reports, and access stored documents. Submissions show their current status — <em>Coach Complete</em> (awaiting advisor) or <em>Fully Complete</em>.</p>
       </div>
+
     </div>
   </div>
 </div>
@@ -502,6 +531,14 @@ const EJS_PK = 'tYiIe0TECODvMI9SP';
 const EJS_SI = 'service_9zriilf';
 const EJS_TI = 'template_ufka8zi';
 emailjs.init(EJS_PK);
+
+// ── COACH-OWNED ITEMS (Stage 1) ───────────────────────────
+// These are the only items the coach checks. Everything else is for the advisor.
+const COACH_ITEMS = new Set([
+  'chk_1_0','chk_1_1','chk_1_2',          // Section 1: all 3
+  'chk_2_0','chk_2_1','chk_2_2','chk_2_3','chk_2_4','chk_2_5', // Section 2: all 5
+  'chk_4_2',                               // Section 4: item 3 (final coaching conversation)
+]);
 
 // ── STATE DATA ────────────────────────────────────────────
 const STATES={
@@ -911,13 +948,24 @@ function buildChecklist() {
   title.innerHTML = `<span class="ct-bar"></span>${selState} — ${s.name}`;
   body.innerHTML = '';
 
-  function mkCB(id,html){
-    cbStates[id]=false;
-    const d=document.createElement('div'); d.className='check-item';
-    const cb=document.createElement('input'); cb.type='checkbox'; cb.id=id;
-    cb.onchange=e=>{ cbStates[id]=e.target.checked; };
-    const lbl=document.createElement('label'); lbl.htmlFor=id; lbl.innerHTML=html;
-    d.appendChild(cb); d.appendChild(lbl); return d;
+  function mkCB(id, html){
+    cbStates[id] = false;
+    const isCoachItem = COACH_ITEMS.has(id);
+    const d = document.createElement('div');
+    d.className = 'check-item';
+    if (!isCoachItem) d.style.opacity = '0.45';
+
+    const cb = document.createElement('input'); cb.type='checkbox'; cb.id=id;
+    if (!isCoachItem) {
+      cb.disabled = true;
+      cb.title = 'Completed by advisor';
+    }
+    cb.onchange = e => { cbStates[id] = e.target.checked; };
+
+    const lbl = document.createElement('label'); lbl.htmlFor=id;
+    lbl.innerHTML = html + (!isCoachItem ? ' <span style="font-size:10px;color:var(--sky);font-weight:600;margin-left:4px">ADVISOR</span>' : '');
+    d.appendChild(cb); d.appendChild(lbl);
+    return d;
   }
   function mkSubs(items){
     const ul=document.createElement('ul'); ul.className='sub-list';
@@ -1058,13 +1106,18 @@ async function submitForm(){
   }
 
   try{
+    // Only count coach-owned items for completion
+    const coachTotal   = COACH_ITEMS.size;
+    const coachChecked = Object.entries(cbStates).filter(([id,v]) => COACH_ITEMS.has(id) && v).length;
+
     const res=await fetch('/.netlify/functions/send-checklist',{
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
+        stage: 'coach',
         state:selState, stateName:s.name, residentName:name, studentId:sid,
         coachEmail:coach.email, recipientEmail:recip,
-        checkedCount, totalItems:total, fileAttachments,
-        emailSubject:subject, htmlBody, textBody,
+        checkedCount:coachChecked, totalItems:coachTotal,
+        fileAttachments, emailSubject:subject, htmlBody, textBody,
         checkedItems:cbStates, fileNames:files.map(f=>f.name).join(', ')||null,
       })
     });
@@ -1111,5 +1164,4 @@ function showToast(msg,type='success',dur=4000){
 </script>
 </body>
 </html>
-
 
