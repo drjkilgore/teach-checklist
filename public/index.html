@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1104,14 +1105,34 @@ function rmFile(name,el){ files=files.filter(f=>f.name!==name); el.remove(); }
 // ── SUMMARY ───────────────────────────────────────────────
 function buildSummary(){
   const s=STATES[selState], body=document.getElementById('sumBody'); body.innerHTML='';
-  const total=Object.keys(cbStates).length, checked=Object.values(cbStates).filter(Boolean).length, pct=total?Math.round(checked/total*100):0;
-  [['State',`${selState} — ${s.name}`],['Resident',document.getElementById('resName').value||'—'],['Student ID',document.getElementById('stuId').value||'—'],['Items completed',`${checked} / ${total} (${pct}%)`]].forEach(([k,v])=>{
+
+  // Only count coach-owned items for the summary — advisor items are not coach's responsibility
+  const coachKeys    = Object.keys(cbStates).filter(id => COACH_ITEMS.has(id));
+  const coachTotal   = coachKeys.length;
+  const coachChecked = coachKeys.filter(id => cbStates[id]).length;
+  const pct          = coachTotal ? Math.round(coachChecked/coachTotal*100) : 0;
+
+  [['State',`${selState} — ${s.name}`],
+   ['Resident', document.getElementById('resName').value||'—'],
+   ['Student ID', document.getElementById('stuId').value||'—'],
+   ['Your items completed', `${coachChecked} / ${coachTotal} (${pct}%)`],
+   ['Advisor items', `${Object.keys(cbStates).length - coachTotal} items — completed by recipient`],
+  ].forEach(([k,v])=>{
     const r=document.createElement('div'); r.className='sum-row';
     r.innerHTML=`<span class="sk">${k}</span><span class="sv">${v}</span>`; body.appendChild(r);
   });
+
   const bar=document.createElement('div'); bar.className='comp-bar';
   bar.innerHTML=`<div class="comp-fill" style="width:${pct}%"></div>`; body.appendChild(bar);
-  if(checked<total){const w=document.createElement('div');w.className='warn-box';w.textContent=`${total-checked} item(s) unchecked. You may still submit.`;body.appendChild(w);}
+
+  // Warning only for unchecked coach items
+  const coachUnchecked = coachTotal - coachChecked;
+  if(coachUnchecked > 0){
+    const w=document.createElement('div'); w.className='warn-box';
+    w.textContent=`${coachUnchecked} of your item(s) unchecked. You may still submit.`;
+    body.appendChild(w);
+  }
+
   document.getElementById('sumRecip').textContent=document.getElementById('recipEmail').value||'—';
   document.getElementById('sumCoach').textContent=coach.email||'—';
   document.getElementById('sumFiles').textContent=files.length?files.map(f=>f.name).join(', '):'None';
@@ -1229,4 +1250,3 @@ function showToast(msg,type='success',dur=4000){
 </script>
 </body>
 </html>
-
