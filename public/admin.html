@@ -164,7 +164,7 @@ tr:hover td{background:#fafafa}
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th><input type="checkbox" id="draftCheckAll" onchange="toggleAll('draft-cb',this)"></th><th>Last Updated</th><th>Resident</th><th>Student ID</th><th>State</th><th>Coach</th><th>Created</th></tr></thead>
+          <thead><tr><th><input type="checkbox" id="draftCheckAll" onchange="toggleAll('draft-cb',this)"></th><th>Last Updated</th><th>Resident</th><th>Student ID</th><th>State</th><th>Coach</th><th>Created</th><th>Action</th></tr></thead>
           <tbody id="draftBody"></tbody>
         </table>
       </div>
@@ -412,7 +412,24 @@ function renderDraftTable(rows){
   tbody.innerHTML=rows.map(r=>{
     const upd=r.updated_at?new Date(r.updated_at).toLocaleDateString():'—';
     const crt=r.created_at?new Date(r.created_at).toLocaleDateString():'—';
-    return`<tr><td><input type="checkbox" class="draft-cb" value="${r.id}"></td><td style="color:var(--muted);white-space:nowrap">${upd}</td><td style="font-weight:600;color:var(--navy)">${r.resident_name||'—'}</td><td style="color:var(--muted)">${r.student_id}</td><td><strong>${r.state}</strong></td><td style="font-size:12px;color:var(--muted)">${r.coach_email||'—'}</td><td style="color:var(--muted);font-size:12px">${crt}</td></tr>`;
+    // Encode draft data for the open button
+    const draftData = encodeURIComponent(JSON.stringify({
+      id:             r.id,
+      student_id:     r.student_id,
+      state:          r.state,
+      resident_name:  r.resident_name || '',
+      coach_email:    r.coach_email   || '',
+    }));
+    return`<tr>
+      <td><input type="checkbox" class="draft-cb" value="${r.id}"></td>
+      <td style="color:var(--muted);white-space:nowrap">${upd}</td>
+      <td style="font-weight:600;color:var(--navy)">${r.resident_name||'—'}</td>
+      <td style="color:var(--muted)">${r.student_id}</td>
+      <td><strong>${r.state}</strong></td>
+      <td style="font-size:12px;color:var(--muted)">${r.coach_email||'—'}</td>
+      <td style="color:var(--muted);font-size:12px">${crt}</td>
+      <td><button class="btn btn-sky btn-sm" onclick="openDraft('${draftData}')" title="Open this draft in the checklist app">📂 Open</button></td>
+    </tr>`;
   }).join('');
 }
 
@@ -569,7 +586,25 @@ async function showDocs(submissionId, residentName) {
     document.getElementById('docsModalBody').innerHTML = `<p style="color:var(--crimson);font-size:13px">Error: ${e.message}</p>`;
   }
 }
+
+// ── OPEN DRAFT ────────────────────────────────────────────
+function openDraft(encodedData) {
+  const d = JSON.parse(decodeURIComponent(encodedData));
+
+  // Store the draft info in sessionStorage so index.html can pick it up
+  sessionStorage.setItem('admin_open_draft', JSON.stringify({
+    studentId:    d.student_id,
+    state:        d.state,
+    residentName: d.resident_name,
+    coachEmail:   d.coach_email,
+    draftId:      d.id,
+  }));
+
+  // Open the checklist app in a new tab — the app will auto-load this draft
+  window.open('/', '_blank');
+}
 </script>
 </body>
 </html>
+
 
