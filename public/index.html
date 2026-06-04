@@ -531,13 +531,23 @@ const EJS_SI = 'service_9zriilf';
 const EJS_TI = 'template_ufka8zi';
 emailjs.init(EJS_PK);
 
-// ── COACH-OWNED ITEMS (Stage 1) ───────────────────────────
-// These are the only items the coach checks. Everything else is for the advisor.
-const COACH_ITEMS = new Set([
-  'chk_1_0','chk_1_1','chk_1_2',          // Section 1: all 3
-  'chk_2_0','chk_2_1','chk_2_2','chk_2_3','chk_2_4','chk_2_5', // Section 2: all 5
-  'chk_4_2',                               // Section 4: item 3 (final coaching conversation)
-]);
+// ── COACH-OWNED ITEMS (Stage 1) — state-aware ─────────────
+// Section 1 items 0-2 and Section 2 items 0-4 are always coach items.
+// The "final coaching conversation" is always a coach item but sits at
+// different indexes depending on the state's Section 4 order.
+const COACH_S4_INDEX = { AL: 0, AZ: 0, IN: 1, MI: 2, NC: 2 };
+
+function getCoachItems(state) {
+  const s4idx = COACH_S4_INDEX[state] ?? 2;
+  return new Set([
+    'chk_1_0','chk_1_1','chk_1_2',
+    'chk_2_0','chk_2_1','chk_2_2','chk_2_3','chk_2_4','chk_2_5',
+    `chk_4_${s4idx}`,
+  ]);
+}
+
+// Convenience — returns current state's coach items (falls back to MI if no state selected)
+function coachItems() { return getCoachItems(selState || 'MI'); }
 
 // ── STATE DATA ────────────────────────────────────────────
 const STATES={
@@ -1014,7 +1024,7 @@ function buildChecklist() {
 
   function mkCB(id, html){
     cbStates[id] = false;
-    const isCoachItem = COACH_ITEMS.has(id);
+    const isCoachItem = coachItems().has(id);
     const d = document.createElement('div');
     d.className = 'check-item';
     if (!isCoachItem) d.style.opacity = '0.45';
@@ -1105,7 +1115,7 @@ function buildSummary(){
   const s=STATES[selState], body=document.getElementById('sumBody'); body.innerHTML='';
 
   // Only count coach-owned items for the summary — advisor items are not coach's responsibility
-  const coachKeys    = Object.keys(cbStates).filter(id => COACH_ITEMS.has(id));
+  const coachKeys    = Object.keys(cbStates).filter(id => coachItems().has(id));
   const coachTotal   = coachKeys.length;
   const coachChecked = coachKeys.filter(id => cbStates[id]).length;
   const pct          = coachTotal ? Math.round(coachChecked/coachTotal*100) : 0;
@@ -1191,8 +1201,8 @@ async function submitForm(){
 
   try{
     // Only count coach-owned items for completion
-    const coachTotal   = COACH_ITEMS.size;
-    const coachChecked = Object.entries(cbStates).filter(([id,v]) => COACH_ITEMS.has(id) && v).length;
+    const coachTotal   = coachItems().size;
+    const coachChecked = Object.entries(cbStates).filter(([id,v]) => coachItems().has(id) && v).length;
 
     const res=await fetch('/.netlify/functions/send-checklist',{
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -1248,4 +1258,5 @@ function showToast(msg,type='success',dur=4000){
 </script>
 </body>
 </html>
+
 
