@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>#TEACH — Complete Checklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#002E5D;--crimson:#8B0000;--sky:#12A7E6;--light:#F5F5F5;--silver:#C5C5C5;--white:#fff;--ink:#1a1a1a;--muted:#555;--border:#DCDCDC;--font:'Inter',sans-serif;--r:6px;--rl:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--light);color:var(--ink);font-size:15px;line-height:1.6}
+.site-header{background:var(--navy);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.lt{font-weight:800;font-size:26px;letter-spacing:-.5px}.lh{color:var(--silver)}.lw{color:var(--white)}
+.ls{font-size:12px;font-weight:300;color:rgba(255,255,255,.6);margin-left:12px}
+.caep{font-size:11px;font-weight:600;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.2);padding:4px 10px;border-radius:20px;letter-spacing:.5px}
+.wrap{max-width:820px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);padding:1.5rem;margin-bottom:1.25rem;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.card-title{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);margin-bottom:1.25rem;padding-bottom:10px;border-bottom:2px solid var(--light);display:flex;align-items:center;gap:10px}
+.ct-bar{width:4px;height:18px;background:var(--crimson);border-radius:2px;flex-shrink:0}
+.info-row{display:flex;justify-content:space-between;gap:1rem;padding:8px 0;border-bottom:1px solid var(--light);font-size:14px}
+.info-row:last-child{border-bottom:none}
+.ik{color:var(--muted)}.iv{font-weight:600;color:var(--navy);text-align:right}
+.stage-banner{padding:12px 16px;border-radius:var(--r);margin-bottom:1.25rem;font-size:13px;line-height:1.6}
+.stage-coach{background:#EBF5FB;border:1.5px solid var(--sky);color:var(--navy)}
+.stage-advisor{background:#E8F5E9;border:1.5px solid #66BB6A;color:#1B5E20}
+.cl-section{margin-bottom:1.25rem}
+.cl-head{font-size:13px;font-weight:700;color:var(--white);background:var(--navy);padding:7px 12px;border-radius:var(--r);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.cl-head .num{background:var(--crimson);color:var(--white);font-size:11px;font-weight:800;padding:1px 7px;border-radius:10px;flex-shrink:0}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:8px 4px;border-bottom:1px solid var(--light);cursor:pointer}
+.check-item:last-child{border-bottom:none}
+.check-item input[type=checkbox]{width:16px;height:16px;flex-shrink:0;margin-top:2px;accent-color:var(--navy);cursor:pointer}
+.check-item input[type=checkbox]:disabled{cursor:default;opacity:.6}
+.check-item label{font-size:13.5px;color:var(--ink);line-height:1.5;cursor:pointer;flex:1}
+.check-item.coach-item{background:rgba(18,167,230,0.04)}
+.check-item.coach-item label{color:var(--muted)}
+.sub-list{margin:5px 0 2px 26px;list-style:none}
+.sub-list li{font-size:12px;color:var(--muted);padding:2px 0;display:flex;gap:6px;align-items:flex-start;line-height:1.5}
+.sub-list li::before{content:"–";color:var(--sky);flex-shrink:0}
+.cl-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.cl-col-head{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px;padding:6px 10px;background:var(--light);border-radius:var(--r);margin-bottom:6px}
+.coach-tag{font-size:10px;font-weight:700;color:var(--sky);margin-left:6px;letter-spacing:.5px}
+.advisor-tag{font-size:10px;font-weight:700;color:#2E7D32;margin-left:6px;letter-spacing:.5px}
+.prog-wrap{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem}
+.prog-bar{flex:1;height:6px;background:var(--border);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;background:var(--navy);border-radius:4px;transition:width .3s}
+.prog-pct{font-size:13px;font-weight:700;color:var(--navy);min-width:40px;text-align:right}
+.btn{padding:11px 24px;border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:700;letter-spacing:.3px;cursor:pointer;border:1.5px solid var(--border);background:var(--white);color:var(--navy);transition:all .15s;text-transform:uppercase}
+.btn:hover{background:var(--light)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn-primary:hover{background:#001e3d}
+.btn-crimson{background:var(--crimson);border-color:var(--crimson);color:#fff}
+.btn-sky{background:var(--sky);border-color:var(--sky);color:#fff}
+.btn-sky:hover{background:#0e8ec4}
+.btn-full{width:100%;padding:13px;font-size:14px}
+.btn-row{display:flex;gap:12px;margin-top:1.5rem;flex-wrap:wrap}
+.done-screen{text-align:center;padding:3rem 1rem}
+.done-icon{font-size:56px;display:block;margin-bottom:1rem;animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.done-screen h2{font-size:26px;font-weight:800;color:var(--navy);margin-bottom:8px}
+.done-screen p{font-size:14px;color:var(--muted);margin-bottom:6px}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:var(--rl);font-size:14px;font-weight:600;color:#fff;box-shadow:0 4px 20px rgba(0,0,0,.15);z-index:9999;display:none;max-width:340px}
+.toast.show{display:block}.toast.success{background:var(--navy)}.toast.error{background:var(--crimson)}.toast.sending{background:var(--sky)}
+.loading{text-align:center;padding:4rem;color:var(--muted);font-size:14px}
+.error-screen{text-align:center;padding:3rem;color:var(--crimson)}
+.error-screen h2{font-size:22px;font-weight:700;margin-bottom:8px}
+.site-footer{background:var(--navy);padding:1rem 2rem;display:flex;justify-content:space-between;margin-top:4rem}
+.footer-brand{font-size:14px;font-weight:800;color:#fff}.fh{color:var(--silver)}
+.footer-meta{font-size:11px;color:rgba(255,255,255,.4)}
+@media(max-width:640px){.cl-two-col{grid-template-columns:1fr}.wrap{padding:1.5rem 1rem 3rem}.caep,.ls{display:none}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div style="display:flex;align-items:center">
+    <div class="lt"><span class="lh">#</span><span class="lw">TEACH</span></div>
+    <span class="ls">Advisor Completion Portal</span>
+  </div>
+  <div class="caep">CAEP Accredited</div>
+</header>
+
+<div class="wrap" id="mainWrap">
+  <div class="loading" id="loadingScreen">Loading checklist…</div>
+  <div id="errorScreen" style="display:none" class="error-screen">
+    <h2 id="errorTitle">Link Invalid</h2>
+    <p id="errorMsg">This link is invalid or has expired. Please contact the coach.</p>
+  </div>
+  <div id="appScreen" style="display:none">
+
+    <!-- RESIDENT INFO -->
+    <div class="card" id="residentCard"></div>
+
+    <!-- PROGRESS -->
+    <div class="prog-wrap">
+      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      <div class="prog-pct" id="progPct">0%</div>
+    </div>
+
+    <!-- CHECKLIST -->
+    <div class="stage-banner stage-coach">
+      <strong>📋 Coach items</strong> (grayed) were completed by the instructional coach and are shown for reference. You may edit them if needed.
+      <br><strong>✏️ Your items</strong> are the remaining unchecked boxes — please complete all that apply.
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="ct-bar"></span><span id="clTitle">Checklist</span></div>
+      <div id="clBody"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-crimson btn-full" id="submitBtn" onclick="submitAdvisor()">✓ Submit Final Checklist</button>
+    </div>
+  </div>
+
+  <!-- DONE -->
+  <div id="doneScreen" style="display:none">
+    <div class="card">
+      <div class="done-screen">
+        <span class="done-icon">🎉</span>
+        <h2>Checklist Fully Complete!</h2>
+        <p>The completed checklist has been emailed to the coach.</p>
+        <p>A final PDF has been generated and sent to all parties.</p>
+        <p style="font-size:12px;color:var(--silver);margin-top:8px">You may close this window.</p>
+        <div style="margin-top:1.5rem">
+          <a id="pdfDownloadBtn" href="#" style="display:none" class="btn btn-sky">⬇ Download PDF</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer class="site-footer">
+  <div class="footer-brand"><span class="fh">#</span>TEACH</div>
+  <div class="footer-meta">Confidential – Internal Use Only</div>
+</footer>
+
+<script>
+const STATES={
+  AL:{name:"Alabama",s8lbl:"Completion Letter Sent",s9lbl:"Professional License",s9item:"Applied for Professional Educator Certificate",bgCheck:"Background Checks on file - FBI and ASBI",
+    s3:[{text:"The documentation of passing scores on all required Assessment(s) have been submitted to #TEACH",subs:["Praxis Subject Exam","If no Praxis for subject: must have earned a non-education major in a teaching field OR must have earned at least 30 credit hours, including 18 upper-division, in the teaching field."]},{text:"Documentation of passing score on required pedagogy exam",subs:["Individuals who complete LESS THAN three full years of teaching experience while holding the CCTF — edTPA is required","Individuals who complete three full years of teaching experience while holding the CCTF — PLT is required"]},{text:"Documentation of a practical or highly effective school-based evaluation has been submitted to #TEACH"}],
+    s4:[{text:"The final coaching conversation has been recorded in the CRM system (Coach)"},{text:"Required certifications are valid",subs:["CPR/First Aid (Valid for 2 years)"]},{text:"Documentation that Resident has taught at least <strong>1 full academic year</strong>"}],
+    s8:["Program Completion Letter sent to Resident"],noMentor:false},
+  AZ:{name:"Arizona",s8lbl:"License Conversion Letters Sent",s9lbl:"Standard Professional License",s9item:"Applied for Standard Professional License",bgCheck:"Background Check on file (N/A in AZ)",
+    s3:[{text:"Documentation that Resident has met Content Knowledge Requirement",subs:["Option A: Arizona Exam","Option B: Out of State Exam","Option C: Degree in the Subject","Option D: Teaching Experience"]},{text:"Documentation that Resident has met Professional Knowledge Requirement",subs:["Option A: Arizona Exam","Option B: Out of State Exam","Option C: Teaching Experience"]},{text:"Documentation that Resident has met other requirements",subs:["OPI (as required for World Language and Bilingual Education)","Passed the Constitutions of the United States and Arizona Exams","Completed AZ Literacy Endorsement"]}],
+    s4:[{text:"The final coaching conversation has been recorded in the CRM system (Coach)"},{text:"Required certifications are valid",subs:["CPR/First Aid/AED (Valid for 2 years)"]},{text:"Documentation that the Resident has taught at least <strong>1 full academic year or 150 days</strong>"}],
+    s8:["Program Completion Letter sent to Resident"],noMentor:false},
+  IN:{name:"Indiana",s8lbl:"Completion Letter Sent",s9lbl:"Practitioners License",s9item:"Applied for Practitioners License (2 yr or 5 yr)",bgCheck:"Background Check on file (N/A in IN)",
+    s3:[{text:"The documentation of passing scores on all required Assessment(s) have been submitted to #TEACH",subs:["Praxis Subject Exam AND PLT (Principals of Teaching & Learning)","Early Literacy Endorsement — Required for Elementary and Special Education","OPI (as required for World Language and Bilingual Education), SLIPI (as required for ASL)","Documentation of a practical or highly effective school-based evaluation has been submitted to #TEACH"]}],
+    s4:[{text:"Documentation that Resident has taught at least <strong>2 full academic years (for 5 yr License) or 10 Weeks (2 yr License)</strong>",subs:["If a candidate teaches under a T2T and/or Emergency Permit for two years, and all program requirements are met, they may be approved for the 5-year Practitioner License (PL) instead of the 2-year Initial Practitioner License (IPL). If just 10 Weeks, the 2 Yr IPL is the only option."]},{text:"The final coaching conversation has been recorded in the CRM system (Coach)"},{text:"Required certifications are valid",subs:["CPR/AED/Heimlich Maneuver (Valid for 2 years)","Youth Suicide Prevention (One-time completion requirement)","Child Abuse Training (Valid for 2 years)","Human Trafficking Training (One-time completion requirement)"]}],
+    s8:["Program Completion Letter sent to Resident"],noMentor:true},
+  MI:{name:"Michigan",s8lbl:"Completion Letter Sent",s9lbl:"Standard Certificate",s9item:"Applied for Standard Certification",bgCheck:"Background Check on file",
+    s3:[{text:"The documentation of passing scores on all required Assessment(s) have been submitted to #TEACH",subs:["MTTC, PKS (as required), OPI (as required for World Language and Bilingual Education), ASLPI/SLIPI (as required for American Sign Language)"]}],
+    s4:[{text:"Documentation that Resident has taught at least <strong>3 full academic years</strong>"},{text:"Resident has met at least 600 hours of teaching with at least 50 hours in each endorsement area",subs:["If the resident has not met at least 50 hours in each endorsement area, advisors should confirm they wish to move forward with the standard for the areas they have met the time taught. If confirmed, a priority note should be added to the account indicating they wish to move forward."]},{text:"The final coaching conversation has been recorded in the CRM system (Coach)"},{text:"Update status in MOECS"}],
+    s8:["Program Completion Letter sent to Resident"],noMentor:true},
+  NC:{name:"North Carolina",s8lbl:"Completion Letters Sent",s9lbl:"Professional License",s9item:"Applied for Professional License",bgCheck:"Background Check on file (N/A in NC)",
+    s3:[{text:"The documentation of a passing score on the Pearson and/or Praxis Subject Assessment(s) in the area of certification has been submitted to #TEACH"},{text:"The documentation of a passing score on the EdTPA has been submitted to #TEACH"}],
+    s4:[{text:"The Field Experience Form has been completed, signed by the principal, and recorded in the CRM"},{text:"Summative Evaluation, completed by the school administrator, has been submitted to #TEACH"},{text:"The final coaching conversation has been recorded in the CRM system (Coach)"},{text:"Documentation that Resident has taught at least <strong>1 full academic year</strong>"}],
+    s8:["Form V sent to Resident","Program Completion Letter sent to Resident"],noMentor:true}
+};
+
+const COACH_ITEMS = new Set([
+  'chk_1_0','chk_1_1','chk_1_2',
+  'chk_2_0','chk_2_1','chk_2_2','chk_2_3','chk_2_4','chk_2_5',
+  'chk_4_2',
+]);
+
+let submission = null;
+let cbStates   = {};
+let token      = null;
+
+function showToast(msg,type='success',dur=4000){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+type;
+  setTimeout(()=>t.className='toast',dur);
+}
+
+function updateProgress(){
+  const total   = Object.keys(cbStates).length;
+  const checked = Object.values(cbStates).filter(Boolean).length;
+  const pct     = total ? Math.round(checked/total*100) : 0;
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progPct').textContent  = pct+'%';
+}
+
+(async function init(){
+  const params = new URLSearchParams(window.location.search);
+  token = params.get('token');
+  if (!token) { showError('No link token', 'This link appears to be incomplete. Please use the full link from the email.'); return; }
+
+  try {
+    const res    = await fetch(`/.netlify/functions/get-completion?token=${encodeURIComponent(token)}`);
+    const result = await res.json();
+
+    if (result.alreadyComplete) {
+      showError('Already Complete', `The checklist for ${result.residentName} (${result.state}) has already been completed. No further action needed.`);
+      return;
+    }
+    if (result.error) { showError('Link Error', result.error); return; }
+    if (!result.success) { showError('Error', 'Could not load checklist.'); return; }
+
+    submission = result.submission;
+    buildPage();
+  } catch(e) {
+    showError('Network Error', 'Could not connect. Please try again.');
+  }
+})();
+
+function showError(title, msg){
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('errorScreen').style.display   = 'block';
+  document.getElementById('errorTitle').textContent  = title;
+  document.getElementById('errorMsg').textContent    = msg;
+}
+
+function buildPage(){
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display     = 'block';
+
+  const s    = STATES[submission.state];
+  const name = submission.resident_name;
+  const sid  = submission.student_id;
+
+  document.getElementById('clTitle').textContent = `${submission.state} — ${s.name}`;
+
+  // Resident info card
+  document.getElementById('residentCard').innerHTML = `
+    <div class="card-title"><span class="ct-bar"></span>Resident Information</div>
+    <div class="info-row"><span class="ik">Resident</span><span class="iv">${name}</span></div>
+    ${sid ? `<div class="info-row"><span class="ik">Student ID</span><span class="iv">${sid}</span></div>` : ''}
+    <div class="info-row"><span class="ik">State</span><span class="iv">${submission.state} — ${s.name}</span></div>
+    <div class="info-row"><span class="ik">Coach</span><span class="iv">${submission.coach_email}</span></div>
+    <div class="info-row"><span class="ik">Status</span><span class="iv" style="color:var(--sky)">Stage 2 — Awaiting Advisor Completion</span></div>`;
+
+  // Build checklist with coach items pre-checked
+  const coachChecked = submission.checked_items || {};
+  buildChecklist(s, coachChecked);
+  updateProgress();
+}
+
+function buildChecklist(s, coachChecked){
+  cbStates = {};
+  const body = document.getElementById('clBody');
+  body.innerHTML = '';
+
+  function mkCB(id, html){
+    const isCoach    = COACH_ITEMS.has(id);
+    const wasChecked = coachChecked[id] === true;
+    cbStates[id]     = wasChecked;
+
+    const d   = document.createElement('div');
+    d.className = 'check-item' + (isCoach ? ' coach-item' : '');
+
+    const cb  = document.createElement('input');
+    cb.type   = 'checkbox';
+    cb.id     = id;
+    cb.checked = wasChecked;
+    cb.onchange = e => { cbStates[id] = e.target.checked; updateProgress(); };
+
+    const lbl = document.createElement('label');
+    lbl.htmlFor = id;
+    lbl.innerHTML = html.replace(/<[^>]+>/g,'') +
+      (isCoach ? '<span class="coach-tag">✓ COACH</span>' : '<span class="advisor-tag">YOUR ITEM</span>');
+    d.appendChild(cb); d.appendChild(lbl);
+    return d;
+  }
+  function mkSubs(items){
+    const ul = document.createElement('ul'); ul.className='sub-list';
+    items.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; ul.appendChild(li); });
+    return ul;
+  }
+  function sec(num,ttl,items){
+    const sec=document.createElement('div'); sec.className='cl-section';
+    const h=document.createElement('div'); h.className='cl-head';
+    h.innerHTML=`<span class="num">${num}</span>${ttl}`; sec.appendChild(h);
+    items.forEach((item,i)=>{
+      const id=`chk_${num}_${i}`;
+      sec.appendChild(mkCB(id,item.text||item));
+      if(item.subs) sec.appendChild(mkSubs(item.subs));
+    });
+    return sec;
+  }
+  function twoCol(la,lt,li,ra,rt,ri){
+    const wrap=document.createElement('div'); wrap.className='cl-two-col';
+    [[la,lt,li],[ra,rt,ri]].forEach(([num,ttl,items])=>{
+      const col=document.createElement('div');
+      const h=document.createElement('div'); h.className='cl-col-head';
+      h.textContent=`${num}. ${ttl}`; col.appendChild(h);
+      items.forEach((item,i)=>{
+        const id=`chk_${num}_${i}`;
+        col.appendChild(mkCB(id,item.text||item));
+        if(item.subs) col.appendChild(mkSubs(item.subs));
+      });
+      wrap.appendChild(col);
+    });
+    body.appendChild(wrap);
+  }
+
+  const s1=["All courses were completed and met the minimum 3.0 score requirement","All courses have been logged in the learning management system","A transcript request can be processed at the resident's request"];
+  body.appendChild(sec(1,'Coursework (Coach)',s1));
+  const s2i=["The Teacher Proficiency Assessment (TPA) scores (3) are recorded in the Status Report","The Family Conferences Self-Assessment has been recorded in the system","The Professionalism Self-Assessment has been recorded in the system","The Fall Assessment for Planning and Teaching has been recorded in the system","The Spring Assessment for Planning and Teaching has been recorded in the system"];
+  if(!s.noMentor)s2i.push("Mentor Assessment has been recorded in the system.");
+  body.appendChild(sec(2,'#TEACH Assessments (Coach)',s2i));
+  body.appendChild(sec(3,'State Assessments and Requirements',s.s3));
+  body.appendChild(sec(4,'Documentation and Conversations',s.s4));
+  const s5=[{text:"Confirm that the program balance is paid in full",subs:["Advisor Portal > Contract Tool > Payment Info","Intern Portal > Payments > Program Fees > Remaining Balance"]}];
+  const s6nc=submission.state==='NC'?'Regional or National Accreditation Confirmed':'Regional Accreditation Confirmed';
+  twoCol(5,'Check Financial Standing',s5, 6,'Official Transcripts',["Official Transcripts on file",s6nc]);
+  twoCol(7,'Background Checks',[s.bgCheck], 8,s.s8lbl,s.s8);
+  twoCol(9,s.s9lbl,[s.s9item], 10,'Completion Certificate',["Request to send formal Completion Certificate via Parchment sent to processor."]);
+}
+
+function buildHTMLEmail(){
+  const s    = STATES[submission.state];
+  const name = submission.resident_name;
+  const sid  = submission.student_id;
+  const date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  function ck(id){return cbStates[id]?'&#10003;':'&#9744;';}
+  function row(id,label){const checked=cbStates[id];return`<tr><td style="padding:2px 6px;width:24px;text-align:center;font-size:16px;color:${checked?'#002E5D':'#aaa'}">${ck(id)}</td><td style="padding:2px 6px;font-size:12px;color:${checked?'#1a1a1a':'#666'}">${label.replace(/<[^>]+>/g,'')}</td></tr>`;}
+  function subRows(items){return items.map(s=>`<tr><td></td><td style="padding:1px 6px 1px 20px;font-size:11px;color:#888">– ${s}</td></tr>`).join('');}
+  function sHead(num,title){return`<tr><td colspan="2" style="background:#002E5D;color:#fff;padding:5px 10px;font-size:12px;font-weight:700">${num}. ${title.toUpperCase()}</td></tr>`;}
+  function twoColSec(ln,lt,li,rn,rt,ri){
+    const lR=li.map((item,i)=>row(`chk_${ln}_${i}`,item.text||item)+(item.subs?subRows(item.subs):'')).join('');
+    const rR=ri.map((item,i)=>row(`chk_${rn}_${i}`,item.text||item)+(item.subs?subRows(item.subs):'')).join('');
+    return`<tr><td colspan="2"><table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse"><tr><td width="50%" valign="top" style="padding-right:6px"><table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e8e8e8"><tr><td colspan="2" style="background:#002E5D;color:#fff;padding:4px 8px;font-size:11px;font-weight:700">${ln}. ${lt.toUpperCase()}</td></tr>${lR}</table></td><td width="50%" valign="top" style="padding-left:6px"><table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e8e8e8"><tr><td colspan="2" style="background:#002E5D;color:#fff;padding:4px 8px;font-size:11px;font-weight:700">${rn}. ${rt.toUpperCase()}</td></tr>${rR}</table></td></tr></table></td></tr>`;
+  }
+  const s1i=["All courses were completed and met the minimum 3.0 score requirement","All courses have been logged in the learning management system","A transcript request can be processed at the resident's request"];
+  const s2i=["The Teacher Proficiency Assessment (TPA) scores (3) are recorded in the Status Report","The Family Conferences Self-Assessment has been recorded in the system","The Professionalism Self-Assessment has been recorded in the system","The Fall Assessment for Planning and Teaching has been recorded in the system","The Spring Assessment for Planning and Teaching has been recorded in the system"];
+  if(!s.noMentor)s2i.push("Mentor Assessment has been recorded in the system.");
+  const s5=[{text:"Confirm that the program balance is paid in full",subs:["Advisor Portal > Contract Tool > Payment Info","Intern Portal > Payments > Program Fees > Remaining Balance"]}];
+  const s6nc=submission.state==='NC'?'Regional or National Accreditation Confirmed':'Regional Accreditation Confirmed';
+  return`<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif"><table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:16px 0"><tr><td align="center"><table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)"><tr><td style="background:#002E5D;padding:12px 20px"><table width="100%" cellpadding="0" cellspacing="0"><tr><td><div style="font-size:22px;font-weight:900;color:#fff"><span style="color:#C5C5C5">#</span>TEACH</div><div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px">Resident Completion Checklist — FINAL</div></td><td align="right" style="font-size:9px;color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.2);padding:3px 8px;border-radius:20px;white-space:nowrap">CAEP ACCREDITED</td></tr></table></td></tr><tr><td style="background:#F5F5F5;border-bottom:2px solid #002E5D;padding:8px 20px"><table width="100%" cellpadding="0" cellspacing="0"><tr><td style="font-size:12px;color:#555"><strong style="color:#002E5D">Resident:</strong> ${name}${sid?` &nbsp;<strong style="color:#002E5D">ID:</strong> ${sid}`:''}</td><td align="right" style="font-size:12px;color:#555"><strong style="color:#002E5D">State:</strong> ${submission.state} — ${s.name} &nbsp;<strong style="color:#002E5D">Date:</strong> ${date}</td></tr></table></td></tr><tr><td style="padding:12px 20px"><table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e8e8e8;border-radius:4px;overflow:hidden">${sHead(1,'Coursework (Coach)')}${s1i.map((item,i)=>row(`chk_1_${i}`,item)).join('')}${sHead(2,'#TEACH Assessments (Coach)')}${s2i.map((item,i)=>row(`chk_2_${i}`,item)).join('')}${sHead(3,'State Assessments and Requirements')}${s.s3.map((item,i)=>row(`chk_3_${i}`,item.text||item)+(item.subs?subRows(item.subs):'')).join('')}${sHead(4,'Documentation and Conversations')}${s.s4.map((item,i)=>row(`chk_4_${i}`,item.text||item)+(item.subs?subRows(item.subs):'')).join('')}</table><div style="height:8px"></div><table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">${twoColSec(5,'Check Financial Standing',s5,6,'Official Transcripts',["Official Transcripts on file",s6nc])}<tr><td colspan="2" style="height:6px"></td></tr>${twoColSec(7,'Background Checks',[s.bgCheck],8,s.s8lbl,s.s8)}<tr><td colspan="2" style="height:6px"></td></tr>${twoColSec(9,s.s9lbl,[s.s9item],10,'Completion Certificate',["Request to send formal Completion Certificate via Parchment sent to processor."])}</table></td></tr><tr><td style="background:#002E5D;padding:8px 20px"><span style="font-size:10px;color:rgba(255,255,255,0.5)">Confidential – Internal Use Only · Fully completed ${date}</span></td></tr></table></td></tr></table></body></html>`;
+}
+
+async function submitAdvisor(){
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  showToast('Generating final PDF and sending…','sending',20000);
+
+  const total   = Object.keys(cbStates).length;
+  const checked = Object.values(cbStates).filter(Boolean).length;
+  const htmlBody = buildHTMLEmail();
+  const textBody = `TEACH Checklist FINAL — ${submission.resident_name} — ${submission.state}\nCompleted: ${checked}/${total} items.`;
+
+  try {
+    const res = await fetch('/.netlify/functions/send-checklist', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        stage:             'advisor',
+        submissionId:      submission.id,
+        state:             submission.state,
+        stateName:         STATES[submission.state].name,
+        residentName:      submission.resident_name,
+        studentId:         submission.student_id,
+        coachEmail:        submission.coach_email,
+        recipientEmail:    submission.advisor_email,
+        checkedCount:      checked,
+        totalItems:        total,
+        advisorCheckedItems: cbStates,
+        htmlBody,
+        textBody,
+        emailSubject: `✓ FINAL: #TEACH Checklist — ${submission.resident_name}${submission.student_id?' ('+submission.student_id+')':''} — ${submission.state}`,
+      })
+    });
+    const result = await res.json();
+    if (!result.success) throw new Error(result.error || 'Submission failed');
+
+    document.getElementById('appScreen').style.display = 'none';
+    document.getElementById('doneScreen').style.display = 'block';
+    showToast('✓ Checklist complete! Final PDF sent to coach.','success',6000);
+
+  } catch(e) {
+    showToast('Error: '+e.message,'error',8000);
+    btn.disabled=false; btn.textContent='✓ Submit Final Checklist';
+  }
+}
+</script>
+</body>
+</html>
