@@ -1,3 +1,4 @@
+
 const https   = require('https');
 const crypto  = require('crypto');
 const { createClient } = require('@supabase/supabase-js');
@@ -247,8 +248,10 @@ exports.handler = async (event) => {
 
       // Merge coach + advisor items
       const allChecked = { ...sub.checked_items, ...advisorCheckedItems };
-      const allTotal   = totalItems || sub.total_items;
-      const allCount   = Object.values(allChecked).filter(Boolean).length;
+      // total_items must equal the number of unique keys in the merged checklist
+      // (not the coach-only count stored in Stage 1, which would cause 200%)
+      const allTotal = Object.keys(allChecked).length;
+      const allCount = Object.values(allChecked).filter(Boolean).length;
 
       // Generate the fully completed PDF
       let pdfBuffer = null, pdfGenerated = false, pdfError = null, pdfPath = null;
@@ -273,9 +276,10 @@ exports.handler = async (event) => {
         status:               'fully_complete',
         advisor_items:        advisorCheckedItems,
         checked_items:        allChecked,
+        total_items:          allTotal,
         checked_count:        allCount,
         advisor_completed_at: new Date().toISOString(),
-        completion_token:     null, // invalidate token
+        completion_token:     null,
         token_expires:        null,
         storage_paths:        allPaths,
       }).eq('id', submissionId);
@@ -322,6 +326,5 @@ exports.handler = async (event) => {
     };
   }
 };
-
 
 
