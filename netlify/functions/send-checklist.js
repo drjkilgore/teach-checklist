@@ -1,4 +1,3 @@
-
 const https   = require('https');
 const crypto  = require('crypto');
 const { createClient } = require('@supabase/supabase-js');
@@ -326,5 +325,6 @@ exports.handler = async (event) => {
     };
   }
 };
+
 
 
