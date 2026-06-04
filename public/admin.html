@@ -141,7 +141,7 @@ tr:hover td{background:#fafafa}
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th><input type="checkbox" id="subCheckAll" onchange="toggleAll('sub-cb',this)"></th><th>Date</th><th>Resident</th><th>ID</th><th>State</th><th>Coach</th><th>Recipient</th><th>Status</th><th>Complete</th><th>Files</th><th>Docs</th></tr></thead>
+          <thead><tr><th><input type="checkbox" id="subCheckAll" onchange="toggleAll('sub-cb',this)"></th><th>Date</th><th>Resident</th><th>ID</th><th>State</th><th>Coach</th><th>Recipient</th><th>Status</th><th>Complete</th><th>Files</th><th style="min-width:160px">Docs</th></tr></thead>
           <tbody id="subBody"></tbody>
         </table>
       </div>
@@ -403,7 +403,7 @@ function renderSubTable(rows){
 
     // Complete Stage 2 button — admin only, only for coach_complete records
     const completeBtn = (coach.role === 'admin' && isCoachComplete)
-      ? `<button class="btn btn-green btn-sm" style="white-space:nowrap;margin-top:4px" onclick="openStage2('${r.id}','${(r.resident_name||'').replace(/'/g,'')}','${r.state}','${r.student_id||''}','${r.coach_email||''}','${r.recipient_email||''}')">✏️ Complete Stage 2</button>`
+      ? `<button class="btn btn-green btn-sm" style="white-space:nowrap" onclick="openStage2('${r.id}','${(r.resident_name||'').replace(/'/g,'')}','${r.state}','${r.student_id||''}','${r.coach_email||''}','${r.recipient_email||''}')">✏️ Complete Stage 2</button>`
       : '';
 
     return`<tr>
@@ -417,7 +417,7 @@ function renderSubTable(rows){
       <td>${statusBadge}</td>
       <td>${completePct}</td>
       <td style="font-size:12px">${files}</td>
-      <td>${docsBtn}${completeBtn}</td>
+      <td style="min-width:160px"><div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start">${docsBtn}${completeBtn}</div></td>
     </tr>`;
   }).join('');
 }
@@ -842,5 +842,3 @@ function openDraft(encodedData) {
 </script>
 </body>
 </html>
-
-
