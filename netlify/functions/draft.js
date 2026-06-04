@@ -31,7 +31,7 @@ exports.handler = async (event) => {
 
     // ── SAVE DRAFT ───────────────────────────────────────
     if (action === 'save') {
-      const { studentId, state, stateName, residentName, coachEmail, recipientEmail, formData } = params;
+      const { studentId, state, stateName, residentName, coachEmail, recipientEmail, ccEmails = [], formData } = params;
       if (!studentId) return err('Student ID is required to save a draft.');
 
       // Check coach has access to this state
@@ -48,7 +48,7 @@ exports.handler = async (event) => {
           coach_id:        coach.id,
           coach_email:     coachEmail,
           recipient_email: recipientEmail,
-          form_data:       formData,
+          form_data:       { ...(formData||{}), cc_emails: ccEmails },
         }).eq('id', existing.id);
         if (error) throw error;
         return ok({ message: 'Draft updated.', draftId: existing.id });
@@ -62,7 +62,7 @@ exports.handler = async (event) => {
           resident_name:   residentName,
           coach_email:     coachEmail,
           recipient_email: recipientEmail,
-          form_data:       formData,
+          form_data:       { ...(formData||{}), cc_emails: ccEmails },
         }]).select('id').single();
         if (error) throw error;
         return ok({ message: 'Draft saved.', draftId: data.id });
@@ -122,3 +122,4 @@ exports.handler = async (event) => {
     return { statusCode: 500, headers, body: JSON.stringify({ success: false, error: e.message }) };
   }
 };
+
