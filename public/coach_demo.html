@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>#TEACH — Coach Interactive Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#002E5D;--crimson:#8B0000;--sky:#12A7E6;--silver:#C5C5C5;
+  --gold:#C8922A;--white:#fff;--light:#F5F5F5;--ink:#1a1a1a;
+  --muted:#555;--border:#DCDCDC;--font:'Inter',sans-serif;
+  --r:6px;--rl:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:#0B1220;color:#fff;min-height:100vh;overflow-x:hidden}
+
+/* ── DEMO SHELL ── */
+.demo-shell{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{background:rgba(0,46,93,0.6);border-right:1px solid rgba(255,255,255,0.08);padding:0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-header{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,0.08)}
+.sb-logo{font-size:20px;font-weight:800;margin-bottom:4px}<br>
+.sb-logo .h{color:var(--silver)}.sb-logo .w{color:#fff}
+.sb-sub{font-size:11px;color:rgba(255,255,255,0.45);letter-spacing:.3px}
+.sb-badge{display:inline-block;background:var(--crimson);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:6px;letter-spacing:.5px}
+.sb-steps{padding:1rem 0;flex:1}
+.sb-step{display:flex;align-items:flex-start;gap:10px;padding:10px 1.25rem;cursor:pointer;transition:all .15s;border-left:3px solid transparent;position:relative}
+.sb-step:hover{background:rgba(255,255,255,0.04)}
+.sb-step.active{background:rgba(18,167,230,0.08);border-left-color:var(--sky)}
+.sb-step.done{border-left-color:rgba(18,167,230,0.3)}
+.sb-step.locked{opacity:.4;cursor:not-allowed}
+.sb-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;transition:all .2s}
+.sb-step.active .sb-icon{background:var(--sky);color:var(--navy)}
+.sb-step.done .sb-icon{background:rgba(18,167,230,0.2);color:var(--sky)}
+.sb-step.locked .sb-icon{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.3)}
+.sb-step:not(.active):not(.done):not(.locked) .sb-icon{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5)}
+.sb-info{flex:1;min-width:0}
+.sb-title{font-size:12px;font-weight:600;color:#fff;margin-bottom:2px;line-height:1.3}
+.sb-step.active .sb-title{color:var(--sky)}
+.sb-desc{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.4}
+.sb-progress{padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,0.08)}
+.sb-prog-label{font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;display:flex;justify-content:space-between}
+.sb-prog-bar{height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden}
+.sb-prog-fill{height:100%;background:linear-gradient(90deg,var(--sky),var(--gold));border-radius:2px;transition:width .4s}
+
+/* ── MAIN CONTENT ── */
+.main{display:flex;flex-direction:column;min-height:100vh}
+.top-bar{background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.06);padding:.875rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;backdrop-filter:blur(8px)}
+.top-step{font-size:12px;font-weight:600;color:var(--sky);letter-spacing:.5px;text-transform:uppercase}
+.top-hint{font-size:12px;color:rgba(255,255,255,0.4);font-style:italic}
+
+.content{flex:1;padding:2.5rem 2rem;max-width:720px}
+
+/* ── DEMO SCREEN ── */
+.demo-screen{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;margin-bottom:1.5rem}
+.ds-header{background:var(--navy);padding:.875rem 1.25rem;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.ds-dot{width:9px;height:9px;border-radius:50%}
+.ds-dot.r{background:#ff5f57}.ds-dot.y{background:#ffbd2e}.ds-dot.g{background:#28c840}
+.ds-url{flex:1;background:rgba(255,255,255,0.06);border-radius:3px;padding:3px 10px;font-size:11px;color:rgba(255,255,255,0.4);font-family:monospace}
+.ds-body{padding:1.25rem;background:#fff}
+
+/* ── FORM ELEMENTS ── */
+.df-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);margin-bottom:5px;display:block}
+.df-input{width:100%;border:1.5px solid var(--border);border-radius:var(--r);padding:9px 12px;font-family:var(--font);font-size:13px;color:var(--ink);margin-bottom:12px;outline:none;transition:border-color .15s}
+.df-input:focus{border-color:var(--sky)}
+.df-input.filled{background:#F0F8FF;border-color:var(--sky)}
+.df-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.df-btn{padding:10px 20px;border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;letter-spacing:.3px;text-transform:uppercase}
+.df-btn.primary{background:var(--navy);color:#fff}
+.df-btn.primary:hover{background:#001e3d}
+.df-btn.sky{background:var(--sky);color:#fff}
+.df-btn.sky:hover{background:#0e8ec4}
+.df-btn.outline{background:transparent;border:1.5px solid var(--sky);color:var(--sky)}
+
+/* ── CHECKLIST IN DEMO ── */
+.demo-section{margin-bottom:12px}
+.demo-cl-head{background:var(--navy);color:#fff;padding:7px 12px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.demo-cl-head .n{background:var(--crimson);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:6px}
+.demo-cl-item{display:flex;align-items:flex-start;gap:8px;padding:6px 6px;border-bottom:1px solid #f5f5f5;font-size:12px;cursor:pointer;transition:background .1s;border-radius:3px}
+.demo-cl-item:hover{background:#f9f9f9}
+.demo-cl-item.advisor{opacity:.35;cursor:not-allowed}
+.demo-cl-item input[type=checkbox]{width:14px;height:14px;flex-shrink:0;margin-top:1px;accent-color:var(--navy);cursor:pointer}
+.demo-cl-item.advisor input{cursor:not-allowed}
+.demo-cl-item label{font-size:12px;color:var(--ink);cursor:pointer;line-height:1.4}
+.demo-cl-item.advisor label{cursor:not-allowed}
+.adv-tag{font-size:9px;font-weight:700;color:var(--sky);margin-left:auto;flex-shrink:0;letter-spacing:.5px;padding-top:1px}
+
+/* ── DRAFT LIST ── */
+.draft-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#F8FAFD;border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:all .15s}
+.draft-item:hover{border-color:var(--sky);background:#EBF5FB}
+.draft-info strong{font-size:13px;color:var(--navy);display:block}
+.draft-info span{font-size:11px;color:var(--muted)}
+.draft-state{background:var(--navy);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px}
+
+/* ── SUMMARY BOX ── */
+.sum-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f5f5f5;font-size:13px}
+.sum-row:last-child{border-bottom:none}
+.sk{color:var(--muted)}.sv{font-weight:600;color:var(--navy);text-align:right}
+.sum-bar{height:5px;background:#eee;border-radius:3px;overflow:hidden;margin:8px 0 12px}
+.sum-fill{height:100%;background:var(--navy);border-radius:3px;transition:width .5s}
+.info-box{background:#EBF5FB;border:1px solid #B3DEF5;border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6}
+.info-box strong{color:var(--navy)}
+.success-screen{text-align:center;padding:1.5rem}
+.success-icon{font-size:48px;display:block;margin-bottom:1rem;animation:pop .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.success-title{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.success-sub{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── NARRATION BOX ── */
+.narration{background:rgba(18,167,230,0.08);border:1px solid rgba(18,167,230,0.25);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;animation:fadeIn .4s both}
+.narration-icon{font-size:20px;margin-bottom:6px;display:block}
+.narration-text{font-size:14px;color:rgba(255,255,255,0.85);line-height:1.65}
+.narration-text strong{color:#fff}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── ACTION AREA ── */
+.action-area{margin-top:1.5rem;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.demo-next{background:var(--sky);color:var(--navy);border:none;padding:11px 24px;border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .15s;text-transform:uppercase}
+.demo-next:hover{background:#0e8ec4;transform:translateY(-1px)}
+.demo-back{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);padding:11px 18px;border-radius:var(--r);font-family:var(--font);font-size:13px;cursor:pointer;transition:all .15s}
+.demo-back:hover{background:rgba(255,255,255,0.12)}
+.hint-text{font-size:12px;color:rgba(255,255,255,0.4);font-style:italic}
+
+/* ── LOGIN FORM ── */
+.login-card{background:#fff;border-radius:var(--rl);padding:1.5rem;max-width:340px;margin:0 auto}
+.login-title{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px;text-align:center}
+.login-sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:1.25rem}
+.tab-row{display:flex;border-bottom:2px solid #eee;margin-bottom:1.25rem}
+.tab{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px}
+.tab.active{color:var(--navy);border-bottom-color:var(--navy)}
+
+/* ── STATE BUTTONS ── */
+.state-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+.state-btn{background:#fff;border:2px solid var(--border);border-radius:var(--r);padding:10px 4px;cursor:pointer;text-align:center;transition:all .15s;font-family:var(--font)}
+.state-btn:hover{border-color:var(--sky)}
+.state-btn.sel{background:var(--navy);border-color:var(--navy);color:#fff}
+.state-btn .sc{font-size:16px;font-weight:800;line-height:1;margin-bottom:3px;color:var(--ink)}
+.state-btn.sel .sc{color:#fff}
+.state-btn .sn{font-size:9px;color:var(--muted);line-height:1.2}
+.state-btn.sel .sn{color:rgba(255,255,255,.7)}
+
+/* ── STEP TAG ── */
+.step-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(18,167,230,0.12);border:1px solid rgba(18,167,230,0.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--sky);letter-spacing:.5px;margin-bottom:1rem}
+
+@media(max-width:768px){.demo-shell{grid-template-columns:1fr}.sidebar{display:none}}
+</style>
+</head>
+<body>
+
+<div class="demo-shell">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-header">
+      <div class="sb-logo"><span class="h">#</span><span class="w">TEACH</span></div>
+      <div class="sb-sub">Resident Completion Checklist</div>
+      <div class="sb-badge">COACH DEMO</div>
+    </div>
+    <div class="sb-steps" id="sbSteps">
+      <!-- filled by JS -->
+    </div>
+    <div class="sb-progress">
+      <div class="sb-prog-label"><span>Progress</span><span id="progLabel">0%</span></div>
+      <div class="sb-prog-bar"><div class="sb-prog-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="top-bar">
+      <span class="top-step" id="topStep">STEP 1 OF 6</span>
+      <span class="top-hint" id="topHint">Click the interactive elements to continue</span>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<script>
+const STEPS = [
+  { id:'login',    icon:'🔐', title:'Sign In',           desc:'Access your coach account' },
+  { id:'resident', icon:'👤', title:'Resident Info',     desc:'Enter resident details' },
+  { id:'draft',    icon:'💾', title:'Saved Drafts',      desc:'Resume or start new' },
+  { id:'checklist',icon:'✅', title:'Checklist',         desc:'Complete your items' },
+  { id:'review',   icon:'📋', title:'Review & Submit',   desc:'Confirm and send' },
+  { id:'done',     icon:'🎉', title:'Complete!',         desc:'Stage 1 submitted' },
+];
+
+let currentStep = 0;
+let cbStates = {};
+let residentData = { name:'', id:'', recip:'' };
+
+// --- SIDEBAR ---
+function buildSidebar(){
+  const el = document.getElementById('sbSteps');
+  el.innerHTML = STEPS.map((s,i) => {
+    let cls = 'sb-step';
+    if(i === currentStep) cls += ' active';
+    else if(i < currentStep) cls += ' done';
+    else if(i > currentStep + 1) cls += ' locked';
+    const iconContent = i < currentStep ? '✓' : s.icon;
+    return `<div class="${cls}" onclick="tryNav(${i})">
+      <div class="sb-icon">${iconContent}</div>
+      <div class="sb-info">
+        <div class="sb-title">${s.title}</div>
+        <div class="sb-desc">${s.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+  const pct = Math.round((currentStep / (STEPS.length-1)) * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = pct + '%';
+  document.getElementById('topStep').textContent = `STEP ${currentStep+1} OF ${STEPS.length}`;
+}
+
+function tryNav(i){ if(i <= currentStep) goTo(i); }
+
+function goTo(i){
+  currentStep = i;
+  buildSidebar();
+  renderStep(STEPS[i].id);
+  window.scrollTo(0,0);
+}
+
+// --- STEPS ---
+function renderStep(id){
+  const c = document.getElementById('content');
+  const hints = {
+    login:'Fill in the form and click Sign In',
+    resident:'Fill in the resident details',
+    draft:'Click a draft to resume, or start new',
+    checklist:'Check the boxes for your items',
+    review:'Review the summary and submit',
+    done:''
+  };
+  document.getElementById('topHint').textContent = hints[id] || '';
+
+  if(id==='login')    c.innerHTML = renderLogin();
+  if(id==='resident') c.innerHTML = renderResident();
+  if(id==='draft')    c.innerHTML = renderDraft();
+  if(id==='checklist')c.innerHTML = renderChecklist();
+  if(id==='review')   c.innerHTML = renderReview();
+  if(id==='done')     c.innerHTML = renderDone();
+  attachHandlers(id);
+}
+
+// LOGIN
+function renderLogin(){
+  return `
+  <div class="narration">
+    <span class="narration-icon">🔐</span>
+    <div class="narration-text">Go to your #TEACH Checklist site and sign in. First time? Use <strong>Request Access</strong> to sign up. An admin will approve your account.</div>
+  </div>
+  <div class="demo-screen">
+    <div class="ds-header"><div class="ds-dot r"></div><div class="ds-dot y"></div><div class="ds-dot g"></div><div class="ds-url">teach-checklist.netlify.app</div></div>
+    <div class="ds-body">
+      <div class="login-card">
+        <div style="text-align:center;margin-bottom:12px"><span style="font-size:24px;font-weight:800;color:var(--navy)"><span style="color:#C5C5C5">#</span>TEACH</span></div>
+        <div class="tab-row">
+          <div class="tab active">Sign In</div>
+          <div class="tab">Request Access</div>
+        </div>
+        <label class="df-label">Email</label>
+        <input type="email" class="df-input" id="demoEmail" placeholder="coach@organization.com">
+        <label class="df-label">Password</label>
+        <input type="password" class="df-input" id="demoPwd" placeholder="••••••••">
+        <button class="df-btn primary" style="width:100%" id="loginBtn" onclick="handleLogin()">Sign In</button>
+        <div style="text-align:center;margin-top:10px"><a href="#" style="font-size:12px;color:var(--sky)">Forgot password?</a></div>
+      </div>
+    </div>
+  </div>
+  <div class="hint-text">→ Type any email and password, then click Sign In</div>`;
+}
+
+function handleLogin(){
+  const email = document.getElementById('demoEmail').value;
+  const pwd   = document.getElementById('demoPwd').value;
+  if(!email || !pwd){ document.getElementById('demoEmail').style.borderColor='var(--crimson)'; return; }
+  document.getElementById('demoEmail').classList.add('filled');
+  document.getElementById('demoPwd').classList.add('filled');
+  setTimeout(()=>goTo(1), 600);
+}
+
+// RESIDENT
+function renderResident(){
+  return `
+  <div class="narration">
+    <span class="narration-icon">👤</span>
+    <div class="narration-text">After logging in you'll see this form. Enter the resident's details. The <strong>Student ID is required</strong> — it's how drafts are saved and resumed. The recipient email goes to the certification team.</div>
+  </div>
+  <div class="demo-screen">
+    <div class="ds-header"><div class="ds-dot r"></div><div class="ds-dot y"></div><div class="ds-dot g"></div><div class="ds-url">Step 1 — Resident Information</div></div>
+    <div class="ds-body">
+      <div style="background:#EBF5FB;border:1.5px solid var(--sky);border-radius:6px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:12px;color:var(--navy)">Have a draft in progress?</span>
+        <button class="df-btn outline" style="font-size:11px;padding:5px 12px" onclick="goTo(2)">📋 View Saved Drafts</button>
+      </div>
+      <div class="df-row">
+        <div>
+          <label class="df-label">Resident Full Name *</label>
+          <input type="text" class="df-input" id="resName" placeholder="First Last" oninput="residentData.name=this.value">
+        </div>
+        <div>
+          <label class="df-label">Student ID *</label>
+          <input type="text" class="df-input" id="resId" placeholder="e.g. 123456" oninput="residentData.id=this.value">
+        </div>
+      </div>
+      <label class="df-label">State</label>
+      <div class="state-grid">
+        ${['AL','AZ','IN','MI','NC'].map(s=>`<button class="state-btn${s==='MI'?' sel':''}" onclick="selectState(this,'${s}')"><div class="sc">${s}</div><div class="sn">${{AL:'Alabama',AZ:'Arizona',IN:'Indiana',MI:'Michigan',NC:'N. Carolina'}[s]}</div></button>`).join('')}
+      </div>
+      <label class="df-label">Send Form To (Certification Team) *</label>
+      <input type="email" class="df-input" id="resRecip" placeholder="certification@trainingeducators.com" oninput="residentData.recip=this.value">
+      <button class="df-btn primary" style="width:100%" onclick="handleResident()">Next →</button>
+    </div>
+  </div>`;
+}
+
+function selectState(el, code){
+  document.querySelectorAll('.state-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function handleResident(){
+  residentData.name = document.getElementById('resName').value || 'John Doe';
+  residentData.id   = document.getElementById('resId').value   || '12345';
+  residentData.recip= document.getElementById('resRecip').value|| 'certification@trainingeducators.com';
+  goTo(3);
+}
+
+// DRAFT
+function renderDraft(){
+  return `
+  <div class="narration">
+    <span class="narration-icon">💾</span>
+    <div class="narration-text">Any saved drafts appear here. Click a draft to <strong>resume exactly where you left off</strong> — all checkboxes restored. Or start a new checklist.</div>
+  </div>
+  <div class="demo-screen">
+    <div class="ds-header"><div class="ds-dot r"></div><div class="ds-dot y"></div><div class="ds-dot g"></div><div class="ds-url">📋 Saved Drafts — 2 open</div></div>
+    <div class="ds-body">
+      <div class="draft-item" onclick="goTo(3)" style="cursor:pointer">
+        <div class="draft-info"><strong>Sarah Thompson</strong><span>Student ID: 98765 · Started Jun 1 · Last saved Jun 2</span></div>
+        <div class="draft-state">MI</div>
+      </div>
+      <div class="draft-item" onclick="goTo(3)" style="cursor:pointer">
+        <div class="draft-info"><strong>Marcus Williams</strong><span>Student ID: 44321 · Started May 29 · Last saved May 30</span></div>
+        <div class="draft-state">IN</div>
+      </div>
+      <div style="margin-top:12px;text-align:center">
+        <button class="df-btn primary" onclick="goTo(1)">+ Start New Checklist Instead</button>
+      </div>
+    </div>
+  </div>
+  <div class="hint-text">→ Click a draft to resume it, or click Start New</div>`;
+}
+
+// CHECKLIST
+function renderChecklist(){
+  const items = {
+    coach:[
+      {id:'c1_0',text:'All courses were completed and met the minimum 3.0 score requirement'},
+      {id:'c1_1',text:'All courses have been logged in the learning management system'},
+      {id:'c1_2',text:"A transcript request can be processed at the resident's request"},
+    ],
+    coach2:[
+      {id:'c2_0',text:'The Teacher Proficiency Assessment (TPA) scores (3) are recorded in the Status Report'},
+      {id:'c2_1',text:'The Family Conferences Self-Assessment has been recorded in the system'},
+      {id:'c2_2',text:'The Professionalism Self-Assessment has been recorded in the system'},
+      {id:'c2_3',text:'The Fall Assessment for Planning and Teaching has been recorded in the system'},
+      {id:'c2_4',text:'The Spring Assessment for Planning and Teaching has been recorded in the system'},
+    ],
+    advisor:[
+      {id:'a3_0',text:'MTTC scores submitted to #TEACH'},
+      {id:'a3_1',text:'PKS documentation confirmed'},
+    ],
+    coach4:[
+      {id:'a4_0',text:'Documentation that Resident has taught at least 3 full academic years'},
+      {id:'a4_1',text:'Resident has met at least 600 hours of teaching with at least 50 hours in each endorsement area'},
+      {id:'c4_2',text:'The final coaching conversation has been recorded in the CRM system (Coach)'},
+      {id:'a4_3',text:'Update status in MOECS'},
+    ]
+  };
+
+  const checkedCount = Object.values(cbStates).filter(Boolean).length;
+  const coachIds = ['c1_0','c1_1','c1_2','c2_0','c2_1','c2_2','c2_3','c2_4','c4_2'];
+  const coachChecked = coachIds.filter(id=>cbStates[id]).length;
+  const pct = Math.round(coachChecked/coachIds.length*100);
+
+  function mkItem(item, isAdvisor){
+    const checked = cbStates[item.id] || false;
+    return `<div class="demo-cl-item${isAdvisor?' advisor':''}" onclick="${isAdvisor?'':''}" id="row_${item.id}">
+      <input type="checkbox" id="cb_${item.id}" ${checked?'checked':''} ${isAdvisor?'disabled':''} onchange="toggleCB('${item.id}',this.checked)">
+      <label for="${isAdvisor?'':('cb_'+item.id)}" style="color:${isAdvisor?'#999':'var(--ink)'}">${item.text}</label>
+      ${isAdvisor?'<span class="adv-tag">ADVISOR</span>':''}
+    </div>`;
+  }
+
+  return `
+  <div class="narration">
+    <span class="narration-icon">✅</span>
+    <div class="narration-text">Only <strong>your items are active</strong>. Grayed items labeled <span style="color:var(--sky);font-weight:600">ADVISOR</span> are completed by the certification team later. Check all your items, then save or submit.</div>
+  </div>
+  <div style="background:rgba(18,167,230,0.08);border:1px solid rgba(18,167,230,0.2);border-radius:6px;padding:8px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:12px;color:rgba(255,255,255,.7)">Your items: <strong style="color:#fff">${coachChecked}/${coachIds.length}</strong></span>
+    <div style="background:var(--sky);height:4px;width:80px;border-radius:2px;overflow:hidden"><div style="background:#fff;height:100%;width:${pct}%;transition:width .3s"></div></div>
+  </div>
+  <div class="demo-screen">
+    <div class="ds-header"><div class="ds-dot r"></div><div class="ds-dot y"></div><div class="ds-dot g"></div><div class="ds-url">MI — Michigan · Checklist</div></div>
+    <div class="ds-body" style="max-height:340px;overflow-y:auto">
+      <div class="demo-section">
+        <div class="demo-cl-head"><span class="n">1</span>COURSEWORK (COACH)</div>
+        ${items.coach.map(i=>mkItem(i,false)).join('')}
+      </div>
+      <div class="demo-section">
+        <div class="demo-cl-head"><span class="n">2</span>#TEACH ASSESSMENTS (COACH)</div>
+        ${items.coach2.map(i=>mkItem(i,false)).join('')}
+      </div>
+      <div class="demo-section">
+        <div class="demo-cl-head"><span class="n">3</span>STATE ASSESSMENTS</div>
+        ${items.advisor.map(i=>mkItem(i,true)).join('')}
+      </div>
+      <div class="demo-section">
+        <div class="demo-cl-head"><span class="n">4</span>DOCUMENTATION</div>
+        ${items.coach4.map((i,idx)=>mkItem(i,idx!==2)).join('')}
+      </div>
+    </div>
+  </div>
+  <div class="action-area">
+    <button class="demo-next" onclick="goTo(4)">Review & Submit →</button>
+    <button class="demo-back" onclick="saveDraft()">💾 Save Draft</button>
+    <span class="hint-text">Check your items, then click Review</span>
+  </div>`;
+}
+
+function toggleCB(id, val){
+  cbStates[id] = val;
+  // Re-render progress
+  const coachIds = ['c1_0','c1_1','c1_2','c2_0','c2_1','c2_2','c2_3','c2_4','c4_2'];
+  const coachChecked = coachIds.filter(id=>cbStates[id]).length;
+  const pct = Math.round(coachChecked/coachIds.length*100);
+}
+
+function saveDraft(){
+  const btn = event.target;
+  btn.textContent = '✓ Draft Saved!';
+  btn.style.background = 'rgba(18,167,230,0.2)';
+  btn.style.color = 'var(--sky)';
+  setTimeout(()=>{btn.textContent='💾 Save Draft';btn.style.background='';btn.style.color='';},2000);
+}
+
+// REVIEW
+function renderReview(){
+  const coachIds = ['c1_0','c1_1','c1_2','c2_0','c2_1','c2_2','c2_3','c2_4','c4_2'];
+  const coachChecked = coachIds.filter(id=>cbStates[id]).length;
+  const pct = Math.round(coachChecked/coachIds.length*100);
+  const name = residentData.name || 'John Doe';
+  const id   = residentData.id   || '12345';
+  const recip= residentData.recip|| 'certification@trainingeducators.com';
+
+  return `
+  <div class="narration">
+    <span class="narration-icon">📋</span>
+    <div class="narration-text">Review the summary. <strong>Your items are what count</strong> — the warning only shows if you missed one of your required boxes. Click Submit to send to the certification team.</div>
+  </div>
+  <div class="demo-screen">
+    <div class="ds-header"><div class="ds-dot r"></div><div class="ds-dot y"></div><div class="ds-dot g"></div><div class="ds-url">Step 4 — Review & Submit</div></div>
+    <div class="ds-body">
+      <div class="sum-row"><span class="sk">State</span><span class="sv">MI — Michigan</span></div>
+      <div class="sum-row"><span class="sk">Resident</span><span class="sv">${name}</span></div>
+      <div class="sum-row"><span class="sk">Student ID</span><span class="sv">${id}</span></div>
+      <div class="sum-row"><span class="sk">Your items completed</span><span class="sv" style="color:${coachChecked===coachIds.length?'var(--navy)':'var(--crimson)'}">${coachChecked} / ${coachIds.length} (${pct}%)</span></div>
+      <div class="sum-row"><span class="sk">Advisor items</span><span class="sv" style="color:var(--sky)">Completed by recipient</span></div>
+      <div class="sum-bar"><div class="sum-fill" style="width:${pct}%"></div></div>
+      ${coachChecked < coachIds.length ? `<div style="background:#FEF3F2;border:1px solid #FECAC9;border-radius:4px;padding:8px 12px;font-size:12px;color:var(--crimson);margin-bottom:12px">${coachIds.length-coachChecked} of your item(s) unchecked. You may still submit.</div>` : ''}
+      <div class="sum-row"><span class="sk">Send to</span><span class="sv">${recip}</span></div>
+      <div class="sum-row"><span class="sk">Coach CC</span><span class="sv">coach@organization.com</span></div>
+      <div style="margin-top:14px">
+        <div class="info-box"><strong>What gets sent:</strong> The certification team receives an email with your completed items, all uploaded documents, and a secure link to complete their portion.</div>
+        <button class="df-btn primary" style="width:100%;background:var(--crimson);padding:12px" onclick="goTo(5)">✓ Submit & Send</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// DONE
+function renderDone(){
+  const name = residentData.name || 'John Doe';
+  const recip= residentData.recip|| 'certification@trainingeducators.com';
+  return `
+  <div class="demo-screen">
+    <div class="ds-header"><div class="ds-dot r"></div><div class="ds-dot y"></div><div class="ds-dot g"></div><div class="ds-url">Stage 1 Complete!</div></div>
+    <div class="ds-body">
+      <div class="success-screen">
+        <span class="success-icon">✅</span>
+        <div class="success-title">Stage 1 Complete!</div>
+        <div class="success-sub">
+          <p>Checklist sent to: <strong>${recip}</strong></p>
+          <p>A copy was CC'd to your inbox.</p>
+          <p style="margin-top:8px;color:#888;font-size:12px">The certification team will receive a secure link to complete Stage 2. You'll get the final PDF automatically when they're done.</p>
+        </div>
+        <button class="df-btn sky" style="margin-top:16px;padding:10px 24px" onclick="resetDemo()">↺ Start Over</button>
+      </div>
+    </div>
+  </div>
+  <div class="narration" style="margin-top:1rem">
+    <span class="narration-icon">🎉</span>
+    <div class="narration-text"><strong>That's it!</strong> No follow-up needed. Once the certification team completes Stage 2, a final PDF is automatically generated and emailed back to you.</div>
+  </div>`;
+}
+
+function resetDemo(){
+  cbStates={};residentData={name:'',id:'',recip:''};
+  goTo(0);
+}
+
+function attachHandlers(id){
+  // handlers attached inline via onclick
+}
+
+// INIT
+buildSidebar();
+renderStep('login');
+</script>
+</body>
+</html>

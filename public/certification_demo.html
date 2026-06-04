@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>#TEACH — Certification Team Interactive Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#002E5D;--teal:#1B7A6E;--sky:#12A7E6;--silver:#C5C5C5;
+  --gold:#C8922A;--white:#fff;--light:#F5F8F8;--ink:#1a1a1a;
+  --muted:#555;--border:#DCDCDC;--font:'Inter',sans-serif;--r:6px;--rl:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:#091818;color:#fff;min-height:100vh;overflow-x:hidden}
+
+.demo-shell{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+
+.sidebar{background:rgba(27,122,110,0.15);border-right:1px solid rgba(255,255,255,0.08);padding:0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-header{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,0.08)}
+.sb-logo{font-size:20px;font-weight:800;margin-bottom:4px}
+.sb-logo .h{color:var(--silver)}.sb-logo .w{color:#fff}
+.sb-sub{font-size:11px;color:rgba(255,255,255,0.45);letter-spacing:.3px}
+.sb-badge{display:inline-block;background:var(--teal);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:6px;letter-spacing:.5px}
+.sb-steps{padding:1rem 0;flex:1}
+.sb-step{display:flex;align-items:flex-start;gap:10px;padding:10px 1.25rem;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.sb-step:hover{background:rgba(255,255,255,0.04)}
+.sb-step.active{background:rgba(27,122,110,0.15);border-left-color:var(--teal)}
+.sb-step.done{border-left-color:rgba(27,122,110,0.35)}
+.sb-step.locked{opacity:.4;cursor:not-allowed}
+.sb-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;transition:all .2s}
+.sb-step.active .sb-icon{background:var(--teal);color:#fff}
+.sb-step.done .sb-icon{background:rgba(27,122,110,0.25);color:var(--teal)}
+.sb-step:not(.active):not(.done):not(.locked) .sb-icon{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5)}
+.sb-title{font-size:12px;font-weight:600;color:#fff;margin-bottom:2px;line-height:1.3}
+.sb-step.active .sb-title{color:var(--teal)}
+.sb-desc{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.4}
+.sb-progress{padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,0.08)}
+.sb-prog-label{font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;display:flex;justify-content:space-between}
+.sb-prog-bar{height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden}
+.sb-prog-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--sky));border-radius:2px;transition:width .4s}
+
+.main{display:flex;flex-direction:column;min-height:100vh}
+.top-bar{background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.06);padding:.875rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;backdrop-filter:blur(8px)}
+.top-step{font-size:12px;font-weight:600;color:var(--teal);letter-spacing:.5px;text-transform:uppercase}
+.top-hint{font-size:12px;color:rgba(255,255,255,0.4);font-style:italic}
+.content{flex:1;padding:2.5rem 2rem;max-width:720px}
+
+.demo-screen{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;margin-bottom:1.5rem}
+.ds-header{background:#091818;padding:.875rem 1.25rem;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.ds-dot{width:9px;height:9px;border-radius:50%}
+.ds-dot.r{background:#ff5f57}.ds-dot.y{background:#ffbd2e}.ds-dot.g{background:#28c840}
+.ds-url{flex:1;background:rgba(255,255,255,0.06);border-radius:3px;padding:3px 10px;font-size:11px;color:rgba(255,255,255,0.4);font-family:monospace}
+.ds-body{padding:1.25rem;background:#fff}
+
+.df-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);margin-bottom:5px;display:block}
+.df-input{width:100%;border:1.5px solid var(--border);border-radius:var(--r);padding:9px 12px;font-family:var(--font);font-size:13px;color:var(--ink);margin-bottom:12px;outline:none;transition:border-color .15s}
+.df-input:focus{border-color:var(--teal)}
+.df-btn{padding:10px 20px;border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;letter-spacing:.3px;text-transform:uppercase}
+.df-btn.teal{background:var(--teal);color:#fff}
+.df-btn.teal:hover{background:#156058}
+.df-btn.navy{background:var(--navy);color:#fff}
+.df-btn.crimson{background:#8B0000;color:#fff}
+
+/* Email preview */
+.email-card{background:#f8f9fa;border-radius:8px;overflow:hidden;border:1px solid #e0e0e0}
+.email-card-hdr{background:var(--navy);padding:12px 16px}
+.email-from{font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:2px}
+.email-subject{font-size:13px;font-weight:700;color:#fff}
+.email-card-body{padding:14px 16px}
+.email-meta-bar{background:#EBF5FB;border:1px solid #B3DEF5;border-radius:5px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#002E5D;line-height:1.5}
+.email-text{font-size:12px;color:#555;line-height:1.6;margin-bottom:12px}
+.email-cta{background:var(--navy);color:#fff;text-align:center;padding:11px;border-radius:5px;font-size:13px;font-weight:700;cursor:pointer}
+.email-cta:hover{background:#001e3d}
+.email-footer-bar{background:var(--navy);padding:7px 16px;font-size:10px;color:rgba(255,255,255,0.4)}
+.attach-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#f0f0f0;border-radius:4px;margin-top:8px;font-size:12px;color:#555}
+
+/* Completion portal checklist */
+.cl-section{margin-bottom:10px}
+.cl-head-p{background:var(--navy);padding:6px 10px;border-radius:4px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.cl-head-p .n{background:#8B0000;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:6px}
+.cl-item-p{display:flex;align-items:flex-start;gap:8px;padding:5px 6px;border-bottom:1px solid #f5f5f5;font-size:12px}
+.cl-item-p.coach-p{background:rgba(18,167,230,0.05);opacity:.55}
+.cl-item-p.your-p{cursor:pointer}
+.cl-item-p.your-p:hover{background:#f0faf8}
+.coach-tag-p{font-size:9px;font-weight:700;color:var(--sky);margin-left:auto;flex-shrink:0;letter-spacing:.5px;padding-top:1px}
+.your-tag-p{font-size:9px;font-weight:700;color:var(--teal);margin-left:auto;flex-shrink:0;letter-spacing:.5px;padding-top:1px}
+.cl-check-p{width:13px;height:13px;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;margin-top:1px}
+.cl-check-p.c{background:var(--sky);color:#fff}
+.cl-check-p.u{border:1.5px solid #DCDCDC}
+.cl-check-p.y{border:1.5px solid var(--teal)}
+.cl-check-p.yc{background:var(--teal);color:#fff}
+
+/* Admin table */
+.admin-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.admin-tbl th{background:#f8f9fa;padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #eee}
+.admin-tbl td{padding:8px 10px;border-bottom:1px solid #f5f5f5;vertical-align:middle}
+.status-await{background:#FFF8E1;color:#E65100;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700;white-space:nowrap}
+.status-done{background:#E3F2FD;color:#002E5D;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700}
+.btn-stage2{background:#2E7D32;color:#fff;border:none;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:var(--font)}
+.btn-stage2:hover{background:#1B5E20}
+.btn-files{background:var(--sky);color:#fff;border:none;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font)}
+
+.narration{background:rgba(27,122,110,0.1);border:1px solid rgba(27,122,110,0.3);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;animation:fadeIn .4s both}
+.narration-icon{font-size:20px;margin-bottom:6px;display:block}
+.narration-text{font-size:14px;color:rgba(255,255,255,0.85);line-height:1.65}
+.narration-text strong{color:#fff}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+.highlight-box{border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;line-height:1.6}
+.hb-sky{background:#EBF5FB;border:1px solid #B3DEF5;color:var(--navy)}
+.hb-gold{background:#FFF8E1;border:1px solid #F9A825;color:#5D4037}
+.hb-teal{background:#E0F2F1;border:1px solid #80CBC4;color:#00695C}
+
+.action-area{margin-top:1.5rem;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.demo-next{background:var(--teal);color:#fff;border:none;padding:11px 24px;border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .15s;text-transform:uppercase}
+.demo-next:hover{background:#156058;transform:translateY(-1px)}
+.demo-back{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);padding:11px 18px;border-radius:var(--r);font-family:var(--font);font-size:13px;cursor:pointer}
+.hint-text{font-size:12px;color:rgba(255,255,255,0.4);font-style:italic}
+
+.success-screen{text-align:center;padding:1.5rem}
+.success-icon{font-size:48px;display:block;margin-bottom:1rem;animation:pop .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.success-title{font-size:20px;font-weight:800;color:var(--teal);margin-bottom:6px}
+.success-sub{font-size:13px;color:var(--muted);line-height:1.6}
+
+@media(max-width:768px){.demo-shell{grid-template-columns:1fr}.sidebar{display:none}}
+</style>
+</head>
+<body>
+
+<div class="demo-shell">
+  <div class="sidebar">
+    <div class="sb-header">
+      <div class="sb-logo"><span class="h">#</span><span class="w">TEACH</span></div>
+      <div class="sb-sub">Resident Completion Checklist</div>
+      <div class="sb-badge">CERTIFICATION DEMO</div>
+    </div>
+    <div class="sb-steps" id="sbSteps"></div>
+    <div class="sb-progress">
+      <div class="sb-prog-label"><span>Progress</span><span id="progLabel">0%</span></div>
+      <div class="sb-prog-bar"><div class="sb-prog-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="top-bar">
+      <span class="top-step" id="topStep">STEP 1 OF 5</span>
+      <span class="top-hint" id="topHint">Click the interactive elements to continue</span>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<script>
+const STEPS = [
+  { id:'choose',    icon:'🔀', title:'How Do You Work?',    desc:'Email link or Admin Portal?' },
+  { id:'email',     icon:'📧', title:'Receive the Email',   desc:'What the notification looks like' },
+  { id:'portal',    icon:'✏️', title:'Complete Checklist',  desc:'Check your items in the portal' },
+  { id:'submit',    icon:'📤', title:'Submit Stage 2',      desc:'Finalize and send' },
+  { id:'done',      icon:'🎉', title:'Done!',               desc:'PDF sent, record saved' },
+];
+
+let currentStep = 0;
+let advisorCB = {};
+
+function buildSidebar(){
+  const el = document.getElementById('sbSteps');
+  el.innerHTML = STEPS.map((s,i)=>{
+    let cls='sb-step';
+    if(i===currentStep)cls+=' active';
+    else if(i<currentStep)cls+=' done';
+    else if(i>currentStep+1)cls+=' locked';
+    return `<div class="${cls}" onclick="tryNav(${i})">
+      <div class="sb-icon">${i<currentStep?'✓':s.icon}</div>
+      <div>
+        <div class="sb-title">${s.title}</div>
+        <div class="sb-desc">${s.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+  const pct=Math.round((currentStep/(STEPS.length-1))*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progLabel').textContent=pct+'%';
+  document.getElementById('topStep').textContent=`STEP ${currentStep+1} OF ${STEPS.length}`;
+}
+
+function tryNav(i){ if(i<=currentStep) goTo(i); }
+
+function goTo(i){
+  currentStep=i;
+  buildSidebar();
+  renderStep(STEPS[i].id);
+  window.scrollTo(0,0);
+}
+
+function renderStep(id){
+  const hints={
+    choose:'Choose how you prefer to work',
+    email:'Read the email and click Complete Your Portion',
+    portal:'Check your items in the checklist',
+    submit:'Submit and see what happens',
+    done:''
+  };
+  document.getElementById('topHint').textContent=hints[id]||'';
+  const c=document.getElementById('content');
+  if(id==='choose')  c.innerHTML=renderChoose();
+  if(id==='email')   c.innerHTML=renderEmail();
+  if(id==='portal')  c.innerHTML=renderPortal();
+  if(id==='submit')  c.innerHTML=renderSubmit();
+  if(id==='done')    c.innerHTML=renderDone();
+}
+
+// CHOOSE
+function renderChoose(){
+  return `
+  <div class="narration">
+    <span class="narration-icon">🔀</span>
+    <div class="narration-text">You can complete Stage 2 in <strong>two ways</strong>. Try both paths in this demo — choose one to continue.</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.5rem;cursor:pointer;transition:all .2s;text-align:center" onclick="goTo(1)" onmouseover="this.style.borderColor='var(--sky)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+      <div style="font-size:40px;margin-bottom:10px">📧</div>
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">Option A</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5;margin-bottom:14px">Click the link in your email — no login required.</div>
+      <div style="background:var(--sky);color:#fff;padding:9px;border-radius:6px;font-size:12px;font-weight:700">Try Email Link →</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.5rem;cursor:pointer;transition:all .2s;text-align:center" onclick="goTo(2)" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+      <div style="font-size:40px;margin-bottom:10px">🖥️</div>
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">Option B</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5;margin-bottom:14px">Use the Admin Portal — best if you check it regularly.</div>
+      <div style="background:var(--teal);color:#fff;padding:9px;border-radius:6px;font-size:12px;font-weight:700">Try Admin Portal →</div>
+    </div>
+  </div>
+  <div class="highlight-box hb-sky">Either path leads to the same checklist. The Admin Portal requires an admin login. The email link works for anyone — no account needed.</div>`;
+}
+
+// EMAIL PATH
+function renderEmail(){
+  return `
+  <div class="narration">
+    <span class="narration-icon">📧</span>
+    <div class="narration-text">When a coach submits Stage 1, you receive this email from <strong>certification@trainingeducators.com</strong>. Click the blue button to open the completion portal.</div>
+  </div>
+  <div class="demo-screen">
+    <div class="ds-header"><div class="ds-dot r"></div><div class="ds-dot y"></div><div class="ds-dot g"></div><div class="ds-url">Inbox — New Message</div></div>
+    <div class="ds-body">
+      <div class="email-card">
+        <div class="email-card-hdr">
+          <div class="email-from">From: #TEACH Checklist System &lt;certification@trainingeducators.com&gt;</div>
+          <div class="email-subject">Action Required: Complete Checklist — John Doe (12345) — MI</div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-meta-bar">
+            <strong>Resident:</strong> John Doe (12345) &nbsp;·&nbsp; <strong>State:</strong> MI — Michigan<br>
+            <strong>Submitted by coach:</strong> drjkilgore@trainingeducators.com
+          </div>
+          <div class="email-text">
+            The instructional coach has completed their portion (Sections 1, 2, and the final coaching conversation in Section 4). Please complete the remaining items using the button below.
+          </div>
+          <div class="email-cta" onclick="goTo(2)">✓ Complete Your Portion</div>
+          <div style="font-size:10px;color:#aaa;text-align:center;margin-top:6px">This link expires in 30 days</div>
+          <div class="attach-row">📄 TEACH_Checklist_MI_John_Doe_Stage1.pdf</div>
+          <div class="attach-row">📝 Transcript_JohnDoe.docx</div>
+        </div>
+        <div class="email-footer-bar">Confidential – Internal Use Only</div>
+      </div>
+    </div>
+  </div>
+  <div class="hint-text">→ Click the blue "Complete Your Portion" button to continue</div>`;
+}
+
+// PORTAL / CHECKLIST
+function renderPortal(){
+  const items = {
+    s1:[
+      {id:'s1_0',text:'All courses were completed and met the minimum 3.0 score requirement',coach:true},
+      {id:'s1_1',text:'All courses have been logged in the learning management system',coach:true},
+    ],
+    s2:[
+      {id:'s2_0',text:'The Teacher Proficiency Assessment (TPA) scores recorded in Status Report',coach:true},
+      {id:'s2_1',text:'The Family Conferences Self-Assessment has been recorded',coach:true},
+    ],
+    s3:[
+      {id:'s3_0',text:'MTTC scores submitted to #TEACH',coach:false},
+      {id:'s3_1',text:'PKS documentation confirmed (as required)',coach:false},
+    ],
+    s4:[
+      {id:'s4_0',text:'Resident has taught at least 3 full academic years',coach:false},
+      {id:'s4_1',text:'600 hours of teaching with 50+ hours per endorsement area',coach:false},
+      {id:'s4_2',text:'The final coaching conversation recorded in CRM (Coach)',coach:true},
+      {id:'s4_3',text:'Update status in MOECS',coach:false},
+    ],
+    s5:[
+      {id:'s5_0',text:'Program balance paid in full',coach:false},
+    ],
+    s6:[
+      {id:'s6_0',text:'Official Transcripts on file',coach:false},
+      {id:'s6_1',text:'Regional Accreditation Confirmed',coach:false},
+    ]
+  };
+
+  const yourIds = ['s3_0','s3_1','s4_0','s4_1','s4_3','s5_0','s6_0','s6_1'];
+  const yourChecked = yourIds.filter(id=>advisorCB[id]).length;
+  const pct = Math.round(yourChecked/yourIds.length*100);
+
+  function mkItem(item){
+    if(item.coach){
+      return `<div class="cl-item-p coach-p">
+        <div class="cl-check-p c">✓</div>
+        <span style="color:#888">${item.text}</span>
+        <span class="coach-tag-p">✓ COACH</span>
+      </div>`;
+    }
+    const chk = advisorCB[item.id];
+    return `<div class="cl-item-p your-p" onclick="toggleAdv('${item.id}')">
+      <div class="cl-check-p ${chk?'yc':'y'}" id="chk_${item.id}">${chk?'✓':''}</div>
+      <span id="lbl_${item.id}" style="color:${chk?'var(--ink)':'var(--muted)'}">${item.text}</span>
+      <span class="your-tag-p">YOUR ITEM</span>
+    </div>`;
+  }
+
+  return `
+  <div class="narration">
+    <span class="narration-icon">✏️</span>
+    <div class="narration-text">Coach items show <span style="color:var(--sky);font-weight:600">✓ COACH</span> — they're pre-filled for reference. Click each <span style="color:var(--teal);font-weight:600">YOUR ITEM</span> to check it off. You can edit coach items too if needed.</div>
+  </div>
+  <div style="background:rgba(27,122,110,0.1);border:1px solid rgba(27,122,110,0.2);border-radius:6px;padding:8px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:12px;color:rgba(255,255,255,.7)">Your items: <strong style="color:#fff">${yourChecked}/${yourIds.length}</strong></span>
+    <div style="background:rgba(255,255,255,0.15);height:4px;width:80px;border-radius:2px;overflow:hidden"><div id="portProg" style="background:var(--teal);height:100%;width:${pct}%;transition:width .3s"></div></div>
+  </div>
+  <div class="demo-screen">
+    <div class="ds-header"><div class="ds-dot r"></div><div class="ds-dot y"></div><div class="ds-dot g"></div><div class="ds-url">teach-checklist.netlify.app/complete · MI — Michigan</div></div>
+    <div class="ds-body" style="max-height:320px;overflow-y:auto">
+      <div class="highlight-box hb-teal" style="margin-bottom:10px;font-size:12px"><strong>Coach items</strong> (labeled ✓ COACH) are shown for reference. Click each <strong>YOUR ITEM</strong> to check it off.</div>
+      <div class="cl-section"><div class="cl-head-p"><span class="n">1</span>COURSEWORK (COACH)</div>${items.s1.map(i=>mkItem(i)).join('')}</div>
+      <div class="cl-section"><div class="cl-head-p"><span class="n">2</span>#TEACH ASSESSMENTS (COACH)</div>${items.s2.map(i=>mkItem(i)).join('')}</div>
+      <div class="cl-section"><div class="cl-head-p"><span class="n">3</span>STATE ASSESSMENTS</div>${items.s3.map(i=>mkItem(i)).join('')}</div>
+      <div class="cl-section"><div class="cl-head-p"><span class="n">4</span>DOCUMENTATION</div>${items.s4.map(i=>mkItem(i)).join('')}</div>
+      <div class="cl-section"><div class="cl-head-p"><span class="n">5</span>FINANCIAL STANDING</div>${items.s5.map(i=>mkItem(i)).join('')}</div>
+      <div class="cl-section"><div class="cl-head-p"><span class="n">6</span>OFFICIAL TRANSCRIPTS</div>${items.s6.map(i=>mkItem(i)).join('')}</div>
+    </div>
+  </div>
+  <div class="action-area">
+    <button class="demo-next" onclick="goTo(3)">Submit Final Checklist →</button>
+    <span class="hint-text">Check your items, then click Submit</span>
+  </div>`;
+}
+
+function toggleAdv(id){
+  advisorCB[id] = !advisorCB[id];
+  const chkEl = document.getElementById('chk_'+id);
+  const lblEl = document.getElementById('lbl_'+id);
+  if(chkEl){ chkEl.className='cl-check-p '+(advisorCB[id]?'yc':'y'); chkEl.textContent=advisorCB[id]?'✓':''; }
+  if(lblEl){ lblEl.style.color=advisorCB[id]?'var(--ink)':'var(--muted)'; }
+  // Update progress bar
+  const yourIds=['s3_0','s3_1','s4_0','s4_1','s4_3','s5_0','s6_0','s6_1'];
+  const yc=yourIds.filter(id=>advisorCB[id]).length;
+  const p=Math.round(yc/yourIds.length*100);
+  const pb=document.getElementById('portProg');
+  if(pb) pb.style.width=p+'%';
+}
+
+// SUBMIT
+function renderSubmit(){
+  const yourIds=['s3_0','s3_1','s4_0','s4_1','s4_3','s5_0','s6_0','s6_1'];
+  const yc=yourIds.filter(id=>advisorCB[id]).length;
+
+  return `
+  <div class="narration">
+    <span class="narration-icon">📤</span>
+    <div class="narration-text">Click <strong>Submit Final Checklist</strong> to complete Stage 2. Watch what the system does automatically after you submit.</div>
+  </div>
+  <div class="demo-screen">
+    <div class="ds-header"><div class="ds-dot r"></div><div class="ds-dot y"></div><div class="ds-dot g"></div><div class="ds-url">Stage 2 — Ready to Submit</div></div>
+    <div class="ds-body">
+      <div style="background:#E0F2F1;border:1px solid #80CBC4;border-radius:6px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#004D40">
+        <strong>Summary:</strong> Your items checked: ${yc}/8 &nbsp;·&nbsp; Coach items: pre-filled &nbsp;·&nbsp; Resident: John Doe (12345) &nbsp;·&nbsp; State: MI
+      </div>
+      <div style="background:#f8f9fa;border-radius:6px;padding:12px 14px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px">After submitting, the system will automatically:</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${['Generate a completed PDF of the full checklist','Email the PDF to the coach automatically','Send you a confirmation copy','Save all files permanently to the document repository','Update the record to ✓ Fully Complete in the Admin Portal'].map((t,i)=>`
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#333">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--teal);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+            ${t}
+          </div>`).join('')}
+        </div>
+      </div>
+      <button class="df-btn crimson" style="width:100%;padding:12px;font-size:14px" onclick="goTo(4)">✓ Submit Final Checklist</button>
+    </div>
+  </div>`;
+}
+
+// DONE
+function renderDone(){
+  return `
+  <div class="demo-screen">
+    <div class="ds-header"><div class="ds-dot r"></div><div class="ds-dot y"></div><div class="ds-dot g"></div><div class="ds-url">Stage 2 Complete!</div></div>
+    <div class="ds-body">
+      <div class="success-screen">
+        <span class="success-icon">🎉</span>
+        <div class="success-title" style="color:var(--teal)">Checklist Fully Complete!</div>
+        <div class="success-sub">
+          <p>The completed PDF has been emailed to the coach.</p>
+          <p>A confirmation copy was sent to your email.</p>
+          <p style="margin-top:8px;color:#888;font-size:12px">All files are stored permanently in the document repository and accessible from the Admin Portal at any time.</p>
+        </div>
+        <button class="df-btn teal" style="margin-top:16px;padding:10px 24px" onclick="resetDemo()">↺ Start Over</button>
+      </div>
+    </div>
+  </div>
+  <div class="narration" style="margin-top:1rem;background:rgba(27,122,110,0.1);border-color:rgba(27,122,110,0.3)">
+    <span class="narration-icon">✅</span>
+    <div class="narration-text"><strong>That's your entire role.</strong> Receive the notification, complete your items, submit. The system handles notifications, PDF generation, and storage automatically.</div>
+  </div>`;
+}
+
+function resetDemo(){
+  advisorCB={};
+  goTo(0);
+}
+
+buildSidebar();
+renderStep('choose');
+</script>
+</body>
+</html>
