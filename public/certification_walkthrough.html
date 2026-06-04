@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>#TEACH — Certification Team Walkthrough</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #002E5D;
+  --teal: #1B7A6E;
+  --sky: #12A7E6;
+  --gold: #C8922A;
+  --silver: #C5C5C5;
+  --white: #FFFFFF;
+  --crimson: #8B0000;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #0A1628;
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Teal accent background for this version */
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px; right: -200px;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(27,122,110,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.progress-track { position:fixed;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.1);z-index:100; }
+.progress-fill { height:100%;background:linear-gradient(90deg,var(--teal),var(--sky));transition:width 0.6s cubic-bezier(0.4,0,0.2,1); }
+
+.site-header {
+  position:fixed;top:3px;left:0;right:0;height:56px;
+  background:rgba(10,22,40,0.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  display:flex;align-items:center;justify-content:space-between;padding:0 2rem;z-index:99;
+}
+.logo { font-weight:600;font-size:18px; }
+.logo span { color:var(--silver); }
+.step-counter { font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(255,255,255,0.5);letter-spacing:1px; }
+.audience-badge { background:var(--teal);color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:0.5px; }
+
+.slide-container { padding-top:59px;min-height:100vh;display:flex;flex-direction:column; }
+
+.slide {
+  display:none;min-height:calc(100vh - 59px);flex-direction:column;justify-content:center;
+  padding:3rem 2rem;animation:slideIn 0.5s cubic-bezier(0.4,0,0.2,1) both;
+  max-width:960px;margin:0 auto;width:100%;position:relative;z-index:1;
+}
+.slide.active { display:flex; }
+
+@keyframes slideIn { from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)} }
+
+.step-label {
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;
+  color:var(--teal);text-transform:uppercase;margin-bottom:1rem;
+  display:flex;align-items:center;gap:10px;
+}
+.step-label::before { content:'';display:block;width:24px;height:1px;background:var(--teal); }
+
+.slide-title { font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);line-height:1.15;margin-bottom:1.25rem; }
+.slide-title em { font-style:normal;color:var(--teal); }
+.slide-title strong { color:var(--gold); }
+
+.slide-body { font-size:1.1rem;line-height:1.75;color:rgba(255,255,255,0.75);max-width:640px;margin-bottom:2rem; }
+.slide-body strong { color:#fff;font-weight:600; }
+
+.feature-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem; }
+.feature-card {
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.25rem;
+  transition:all 0.2s;animation:cardPop 0.4s both;
+}
+.feature-card:hover { background:rgba(27,122,110,0.1);border-color:rgba(27,122,110,0.4);transform:translateY(-2px); }
+.feature-card:nth-child(1){animation-delay:0.1s}.feature-card:nth-child(2){animation-delay:0.2s}
+.feature-card:nth-child(3){animation-delay:0.3s}.feature-card:nth-child(4){animation-delay:0.4s}
+@keyframes cardPop { from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)} }
+.feature-icon { font-size:28px;margin-bottom:0.6rem; }
+.feature-title { font-size:14px;font-weight:600;color:#fff;margin-bottom:4px; }
+.feature-desc { font-size:13px;color:rgba(255,255,255,0.55);line-height:1.5; }
+
+.step-list { list-style:none;margin-bottom:2rem; }
+.step-list li { display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.07);animation:fadeUp 0.4s both; }
+.step-list li:last-child { border-bottom:none; }
+.step-list li:nth-child(1){animation-delay:0.1s}.step-list li:nth-child(2){animation-delay:0.2s}
+.step-list li:nth-child(3){animation-delay:0.3s}.step-list li:nth-child(4){animation-delay:0.4s}
+.step-list li:nth-child(5){animation-delay:0.5s}
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)} }
+.step-num { width:32px;height:32px;border-radius:50%;background:var(--teal);color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px; }
+.step-content strong { display:block;color:#fff;font-size:15px;margin-bottom:3px; }
+.step-content span { font-size:13px;color:rgba(255,255,255,0.55);line-height:1.5; }
+
+.screen-mockup { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;margin-bottom:2rem;animation:fadeUp 0.5s 0.2s both; }
+.mockup-bar { background:#0A1628;padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.08); }
+.dot { width:10px;height:10px;border-radius:50%; }
+.dot.red{background:#ff5f57}.dot.yellow{background:#ffbd2e}.dot.green{background:#28c840}
+.url-bar { flex:1;background:rgba(255,255,255,0.06);border-radius:4px;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,0.5); }
+.mockup-content { padding:1.25rem; }
+
+/* Email preview */
+.email-preview { background:#f8f9fa;border-radius:8px;overflow:hidden;max-width:500px; }
+.email-header { background:var(--navy);padding:14px 18px; }
+.email-from { font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:2px; }
+.email-subject { font-size:13px;font-weight:700;color:#fff; }
+.email-body { padding:16px 18px; }
+.email-resident-bar { background:#EBF5FB;border:1px solid #B3DEF5;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#002E5D; }
+.email-text { font-size:12px;color:#555;line-height:1.6;margin-bottom:14px; }
+.email-cta { background:#002E5D;color:#fff;text-align:center;padding:12px 20px;border-radius:6px;font-size:13px;font-weight:700;letter-spacing:0.3px; }
+.email-footer { background:#002E5D;padding:8px 18px;font-size:10px;color:rgba(255,255,255,0.4); }
+
+/* Checklist preview items */
+.cl-section { margin-bottom:10px; }
+.cl-head { background:var(--navy);padding:6px 10px;border-radius:4px;font-size:11px;font-weight:700;color:#fff;letter-spacing:0.5px;margin-bottom:5px;display:flex;align-items:center;gap:6px; }
+.cl-head .num { background:var(--crimson);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:6px; }
+.cl-item { display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:3px;font-size:11px; }
+.cl-item.coach { color:rgba(0,0,0,0.4);background:rgba(18,167,230,0.04); }
+.cl-item.yours { color:rgba(0,0,0,0.85); }
+.cl-check { width:13px;height:13px;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px; }
+.cl-check.checked { background:var(--sky);color:#fff; }
+.cl-check.unchecked { border:1.5px solid #DCDCDC; }
+.cl-check.yours-check { border:1.5px solid var(--teal); }
+.coach-tag { font-size:8px;font-weight:700;color:var(--sky);margin-left:auto;letter-spacing:0.5px; }
+.your-tag { font-size:8px;font-weight:700;color:var(--teal);margin-left:auto;letter-spacing:0.5px; }
+
+.highlight-box { background:linear-gradient(135deg,rgba(27,122,110,0.12),rgba(27,122,110,0.05));border:1px solid rgba(27,122,110,0.3);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;animation:fadeUp 0.4s 0.3s both; }
+.highlight-box.gold { background:linear-gradient(135deg,rgba(200,146,42,0.12),rgba(200,146,42,0.05));border-color:rgba(200,146,42,0.3); }
+.highlight-box.sky { background:linear-gradient(135deg,rgba(18,167,230,0.1),rgba(18,167,230,0.05));border-color:rgba(18,167,230,0.3); }
+.hb-label { font-size:10px;font-weight:700;letter-spacing:2px;color:var(--teal);text-transform:uppercase;margin-bottom:6px; }
+.hb-label.gold { color:var(--gold); }
+.hb-label.sky { color:var(--sky); }
+.hb-content { font-size:14px;color:rgba(255,255,255,0.8);line-height:1.6; }
+.hb-content strong { color:#fff; }
+
+.two-col { display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem; }
+.col-card { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.25rem;animation:fadeUp 0.4s both; }
+.col-card:nth-child(1){animation-delay:0.1s}.col-card:nth-child(2){animation-delay:0.2s}
+.col-card h4 { font-size:14px;font-weight:600;color:var(--teal);margin-bottom:0.75rem;display:flex;align-items:center;gap:8px; }
+.col-card ul { list-style:none; }
+.col-card ul li { font-size:13px;color:rgba(255,255,255,0.65);padding:4px 0;display:flex;gap:8px;line-height:1.5; }
+.col-card ul li::before { content:"→";color:var(--teal);flex-shrink:0; }
+
+.timeline { position:relative;padding-left:2rem;margin-bottom:2rem; }
+.timeline::before { content:'';position:absolute;left:10px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,var(--teal),var(--sky));border-radius:2px; }
+.tl-item { position:relative;padding:0.6rem 0 0.6rem 1.5rem;animation:fadeUp 0.4s both; }
+.tl-item:nth-child(1){animation-delay:0.1s}.tl-item:nth-child(2){animation-delay:0.2s}
+.tl-item:nth-child(3){animation-delay:0.3s}.tl-item:nth-child(4){animation-delay:0.4s}
+.tl-item::before { content:'';position:absolute;left:-7px;top:14px;width:10px;height:10px;border-radius:50%;background:var(--teal);border:2px solid #0A1628;box-shadow:0 0 0 3px rgba(27,122,110,0.25); }
+.tl-title { font-size:14px;font-weight:600;color:#fff;margin-bottom:2px; }
+.tl-desc { font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5; }
+
+/* Admin portal mockup */
+.admin-row { display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:12px; }
+.admin-row:last-child { border-bottom:none; }
+.status-badge { padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap; }
+.status-awaiting { background:#FFF8E1;color:#E65100; }
+.status-complete { background:#E3F2FD;color:#002E5D; }
+.btn-complete { background:#2E7D32;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap; }
+.btn-files { background:var(--sky);color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap; }
+
+.final-icon { font-size:64px;display:block;margin-bottom:1.5rem;animation:pop 0.5s 0.2s cubic-bezier(0.34,1.56,0.64,1) both; }
+@keyframes pop { from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)} }
+
+.nav-controls { position:fixed;bottom:2rem;right:2rem;display:flex;align-items:center;gap:12px;z-index:99; }
+.nav-btn { width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-family:'DM Sans',sans-serif; }
+.nav-btn.prev { background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7); }
+.nav-btn.prev:hover { background:rgba(255,255,255,0.15);color:#fff; }
+.nav-btn.next { background:var(--teal);color:#fff;font-weight:700; }
+.nav-btn.next:hover { background:#156058;transform:scale(1.05); }
+.nav-btn:disabled { opacity:0.3;cursor:not-allowed;transform:none; }
+
+.slide-dots { position:fixed;bottom:2.6rem;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:99; }
+.slide-dot { width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);cursor:pointer;transition:all 0.3s;border:none; }
+.slide-dot.active { background:var(--teal);transform:scale(1.3); }
+
+@media(max-width:640px){.two-col{grid-template-columns:1fr}.slide{padding:2rem 1.25rem}.nav-controls{bottom:1.5rem;right:1.25rem}}
+</style>
+</head>
+<body>
+
+<div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+
+<header class="site-header">
+  <div class="logo"><span>#</span>TEACH Checklist</div>
+  <span class="step-counter" id="stepCounter">01 / 08</span>
+  <span class="audience-badge">Certification Team</span>
+</header>
+
+<div class="slide-container">
+
+  <!-- SLIDE 1: WELCOME -->
+  <div class="slide active" id="slide-1">
+    <div class="step-label">Getting Started</div>
+    <h1 class="slide-title">Welcome,<br><em>Certification Team.</em></h1>
+    <p class="slide-body">This walkthrough explains your role in the new <strong>#TEACH Resident Completion Checklist System</strong>. The process is simple — you'll receive a notification when a coach has completed their part, and you complete the rest.</p>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📧</div>
+        <div class="feature-title">Email Link</div>
+        <div class="feature-desc">Click a secure link in your email. No login required.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🖥️</div>
+        <div class="feature-title">Admin Portal</div>
+        <div class="feature-desc">Complete Stage 2 directly from the Admin Portal if you're an admin user.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📄</div>
+        <div class="feature-title">Auto PDF</div>
+        <div class="feature-desc">Final PDF generated and emailed to the coach automatically.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🗃️</div>
+        <div class="feature-title">Stored Forever</div>
+        <div class="feature-desc">All files saved permanently — accessible any time, even years later.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: TWO WAYS -->
+  <div class="slide" id="slide-2">
+    <div class="step-label">Two Ways to Complete</div>
+    <h1 class="slide-title">You have<br><strong>two options</strong><br>for Stage 2.</h1>
+    <div class="two-col">
+      <div class="col-card">
+        <h4>📧 Option A — Email Link</h4>
+        <ul>
+          <li>Receive an email from the system when a coach submits</li>
+          <li>Click "Complete Your Portion" button</li>
+          <li>Opens directly in your browser</li>
+          <li>No login or account needed</li>
+          <li>Link expires after 30 days</li>
+        </ul>
+      </div>
+      <div class="col-card">
+        <h4>🖥️ Option B — Admin Portal</h4>
+        <ul>
+          <li>Log in at /admin with your credentials</li>
+          <li>Find submissions showing ⏳ Awaiting Advisor</li>
+          <li>Click ✏️ Complete Stage 2 button</li>
+          <li>Full checklist opens in a modal</li>
+          <li>Best if you check the portal regularly</li>
+        </ul>
+      </div>
+    </div>
+    <div class="highlight-box sky">
+      <div class="hb-label sky">Either way, same experience</div>
+      <div class="hb-content">Whether you use the email link or the Admin Portal, you see the same checklist — the coach's items pre-filled for reference, and your items clearly labeled <strong>YOUR ITEM</strong>.</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: THE EMAIL -->
+  <div class="slide" id="slide-3">
+    <div class="step-label">Option A — Email Link</div>
+    <h1 class="slide-title">What the<br><em>email looks like.</em></h1>
+    <p class="slide-body">When a coach submits Stage 1, you receive this email automatically from <strong>certification@trainingeducators.com</strong>.</p>
+    <div class="screen-mockup">
+      <div class="mockup-bar">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="url-bar">Inbox — certification@trainingeducators.com</div>
+      </div>
+      <div class="mockup-content">
+        <div class="email-preview">
+          <div class="email-header">
+            <div class="email-from">From: #TEACH Checklist System &lt;certification@trainingeducators.com&gt;</div>
+            <div class="email-subject">Action Required: Complete Checklist — John Doe (12345) — MI</div>
+          </div>
+          <div class="email-body">
+            <div class="email-resident-bar">
+              <strong>Resident:</strong> John Doe (12345) &nbsp;|&nbsp; <strong>State:</strong> MI — Michigan<br>
+              <strong>Submitted by:</strong> coach@trainingeducators.com
+            </div>
+            <div class="email-text">
+              The instructional coach has completed their portion. Please complete the remaining certification items using the button below.
+            </div>
+            <div class="email-cta">✓ Complete Your Portion</div>
+          </div>
+          <div class="email-footer">Confidential – Internal Use Only · Link expires in 30 days</div>
+        </div>
+      </div>
+    </div>
+    <div class="highlight-box">
+      <div class="hb-label">Attachments included</div>
+      <div class="hb-content">The email also includes <strong>all documents the coach uploaded</strong> — transcripts, evaluations, certifications — as email attachments.</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: COMPLETION PORTAL -->
+  <div class="slide" id="slide-4">
+    <div class="step-label">Option A — Email Link</div>
+    <h1 class="slide-title">Inside the<br><em>completion portal.</em></h1>
+    <p class="slide-body">After clicking the link, the completion portal opens. No login required. You'll see the full checklist with coach items already filled in for reference.</p>
+    <div class="screen-mockup">
+      <div class="mockup-bar">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="url-bar">teach-checklist.netlify.app/complete?token=...</div>
+      </div>
+      <div class="mockup-content" style="background:#F5F8FF">
+        <div class="cl-section">
+          <div class="cl-head" style="background:#002E5D"><span class="num">1</span>COURSEWORK (COACH)</div>
+          <div class="cl-item coach"><div class="cl-check checked">✓</div>All courses completed with min 3.0 score<span class="coach-tag">✓ COACH</span></div>
+          <div class="cl-item coach"><div class="cl-check checked">✓</div>All courses logged in the LMS<span class="coach-tag">✓ COACH</span></div>
+        </div>
+        <div class="cl-section">
+          <div class="cl-head" style="background:#002E5D"><span class="num">3</span>STATE ASSESSMENTS</div>
+          <div class="cl-item yours"><div class="cl-check yours-check"></div>MTTC scores submitted to #TEACH<span class="your-tag">YOUR ITEM</span></div>
+          <div class="cl-item yours"><div class="cl-check yours-check"></div>PKS documentation confirmed<span class="your-tag">YOUR ITEM</span></div>
+        </div>
+        <div class="cl-section">
+          <div class="cl-head" style="background:#002E5D"><span class="num">5</span>FINANCIAL STANDING</div>
+          <div class="cl-item yours"><div class="cl-check yours-check"></div>Program balance paid in full<span class="your-tag">YOUR ITEM</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="slide-body" style="margin-bottom:0">Items labeled <strong style="color:var(--sky)">✓ COACH</strong> are pre-filled for reference — you can edit them if needed. Items labeled <strong style="color:var(--teal)">YOUR ITEM</strong> are yours to complete.</p>
+  </div>
+
+  <!-- SLIDE 5: YOUR ITEMS -->
+  <div class="slide" id="slide-5">
+    <div class="step-label">Your Responsibilities</div>
+    <h1 class="slide-title">Your items<br>to <em>complete.</em></h1>
+    <p class="slide-body">These sections are yours regardless of the state. The specific items within each section vary by state — the portal shows exactly what's required.</p>
+    <ul class="step-list">
+      <li><div class="step-num">3</div><div class="step-content"><strong>State Assessments & Requirements</strong><span>Varies by state — MTTC/PKS for MI, Praxis for AL/IN, EdTPA for NC, Arizona exams for AZ.</span></div></li>
+      <li><div class="step-num">4</div><div class="step-content"><strong>Documentation & Teaching Hours</strong><span>Teaching years, hours in endorsement area, certifications (CPR, etc.).</span></div></li>
+      <li><div class="step-num">5–6</div><div class="step-content"><strong>Financial Standing & Transcripts</strong><span>Program balance paid in full, official transcripts on file, accreditation confirmed.</span></div></li>
+      <li><div class="step-num">7–8</div><div class="step-content"><strong>Background Checks & Completion Letter</strong><span>Background check confirmed, completion letter sent to resident.</span></div></li>
+      <li><div class="step-num">9–10</div><div class="step-content"><strong>License Application & Completion Certificate</strong><span>License application submitted, Parchment request sent to processor.</span></div></li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 6: ADMIN PORTAL -->
+  <div class="slide" id="slide-6">
+    <div class="step-label">Option B — Admin Portal</div>
+    <h1 class="slide-title">Complete Stage 2<br>from the <em>Admin Portal.</em></h1>
+    <p class="slide-body">If you have admin access, log in at <strong>/admin</strong> and look for the <strong>⏳ Awaiting Advisor</strong> status badge. Click <strong>✏️ Complete Stage 2</strong> to open the checklist directly.</p>
+    <div class="screen-mockup">
+      <div class="mockup-bar">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="url-bar">teach-checklist.netlify.app/admin → Submissions</div>
+      </div>
+      <div class="mockup-content" style="background:#F5F8FF;padding:0">
+        <div style="background:#fff;border-bottom:1px solid #eee;padding:8px 14px;display:grid;grid-template-columns:80px 130px 80px 160px 1fr 90px 140px;gap:10px;font-size:10px;font-weight:700;color:#002E5D;text-transform:uppercase;letter-spacing:0.5px">
+          <span>Date</span><span>Resident</span><span>State</span><span>Coach</span><span>Recipient</span><span>Status</span><span>Docs/Actions</span>
+        </div>
+        <div class="admin-row">
+          <span style="font-size:12px;color:#888;min-width:80px">6/3/2026</span>
+          <span style="font-size:13px;font-weight:600;color:#002E5D;min-width:130px">LaBron James</span>
+          <span style="font-weight:700;min-width:80px">MI</span>
+          <span style="font-size:11px;color:#888;min-width:160px">drjkilgore@...</span>
+          <span style="font-size:11px;color:#888;flex:1">drjkilgore@gmail.com</span>
+          <span class="status-badge status-awaiting" style="min-width:90px">⏳ Awaiting</span>
+          <div style="display:flex;flex-direction:column;gap:4px;min-width:140px">
+            <button class="btn-files">📁 1 File</button>
+            <button class="btn-complete">✏️ Complete Stage 2</button>
+          </div>
+        </div>
+        <div class="admin-row">
+          <span style="font-size:12px;color:#888;min-width:80px">6/3/2026</span>
+          <span style="font-size:13px;font-weight:600;color:#002E5D;min-width:130px">Michael Jackson</span>
+          <span style="font-weight:700;min-width:80px">MI</span>
+          <span style="font-size:11px;color:#888;min-width:160px">drjkilgore@...</span>
+          <span style="font-size:11px;color:#888;flex:1">drjkilgore@gmail.com</span>
+          <span class="status-badge status-complete" style="min-width:90px">✓ Complete</span>
+          <div style="min-width:140px"><button class="btn-files">📁 2 Files</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="highlight-box">
+      <div class="hb-label">Request admin access</div>
+      <div class="hb-content">To get admin access, go to the checklist app and click <strong>Request Access</strong>. Ask your #TEACH administrator to approve and set your role to Admin.</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: WHAT HAPPENS AFTER -->
+  <div class="slide" id="slide-7">
+    <div class="step-label">After You Submit</div>
+    <h1 class="slide-title">What happens<br><em>after you submit.</em></h1>
+    <p class="slide-body">Once you click <strong>Submit Final Checklist</strong>, the system handles everything automatically.</p>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-title">Final PDF generated instantly</div>
+        <div class="tl-desc">PDFShift renders a clean, branded PDF of the fully completed checklist.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-title">PDF emailed to the coach</div>
+        <div class="tl-desc">The coach receives the final checklist in their inbox automatically — no action needed from you.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-title">Confirmation copy sent to you</div>
+        <div class="tl-desc">You receive a CC of the final email as your confirmation.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-title">Record updated to "Fully Complete"</div>
+        <div class="tl-desc">The submission in the Admin Portal updates to ✓ Complete status.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-title">All files stored permanently</div>
+        <div class="tl-desc">The PDF and all uploaded documents are saved in the secure document repository — accessible forever from the Admin Portal.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: DONE -->
+  <div class="slide" id="slide-8">
+    <span class="final-icon">🎉</span>
+    <div class="step-label">You're ready</div>
+    <h1 class="slide-title">That's your<br><em>whole role.</em></h1>
+    <p class="slide-body">Wait for the email, click the link (or use the Admin Portal), check your items, and submit. The system does the rest — PDF generation, notifications, storage, everything.</p>
+    <div class="highlight-box gold">
+      <div class="hb-label gold">One important note</div>
+      <div class="hb-content">Each email link is unique to one resident and <strong>expires after 30 days</strong>. If a link has expired, ask the coach to resubmit. If you have Admin Portal access, you can always complete it from there instead.</div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:1rem">
+      <a href="/admin" style="background:var(--teal);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;display:inline-block">Go to Admin Portal →</a>
+      <button onclick="currentSlide=0;updateSlide()" style="background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:12px 24px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px">↺ Replay</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="slide-dots" id="dots"></div>
+
+<div class="nav-controls">
+  <button class="nav-btn prev" id="prevBtn" onclick="navigate(-1)" disabled>←</button>
+  <button class="nav-btn next" id="nextBtn" onclick="navigate(1)">→</button>
+</div>
+
+<script>
+const TOTAL = 8;
+let currentSlide = 0;
+const dotsEl = document.getElementById('dots');
+for(let i=0;i<TOTAL;i++){
+  const d=document.createElement('button');
+  d.className='slide-dot'+(i===0?' active':'');
+  d.onclick=()=>{currentSlide=i;updateSlide();};
+  dotsEl.appendChild(d);
+}
+function updateSlide(){
+  document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('active',i===currentSlide));
+  document.querySelectorAll('.slide-dot').forEach((d,i)=>d.classList.toggle('active',i===currentSlide));
+  document.getElementById('progress').style.width=((currentSlide+1)/TOTAL*100)+'%';
+  document.getElementById('stepCounter').textContent=String(currentSlide+1).padStart(2,'0')+' / '+String(TOTAL).padStart(2,'0');
+  document.getElementById('prevBtn').disabled=currentSlide===0;
+  document.getElementById('nextBtn').disabled=currentSlide===TOTAL-1;
+  window.scrollTo(0,0);
+}
+function navigate(dir){
+  const next=currentSlide+dir;
+  if(next<0||next>=TOTAL)return;
+  currentSlide=next;updateSlide();
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')navigate(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')navigate(-1);
+});
+</script>
+</body>
+</html>
