@@ -1,9 +1,29 @@
 const { createClient } = require('@supabase/supabase-js');
+const crypto = require('crypto');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 );
+
+function verifyToken(token) {
+  try {
+    const salt = process.env.PASSWORD_SALT || 'teach-checklist-salt-2026';
+    const [data, sig] = token.split('.');
+    const expected = crypto.createHmac('sha256', salt).update(data).digest('hex');
+    if (sig !== expected) return null;
+    return JSON.parse(Buffer.from(data, 'base64').toString());
+  } catch { return null; }
+}
+
+function isAuthorized(token) {
+  // Accept the static download token
+  if (token === process.env.DOWNLOAD_TOKEN) return true;
+  // Accept a valid admin JWT
+  const payload = verifyToken(token);
+  if (payload && payload.role === 'admin' && payload.exp > Date.now()) return true;
+  return false;
+}
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -11,7 +31,7 @@ exports.handler = async (event) => {
   }
 
   const token = event.queryStringParameters && event.queryStringParameters.token;
-  if (!token || token !== process.env.DOWNLOAD_TOKEN) {
+  if (!token || !isAuthorized(token)) {
     return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized' }) };
   }
 
@@ -20,22 +40,17 @@ exports.handler = async (event) => {
 
     let error;
     if (ids === 'ALL') {
-      // Delete everything
       ({ error } = await supabase
         .from('checklist_submissions')
         .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000')); // delete all rows
+        .neq('id', '00000000-0000-0000-0000-000000000000'));
     } else if (Array.isArray(ids) && ids.length > 0) {
-      // Delete specific IDs
       ({ error } = await supabase
         .from('checklist_submissions')
         .delete()
         .in('id', ids));
     } else {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'No IDs provided' })
-      };
+      return { statusCode: 400, body: JSON.stringify({ error: 'No IDs provided' }) };
     }
 
     if (error) throw error;
