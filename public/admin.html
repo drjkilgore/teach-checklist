@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +19,7 @@ body{font-family:var(--font);background:var(--light);color:var(--ink);font-size:
 .hcoach strong{color:#fff}
 .back-link,.logout-btn{font-size:12px;font-weight:600;color:rgba(255,255,255,.7);cursor:pointer;border:1px solid rgba(255,255,255,.2);padding:5px 12px;border-radius:20px;background:none;font-family:var(--font);text-decoration:none}
 .back-link:hover,.logout-btn:hover{color:#fff;border-color:rgba(255,255,255,.5)}
-.wrap{max-width:1600px;margin:0 auto;padding:2rem 2.5rem 4rem}
+.wrap{max-width:1280px;margin:0 auto;padding:2rem 2rem 4rem}
 .card{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);padding:1.5rem;margin-bottom:1.25rem;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);margin-bottom:1.25rem;padding-bottom:10px;border-bottom:2px solid var(--light);display:flex;align-items:center;gap:8px}
 .ct-bar{width:4px;height:16px;background:var(--crimson);border-radius:2px;flex-shrink:0}
@@ -48,7 +50,19 @@ input:focus,select:focus{border-color:var(--sky)}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead tr{background:var(--light);border-bottom:2px solid var(--border)}
 th{padding:9px 12px;text-align:left;font-weight:700;color:var(--navy);font-size:11px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
-td{padding:8px 12px;border-bottom:1px solid var(--light);vertical-align:middle}
+table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+th:nth-child(1){width:36px}
+th:nth-child(2){width:90px}
+th:nth-child(3){width:130px}
+th:nth-child(4){width:90px}
+th:nth-child(5){width:50px}
+th:nth-child(6){width:180px}
+th:nth-child(7){width:180px}
+th:nth-child(8){width:120px}
+th:nth-child(9){width:80px}
+th:nth-child(10){width:55px}
+th:nth-child(11){width:170px}
+td{padding:8px 12px;border-bottom:1px solid var(--light);vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#fafafa}
 .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
@@ -417,7 +431,7 @@ function renderSubTable(rows){
       <td>${statusBadge}</td>
       <td>${completePct}</td>
       <td style="font-size:12px">${files}</td>
-      <td style="min-width:200px;width:200px"><div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start">${docsBtn}${completeBtn}</div></td>
+      <td style="white-space:normal;vertical-align:middle"><div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start">${docsBtn}${completeBtn}</div></td>
     </tr>`;
   }).join('');
 }
@@ -842,4 +856,3 @@ function openDraft(encodedData) {
 </script>
 </body>
 </html>
-
