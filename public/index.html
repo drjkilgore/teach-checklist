@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,6 +74,12 @@ input::placeholder{color:var(--silver)}
 .em{font-size:12px;color:var(--crimson);margin-top:5px;display:none}
 .em.show{display:block}
 .fhint{font-size:12px;color:var(--muted);margin-top:5px}
+.cc-row{display:flex;gap:8px;align-items:center;margin-bottom:7px}
+.cc-row .cc-input{flex:1;margin-bottom:0}
+.cc-remove{width:30px;height:38px;flex-shrink:0;border:1.5px solid var(--border);border-radius:var(--r);background:var(--white);color:var(--muted);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0}
+.cc-remove:hover{border-color:var(--crimson);color:var(--crimson);background:#FFF5F5}
+.cc-add-btn{background:none;border:1.5px dashed var(--border);border-radius:var(--r);padding:7px 14px;font-family:var(--font);font-size:12px;font-weight:600;color:var(--sky);cursor:pointer;width:100%;margin-top:2px;transition:all .15s}
+.cc-add-btn:hover{border-color:var(--sky);background:#EBF5FB}
 .state-multi{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px}
 .state-cb-btn{border:1.5px solid var(--border);border-radius:var(--r);padding:8px 4px;text-align:center;cursor:pointer;font-size:13px;font-weight:700;color:var(--ink);background:var(--white);transition:all .15s}
 .state-cb-btn.sel{background:var(--navy);border-color:var(--navy);color:var(--white)}
@@ -373,6 +377,19 @@ input::placeholder{color:var(--silver)}
           <input type="email" id="recipEmail" placeholder="advisor@organization.com">
           <div class="em" id="recipErr">Valid email required.</div>
           <div class="fhint">A copy is automatically sent to your coach email.</div>
+        </div>
+        <div class="fg">
+          <label class="fl">CC (Additional Recipients)
+            <span style="font-weight:400;font-size:11px;color:var(--muted);margin-left:6px">optional</span>
+          </label>
+          <div id="cc-fields">
+            <div class="cc-row" id="cc-row-0">
+              <input type="email" class="cc-input" id="cc-0" placeholder="cc@organization.com" oninput="onCcInput(0)">
+              <button type="button" class="cc-remove" onclick="removeCc(0)" style="display:none">✕</button>
+            </div>
+          </div>
+          <button type="button" class="cc-add-btn" onclick="addCcField()">+ Add another CC</button>
+          <div class="fhint">Each person will receive the same email sent to the primary recipient.</div>
         </div>
         <!-- State display (locked to coach's states) -->
         <div class="fg" id="stateDisplay"></div>
@@ -792,6 +809,15 @@ async function loadAdminDraft(d) {
     document.getElementById('resName').value    = draft.resident_name   || '';
     document.getElementById('stuId').value      = draft.student_id      || '';
     document.getElementById('recipEmail').value = draft.recipient_email || '';
+    // Restore CC emails (stored in form_data.cc_emails by draft.js)
+    clearCcFields();
+    const savedCCs = (draft.form_data && draft.form_data.cc_emails) || [];
+    if (savedCCs.length) {
+      savedCCs.forEach((email, i) => {
+        if (i === 0) { const el = document.getElementById('cc-0'); if(el) el.value = email; }
+        else { addCcField(); const el = document.getElementById(`cc-${ccCounter}`); if(el) el.value = email; }
+      });
+    }
     selState       = draft.state;
     currentDraftId = draft.id;
     renderStateDisplay();
@@ -975,6 +1001,7 @@ async function saveDraft() {
       residentName:resName,
       coachEmail:coach.email,
       recipientEmail: document.getElementById('recipEmail').value.trim(),
+      ccEmails: getCcEmails(),
       formData:{ checked: cbStates }
     })
   }).then(r=>r.json());
@@ -1008,6 +1035,53 @@ function goStep(n, skipBuild) {
 }
 
 // ── VALIDATE STEP 1 ───────────────────────────────────────
+// ── CC EMAIL MANAGEMENT ──────────────────────────────────
+let ccCounter = 0;
+
+function addCcField() {
+  ccCounter++;
+  const idx = ccCounter;
+  const container = document.getElementById('cc-fields');
+  const row = document.createElement('div');
+  row.className = 'cc-row';
+  row.id = `cc-row-${idx}`;
+  row.innerHTML = `
+    <input type="email" class="cc-input" id="cc-${idx}" placeholder="cc@organization.com" oninput="onCcInput(${idx})">
+    <button type="button" class="cc-remove" onclick="removeCc(${idx})">✕</button>`;
+  container.appendChild(row);
+}
+
+function removeCc(idx) {
+  const row = document.getElementById(`cc-row-${idx}`);
+  if (row) row.remove();
+}
+
+function onCcInput(idx) {
+  // Show remove button on first row once user types something
+  const input = document.getElementById(`cc-${idx}`);
+  const btn   = document.querySelector(`#cc-row-${idx} .cc-remove`);
+  if (btn) btn.style.display = input && input.value.trim() ? '' : 'none';
+}
+
+function getCcEmails() {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return Array.from(document.querySelectorAll('.cc-input'))
+    .map(el => el.value.trim())
+    .filter(e => re.test(e));
+}
+
+function clearCcFields() {
+  const container = document.getElementById('cc-fields');
+  if (!container) return;
+  // Reset to single empty field
+  container.innerHTML = `
+    <div class="cc-row" id="cc-row-0">
+      <input type="email" class="cc-input" id="cc-0" placeholder="cc@organization.com" oninput="onCcInput(0)">
+      <button type="button" class="cc-remove" onclick="removeCc(0)" style="display:none">✕</button>
+    </div>`;
+  ccCounter = 0;
+}
+
 function validateStep1() {
   const name   = document.getElementById('resName').value.trim();
   const stuId  = document.getElementById('stuId').value.trim();
@@ -1220,7 +1294,7 @@ async function submitForm(){
       body:JSON.stringify({
         stage: 'coach',
         state:selState, stateName:s.name, residentName:name, studentId:sid,
-        coachEmail:coach.email, recipientEmail:recip,
+        coachEmail:coach.email, recipientEmail:recip, ccEmails:getCcEmails(),
         checkedCount:coachChecked, totalItems:coachTotal,
         fileAttachments, emailSubject:subject, htmlBody, textBody,
         checkedItems:cbStates, fileNames:files.map(f=>f.name).join(', ')||null,
@@ -1239,7 +1313,8 @@ async function submitForm(){
 
     const pdfMsg=result.pdfGenerated?' PDF attached.':result.pdfError?' (PDF: '+result.pdfError+')':'';
     showToast('✓ Submitted!'+pdfMsg,'success',5000);
-    document.getElementById('dl1').textContent=`Sent to: ${recip}`;
+    const ccList = getCcEmails();
+    document.getElementById('dl1').textContent=`Sent to: ${recip}${ccList.length ? ' + '+ccList.length+' CC' : ''}`;
     document.getElementById('dl2').textContent=`Coach copy: ${coach.email}`;
     goStep(5);
 
@@ -1269,4 +1344,5 @@ function showToast(msg,type='success',dur=4000){
 </script>
 </body>
 </html>
+
 
