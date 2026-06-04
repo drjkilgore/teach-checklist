@@ -52,8 +52,8 @@ td{padding:8px 12px;border-bottom:1px solid var(--light);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#fafafa}
 .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
-.b-complete{background:#e6f0fa;color:var(--navy)}
-.b-partial{background:#fff0f0;color:var(--crimson)}
+.b-coach-complete{background:#FFF8E1;color:#E65100}
+.b-fully-complete{background:#e6f0fa;color:var(--navy)}
 .b-pending{background:#FFF8E1;color:#F57F17}
 .b-active{background:#E8F5E9;color:#2E7D32}
 .b-suspended{background:#FFEBEE;color:var(--crimson)}
@@ -141,7 +141,7 @@ tr:hover td{background:#fafafa}
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th><input type="checkbox" id="subCheckAll" onchange="toggleAll('sub-cb',this)"></th><th>Date</th><th>Resident</th><th>ID</th><th>State</th><th>Coach</th><th>Recipient</th><th>Complete</th><th>Files</th><th>Docs</th></tr></thead>
+          <thead><tr><th><input type="checkbox" id="subCheckAll" onchange="toggleAll('sub-cb',this)"></th><th>Date</th><th>Resident</th><th>ID</th><th>State</th><th>Coach</th><th>Recipient</th><th>Status</th><th>Complete</th><th>Files</th><th>Docs</th></tr></thead>
           <tbody id="subBody"></tbody>
         </table>
       </div>
@@ -230,6 +230,19 @@ tr:hover td{background:#fafafa}
         <button class="btn btn-primary" style="flex:1" onclick="saveCoachEdit()">Save Changes</button>
         <button class="btn" onclick="closeModal()">Cancel</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- STAGE 2 COMPLETION MODAL -->
+<div class="modal-overlay" id="stage2Modal" onclick="if(event.target===this)closeStage2()">
+  <div class="modal" style="max-width:720px">
+    <div class="modal-hdr">
+      <h3 id="stage2Title">Complete Stage 2 — Advisor Portion</h3>
+      <button class="modal-x" onclick="closeStage2()">✕</button>
+    </div>
+    <div class="modal-body" id="stage2Body">
+      <div style="text-align:center;padding:2rem;color:var(--muted)">Loading checklist…</div>
     </div>
   </div>
 </div>
@@ -368,13 +381,44 @@ function renderSubTable(rows){
   tbody.innerHTML=rows.map(r=>{
     const dt=r.submitted_at?new Date(r.submitted_at).toLocaleDateString():'—';
     const pct=r.total_items?Math.round((r.checked_count/r.total_items)*100):0;
-    const badge=pct===100?`<span class="badge b-complete">100%</span>`:`<span class="badge b-partial">${pct}%</span>`;
+
+    // Status badge
+    const isCoachComplete = r.status === 'coach_complete';
+    const isFullyComplete = r.status === 'fully_complete' || pct === 100;
+    let statusBadge;
+    if (isCoachComplete) {
+      statusBadge = `<span class="badge b-coach-complete">⏳ Awaiting Advisor</span>`;
+    } else if (isFullyComplete) {
+      statusBadge = `<span class="badge b-fully-complete">✓ Complete</span>`;
+    } else {
+      statusBadge = `<span class="badge" style="background:#fff0f0;color:var(--crimson)">In Progress</span>`;
+    }
+
+    const completePct = `<span style="font-weight:700;color:${isFullyComplete?'var(--navy)':'var(--crimson)'}">${pct}%</span>`;
     const files=r.file_names?`📎 ${r.file_names.split(',').length}`:'—';
     const hasStorage = r.storage_paths && r.storage_paths.length > 0;
     const docsBtn = hasStorage
-      ? `<button class="btn btn-sky btn-sm" onclick="showDocs('${r.id}','${(r.resident_name||'').replace(/'/g,'')}')" style="white-space:nowrap">📁 ${r.storage_paths.length} file${r.storage_paths.length!==1?'s':''}</button>`
+      ? `<button class="btn btn-sky btn-sm" onclick="showDocs('${r.id}','${(r.resident_name||'').replace(/'/g,'')}')">📁 ${r.storage_paths.length} file${r.storage_paths.length!==1?'s':''}</button>`
       : '<span style="font-size:11px;color:var(--silver)">—</span>';
-    return`<tr><td><input type="checkbox" class="sub-cb" value="${r.id}"></td><td style="color:var(--muted);white-space:nowrap">${dt}</td><td style="font-weight:600;color:var(--navy)">${r.resident_name||'—'}</td><td style="color:var(--muted)">${r.student_id||'—'}</td><td><strong>${r.state||'—'}</strong></td><td style="font-size:12px;color:var(--muted)">${r.coach_email||'—'}</td><td style="font-size:12px;color:var(--muted)">${r.recipient_email||'—'}</td><td>${badge}</td><td style="font-size:12px">${files}</td><td>${docsBtn}</td></tr>`;
+
+    // Complete Stage 2 button — admin only, only for coach_complete records
+    const completeBtn = (coach.role === 'admin' && isCoachComplete)
+      ? `<button class="btn btn-green btn-sm" style="white-space:nowrap;margin-top:4px" onclick="openStage2('${r.id}','${(r.resident_name||'').replace(/'/g,'')}','${r.state}','${r.student_id||''}','${r.coach_email||''}','${r.recipient_email||''}')">✏️ Complete Stage 2</button>`
+      : '';
+
+    return`<tr>
+      <td><input type="checkbox" class="sub-cb" value="${r.id}"></td>
+      <td style="color:var(--muted);white-space:nowrap">${dt}</td>
+      <td style="font-weight:600;color:var(--navy)">${r.resident_name||'—'}</td>
+      <td style="color:var(--muted)">${r.student_id||'—'}</td>
+      <td><strong>${r.state||'—'}</strong></td>
+      <td style="font-size:12px;color:var(--muted)">${r.coach_email||'—'}</td>
+      <td style="font-size:12px;color:var(--muted)">${r.recipient_email||'—'}</td>
+      <td>${statusBadge}</td>
+      <td>${completePct}</td>
+      <td style="font-size:12px">${files}</td>
+      <td>${docsBtn}${completeBtn}</td>
+    </tr>`;
   }).join('');
 }
 
@@ -587,7 +631,199 @@ async function showDocs(submissionId, residentName) {
   }
 }
 
-// ── OPEN DRAFT ────────────────────────────────────────────
+// ── STAGE 2 COMPLETION FROM ADMIN PANEL ──────────────────
+const STATES_S4 = {
+  AL:{name:"Alabama",s8lbl:"Completion Letter Sent",s9lbl:"Professional License",s9item:"Applied for Professional Educator Certificate",bgCheck:"Background Checks on file - FBI and ASBI",s3:[{text:"The documentation of passing scores on all required Assessment(s) have been submitted to #TEACH",subs:["Praxis Subject Exam","If no Praxis for subject: must have earned a non-education major in a teaching field OR must have earned at least 30 credit hours, including 18 upper-division, in the teaching field."]},{text:"Documentation of passing score on required pedagogy exam",subs:["Individuals who complete LESS THAN three full years of teaching experience while holding the CCTF — edTPA is required","Individuals who complete three full years of teaching experience while holding the CCTF — PLT is required"]},{text:"Documentation of a practical or highly effective school-based evaluation has been submitted to #TEACH"}],s4:[{text:"The final coaching conversation has been recorded in the CRM system (Coach)"},{text:"Required certifications are valid",subs:["CPR/First Aid (Valid for 2 years)"]},{text:"Documentation that Resident has taught at least 1 full academic year"}],s8:["Program Completion Letter sent to Resident"],noMentor:false},
+  AZ:{name:"Arizona",s8lbl:"License Conversion Letters Sent",s9lbl:"Standard Professional License",s9item:"Applied for Standard Professional License",bgCheck:"Background Check on file (N/A in AZ)",s3:[{text:"Documentation that Resident has met Content Knowledge Requirement",subs:["Option A: Arizona Exam","Option B: Out of State Exam","Option C: Degree in the Subject","Option D: Teaching Experience"]},{text:"Documentation that Resident has met Professional Knowledge Requirement",subs:["Option A: Arizona Exam","Option B: Out of State Exam","Option C: Teaching Experience"]},{text:"Documentation that Resident has met other requirements",subs:["OPI (as required for World Language and Bilingual Education)","Passed the Constitutions of the United States and Arizona Exams","Completed AZ Literacy Endorsement"]}],s4:[{text:"The final coaching conversation has been recorded in the CRM system (Coach)"},{text:"Required certifications are valid",subs:["CPR/First Aid/AED (Valid for 2 years)"]},{text:"Documentation that the Resident has taught at least 1 full academic year or 150 days"}],s8:["Program Completion Letter sent to Resident"],noMentor:false},
+  IN:{name:"Indiana",s8lbl:"Completion Letter Sent",s9lbl:"Practitioners License",s9item:"Applied for Practitioners License (2 yr or 5 yr)",bgCheck:"Background Check on file (N/A in IN)",s3:[{text:"The documentation of passing scores on all required Assessment(s) have been submitted to #TEACH",subs:["Praxis Subject Exam AND PLT (Principals of Teaching & Learning)","Early Literacy Endorsement — Required for Elementary and Special Education","OPI (as required for World Language and Bilingual Education), SLIPI (as required for ASL)","Documentation of a practical or highly effective school-based evaluation has been submitted to #TEACH"]}],s4:[{text:"Documentation that Resident has taught at least 2 full academic years (for 5 yr License) or 10 Weeks (2 yr License)",subs:["If a candidate teaches under a T2T and/or Emergency Permit for two years, and all program requirements are met, they may be approved for the 5-year Practitioner License (PL) instead of the 2-year Initial Practitioner License (IPL)."]},{text:"The final coaching conversation has been recorded in the CRM system (Coach)"},{text:"Required certifications are valid",subs:["CPR/AED/Heimlich Maneuver (Valid for 2 years)","Youth Suicide Prevention (One-time completion requirement)","Child Abuse Training (Valid for 2 years)","Human Trafficking Training (One-time completion requirement)"]}],s8:["Program Completion Letter sent to Resident"],noMentor:true},
+  MI:{name:"Michigan",s8lbl:"Completion Letter Sent",s9lbl:"Standard Certificate",s9item:"Applied for Standard Certification",bgCheck:"Background Check on file",s3:[{text:"The documentation of passing scores on all required Assessment(s) have been submitted to #TEACH",subs:["MTTC, PKS (as required), OPI (as required for World Language and Bilingual Education), ASLPI/SLIPI (as required for American Sign Language)"]}],s4:[{text:"Documentation that Resident has taught at least 3 full academic years"},{text:"Resident has met at least 600 hours of teaching with at least 50 hours in each endorsement area",subs:["If the resident has not met at least 50 hours in each endorsement area, advisors should confirm they wish to move forward with the standard for the areas they have met the time taught. If confirmed, a priority note should be added to the account indicating they wish to move forward."]},{text:"The final coaching conversation has been recorded in the CRM system (Coach)"},{text:"Update status in MOECS"}],s8:["Program Completion Letter sent to Resident"],noMentor:true},
+  NC:{name:"North Carolina",s8lbl:"Completion Letters Sent",s9lbl:"Professional License",s9item:"Applied for Professional License",bgCheck:"Background Check on file (N/A in NC)",s3:[{text:"The documentation of a passing score on the Pearson and/or Praxis Subject Assessment(s) in the area of certification has been submitted to #TEACH"},{text:"The documentation of a passing score on the EdTPA has been submitted to #TEACH"}],s4:[{text:"The Field Experience Form has been completed, signed by the principal, and recorded in the CRM"},{text:"Summative Evaluation, completed by the school administrator, has been submitted to #TEACH"},{text:"The final coaching conversation has been recorded in the CRM system (Coach)"},{text:"Documentation that Resident has taught at least 1 full academic year"}],s8:["Form V sent to Resident","Program Completion Letter sent to Resident"],noMentor:true}
+};
+
+const COACH_S4_IDX = { AL:0, AZ:0, IN:1, MI:2, NC:2 };
+function getCoachSet(state){ const i=COACH_S4_IDX[state]??2; return new Set(['chk_1_0','chk_1_1','chk_1_2','chk_2_0','chk_2_1','chk_2_2','chk_2_3','chk_2_4','chk_2_5',`chk_4_${i}`]); }
+
+let stage2Sub = null;
+let stage2CB  = {};
+
+async function openStage2(id, residentName, state, studentId, coachEmail, recipientEmail) {
+  stage2Sub = { id, residentName, state, studentId, coachEmail, recipientEmail };
+  stage2CB  = {};
+
+  document.getElementById('stage2Title').textContent = `Complete Stage 2 — ${residentName} (${state})`;
+  document.getElementById('stage2Body').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted)">Loading submission…</div>';
+  document.getElementById('stage2Modal').classList.add('open');
+
+  // Fetch full submission to get coach's checked items
+  try {
+    const res = await fetch(`/.netlify/functions/get-submissions?token=${encodeURIComponent(sessionToken)}`);
+    const subs = await res.json();
+    const sub = subs.find(s => s.id === id);
+    if (!sub) throw new Error('Submission not found');
+
+    const coachChecked = sub.checked_items || {};
+    renderStage2Checklist(state, coachChecked);
+  } catch(e) {
+    document.getElementById('stage2Body').innerHTML = `<p style="color:var(--crimson);padding:1rem">Error: ${e.message}</p>`;
+  }
+}
+
+function renderStage2Checklist(state, coachChecked) {
+  const s        = STATES_S4[state];
+  const coachSet = getCoachSet(state);
+  const body     = document.getElementById('stage2Body');
+
+  // Init all states from coachChecked
+  stage2CB = { ...coachChecked };
+
+  function mkCB(id, labelText) {
+    const isCoach    = coachSet.has(id);
+    const wasChecked = coachChecked[id] === true;
+    if (!stage2CB.hasOwnProperty(id)) stage2CB[id] = false;
+
+    const row = document.createElement('div');
+    row.style.cssText = `display:flex;align-items:flex-start;gap:10px;padding:7px 4px;border-bottom:1px solid #F5F5F5;${isCoach?'opacity:0.55':''}`;
+
+    const cb = document.createElement('input'); cb.type='checkbox'; cb.id='s2_'+id;
+    cb.checked = wasChecked;
+    cb.style.cssText = 'width:15px;height:15px;flex-shrink:0;margin-top:3px;accent-color:#002E5D';
+    cb.onchange = e => { stage2CB[id] = e.target.checked; };
+
+    const lbl = document.createElement('label'); lbl.htmlFor='s2_'+id;
+    lbl.style.cssText = 'font-size:13px;cursor:pointer;flex:1;line-height:1.5';
+    lbl.innerHTML = labelText + (isCoach ? ' <span style="font-size:10px;font-weight:700;color:#12A7E6;margin-left:4px">✓ COACH</span>' : ' <span style="font-size:10px;font-weight:700;color:#2E7D32;margin-left:4px">YOUR ITEM</span>');
+    row.appendChild(cb); row.appendChild(lbl);
+    return row;
+  }
+  function mkSubs(items) {
+    const ul = document.createElement('ul');
+    ul.style.cssText = 'margin:4px 0 2px 30px;list-style:none';
+    items.forEach(t => { const li=document.createElement('li'); li.style.cssText='font-size:11px;color:#888;padding:1px 0;display:flex;gap:6px'; li.innerHTML=`<span style="color:#12A7E6">–</span>${t}`; ul.appendChild(li); });
+    return ul;
+  }
+  function secHead(num,title) {
+    const h=document.createElement('div');
+    h.style.cssText='background:#002E5D;color:#fff;padding:7px 12px;border-radius:4px;margin:12px 0 6px;font-size:12px;font-weight:700';
+    h.textContent=`${num}. ${title.toUpperCase()}`;
+    return h;
+  }
+
+  const wrap = document.createElement('div');
+
+  // Banner
+  const banner = document.createElement('div');
+  banner.style.cssText='background:#EBF5FB;border:1px solid #B3DEF5;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#002E5D';
+  banner.innerHTML='<strong>Coach items</strong> (labeled ✓ COACH) are pre-filled for reference. Check all <strong style="color:#2E7D32">YOUR ITEM</strong> boxes that apply, then click Submit.';
+  wrap.appendChild(banner);
+
+  // Sections 1 & 2
+  const s1=['All courses were completed and met the minimum 3.0 score requirement','All courses have been logged in the learning management system',"A transcript request can be processed at the resident's request"];
+  wrap.appendChild(secHead(1,'Coursework (Coach)'));
+  s1.forEach((t,i)=>wrap.appendChild(mkCB(`chk_1_${i}`,t)));
+
+  const s2i=['The Teacher Proficiency Assessment (TPA) scores (3) are recorded in the Status Report','The Family Conferences Self-Assessment has been recorded in the system','The Professionalism Self-Assessment has been recorded in the system','The Fall Assessment for Planning and Teaching has been recorded in the system','The Spring Assessment for Planning and Teaching has been recorded in the system'];
+  if(!s.noMentor)s2i.push('Mentor Assessment has been recorded in the system.');
+  wrap.appendChild(secHead(2,'#TEACH Assessments (Coach)'));
+  s2i.forEach((t,i)=>wrap.appendChild(mkCB(`chk_2_${i}`,t)));
+
+  wrap.appendChild(secHead(3,'State Assessments and Requirements'));
+  s.s3.forEach((item,i)=>{ wrap.appendChild(mkCB(`chk_3_${i}`,item.text||item)); if(item.subs){wrap.appendChild(mkSubs(item.subs));} });
+
+  wrap.appendChild(secHead(4,'Documentation and Conversations'));
+  s.s4.forEach((item,i)=>{ wrap.appendChild(mkCB(`chk_4_${i}`,item.text||item)); if(item.subs){wrap.appendChild(mkSubs(item.subs));} });
+
+  // Sections 5-10 (two col)
+  const twoColItems = [
+    [5,'Check Financial Standing',[{text:'Confirm that the program balance is paid in full',subs:['Advisor Portal > Contract Tool > Payment Info','Intern Portal > Payments > Program Fees > Remaining Balance']}]],
+    [6,'Official Transcripts',['Official Transcripts on file', state==='NC'?'Regional or National Accreditation Confirmed':'Regional Accreditation Confirmed']],
+    [7,'Background Checks',[s.bgCheck]],
+    [8,s.s8lbl,s.s8],
+    [9,s.s9lbl,[s.s9item]],
+    [10,'Completion Certificate',['Request to send formal Completion Certificate via Parchment sent to processor.']],
+  ];
+
+  const grid = document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px';
+  twoColItems.forEach(([num,title,items])=>{
+    const col=document.createElement('div');
+    const h=document.createElement('div'); h.style.cssText='font-size:11px;font-weight:700;color:#002E5D;text-transform:uppercase;letter-spacing:.5px;padding:6px 8px;background:#F5F5F5;border-radius:4px;margin-bottom:6px';
+    h.textContent=`${num}. ${title}`; col.appendChild(h);
+    items.forEach((item,i)=>{ col.appendChild(mkCB(`chk_${num}_${i}`,item.text||item)); if(item.subs){col.appendChild(mkSubs(item.subs));} });
+    grid.appendChild(col);
+  });
+  wrap.appendChild(grid);
+
+  // Submit button
+  const submitBtn = document.createElement('button');
+  submitBtn.className='btn btn-crimson'; submitBtn.style.cssText='width:100%;padding:13px;font-size:14px;margin-top:16px';
+  submitBtn.textContent='✓ Submit Final Checklist';
+  submitBtn.onclick = submitStage2;
+  wrap.appendChild(submitBtn);
+
+  body.innerHTML='';
+  body.appendChild(wrap);
+}
+
+async function submitStage2() {
+  if(!stage2Sub) return;
+  const btn = document.querySelector('#stage2Modal .btn-crimson');
+  btn.disabled=true; btn.textContent='Submitting…';
+  showToast('Generating final PDF and sending…','sending',20000);
+
+  const s    = STATES_S4[stage2Sub.state];
+  const date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const total   = Object.keys(stage2CB).length;
+  const checked = Object.values(stage2CB).filter(Boolean).length;
+
+  // Build simple HTML email body
+  function ck(id){ return stage2CB[id]?'&#10003;':'&#9744;'; }
+  function row(id,label){const c=stage2CB[id];return`<tr><td style="padding:2px 6px;width:22px;text-align:center;font-size:15px;color:${c?'#002E5D':'#aaa'}">${ck(id)}</td><td style="padding:2px 6px;font-size:12px;color:${c?'#1a1a1a':'#777'}">${label}</td></tr>`;}
+  function sHead(n,t){return`<tr><td colspan="2" style="background:#002E5D;color:#fff;padding:5px 10px;font-size:11px;font-weight:700">${n}. ${t.toUpperCase()}</td></tr>`;}
+
+  const s1i=['All courses were completed and met the minimum 3.0 score requirement','All courses have been logged in the learning management system',"A transcript request can be processed at the resident's request"];
+  const s2i=['The Teacher Proficiency Assessment (TPA) scores (3) are recorded in the Status Report','The Family Conferences Self-Assessment has been recorded in the system','The Professionalism Self-Assessment has been recorded in the system','The Fall Assessment for Planning and Teaching has been recorded in the system','The Spring Assessment for Planning and Teaching has been recorded in the system'];
+  if(!s.noMentor)s2i.push('Mentor Assessment has been recorded in the system.');
+
+  const htmlBody=`<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif"><table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:16px 0"><tr><td align="center"><table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:6px;overflow:hidden"><tr><td style="background:#002E5D;padding:12px 20px"><div style="font-size:22px;font-weight:900;color:#fff"><span style="color:#C5C5C5">#</span>TEACH</div><div style="font-size:11px;color:rgba(255,255,255,0.6)">Resident Completion Checklist — FINAL</div></td></tr><tr><td style="background:#F5F5F5;border-bottom:2px solid #002E5D;padding:8px 20px;font-size:12px;color:#555"><strong style="color:#002E5D">Resident:</strong> ${stage2Sub.residentName}${stage2Sub.studentId?' ('+stage2Sub.studentId+')':''} &nbsp;<strong style="color:#002E5D">State:</strong> ${stage2Sub.state} &nbsp;<strong style="color:#002E5D">Date:</strong> ${date}</td></tr><tr><td style="padding:12px 20px"><table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e8e8e8">${sHead(1,'Coursework')}${s1i.map((t,i)=>row('chk_1_'+i,t)).join('')}${sHead(2,'#TEACH Assessments')}${s2i.map((t,i)=>row('chk_2_'+i,t)).join('')}${sHead(3,'State Assessments')}${s.s3.map((item,i)=>row('chk_3_'+i,item.text||item)).join('')}${sHead(4,'Documentation')}${s.s4.map((item,i)=>row('chk_4_'+i,item.text||item)).join('')}</table></td></tr><tr><td style="background:#002E5D;padding:8px 20px;font-size:10px;color:rgba(255,255,255,0.5)">Completed by admin on ${date}</td></tr></table></td></tr></table></body></html>`;
+
+  const textBody=`TEACH Checklist FINAL — ${stage2Sub.residentName} — ${stage2Sub.state}\nCompleted by admin: ${checked}/${total} items checked.`;
+
+  try {
+    const res = await fetch('/.netlify/functions/send-checklist',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        stage:            'advisor',
+        submissionId:     stage2Sub.id,
+        state:            stage2Sub.state,
+        stateName:        s.name,
+        residentName:     stage2Sub.residentName,
+        studentId:        stage2Sub.studentId,
+        coachEmail:       stage2Sub.coachEmail,
+        recipientEmail:   stage2Sub.recipientEmail,
+        checkedCount:     checked,
+        totalItems:       total,
+        advisorCheckedItems: stage2CB,
+        htmlBody, textBody,
+        emailSubject: `✓ FINAL: #TEACH Checklist — ${stage2Sub.residentName}${stage2Sub.studentId?' ('+stage2Sub.studentId+')':''} — ${stage2Sub.state}`,
+      })
+    });
+    const result = await res.json();
+    if(!result.success) throw new Error(result.error||'Submission failed');
+
+    showToast('✓ Stage 2 complete! Final PDF sent to coach.','success',5000);
+    closeStage2();
+    await loadAll(); // refresh the table
+
+  } catch(e) {
+    showToast('Error: '+e.message,'error',8000);
+    btn.disabled=false; btn.textContent='✓ Submit Final Checklist';
+  }
+}
+
+function closeStage2(){
+  document.getElementById('stage2Modal').classList.remove('open');
+  stage2Sub=null; stage2CB={};
+}
 function openDraft(encodedData) {
   const d = JSON.parse(decodeURIComponent(encodedData));
 
