@@ -63,8 +63,21 @@ async function deliverEmail({ to, cc, subject, html, text, attachments, fromEmai
     to: [{ email: to }],
     subject,
   };
-  if (cc && cc.toLowerCase() !== to.toLowerCase()) {
-    personalization.cc = [{ email: cc }];
+  // cc can be a single string or an array of strings
+  const ccList = Array.isArray(cc) ? cc : (cc ? [cc] : []);
+  const toLower = to.toLowerCase();
+  const seen = new Set([toLower]);
+  const dedupedCCs = ccList
+    .map(e => (e || '').trim())
+    .filter(e => {
+      if (!e) return false;
+      const k = e.toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  if (dedupedCCs.length) {
+    personalization.cc = dedupedCCs.map(e => ({ email: e }));
   }
   const payload = {
     personalizations: [personalization],
@@ -138,7 +151,7 @@ exports.handler = async (event) => {
     const data = JSON.parse(event.body);
     const {
       state, stateName, residentName, studentId,
-      coachEmail, recipientEmail,
+      coachEmail, recipientEmail, ccEmails = [],
       checkedCount, totalItems,
       fileAttachments = [],
       emailSubject, htmlBody, textBody,
@@ -195,6 +208,7 @@ exports.handler = async (event) => {
           completion_token: token,
           token_expires: expires.toISOString(),
           advisor_email: recipientEmail,
+          cc_emails: ccEmails.length ? ccEmails.join(',') : null,
         }])
         .select('id')
         .single();
@@ -216,7 +230,7 @@ exports.handler = async (event) => {
       });
 
       await deliverEmail({
-        to: recipientEmail, cc: coachEmail,
+        to: recipientEmail, cc: [coachEmail, ...ccEmails],
         subject: `Action Required: Complete Checklist — ${residentName}${studentId ? ` (${studentId})` : ''} — ${state}`,
         html: advisorHtml,
         text: `Please complete the resident checklist for ${residentName}. Use this link: ${completionUrl}`,
@@ -325,6 +339,7 @@ exports.handler = async (event) => {
     };
   }
 };
+
 
 
 
