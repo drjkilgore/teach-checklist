@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -505,13 +506,13 @@ function renderCoachTable(rows){
     const statusBadge=`<span class="badge b-${c.status}">${c.status}</span>`;
     const roleBadge=`<span class="badge b-${c.role}">${c.role}</span>`;
     return`<tr>
-      <td style="font-weight:600;color:var(--navy);white-space:nowrap">${c.name}</td>
-      <td style="font-size:12px;color:var(--muted);white-space:nowrap">${c.email}</td>
-      <td><span style="font-size:12px">${(c.states||[]).join(', ')||'—'}</span></td>
-      <td>${roleBadge}</td>
-      <td>${statusBadge}</td>
-      <td style="color:var(--muted);font-size:12px">${dt}</td>
-      <td>
+      <td style="font-weight:600;color:var(--navy);white-space:nowrap;min-width:160px">${c.name}</td>
+      <td style="font-size:12px;color:var(--muted);white-space:nowrap;min-width:200px">${c.email}</td>
+      <td style="min-width:160px"><span style="font-size:12px">${(c.states||[]).join(', ')||'—'}</span></td>
+      <td style="min-width:80px">${roleBadge}</td>
+      <td style="min-width:90px">${statusBadge}</td>
+      <td style="color:var(--muted);font-size:12px;min-width:90px">${dt}</td>
+      <td style="min-width:220px">
         <div class="btn-row">
           ${c.status==='pending'?`<button class="btn btn-green btn-sm" onclick="quickApprove('${c.id}')">Approve</button>`:''}
           <button class="btn btn-sm" onclick="openEditModal('${c.id}')">Edit</button>
