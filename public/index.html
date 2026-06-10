@@ -357,7 +357,7 @@ input::placeholder{color:var(--silver)}
         <!-- Draft resume button -->
         <div style="background:var(--light);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
           <div style="font-size:13px;color:var(--muted)">Have a checklist in progress?</div>
-          <button class="btn btn-outline" style="font-size:12px;padding:7px 16px;white-space:nowrap" onclick="showDraftList()">📋 View Saved Drafts</button>
+          <button id="viewDraftsBtn" class="btn btn-outline" style="font-size:12px;padding:7px 16px;white-space:nowrap" onclick="showDraftList()">📋 View Saved Drafts</button>
         </div>
 
         <div class="two-col">
@@ -373,9 +373,9 @@ input::placeholder{color:var(--silver)}
           </div>
         </div>
         <div class="fg">
-          <label class="fl">Send Completed Form To<span class="freq">*</span></label>
+          <label class="fl">Send Completed Form To <span style="font-weight:400;color:var(--muted);font-size:12px">(optional)</span></label>
           <input type="email" id="recipEmail" placeholder="advisor@organization.com">
-          <div class="em" id="recipErr">Valid email required.</div>
+          <div class="em" id="recipErr">Please enter a valid email address.</div>
           <div class="fhint">A copy is automatically sent to your coach email.</div>
         </div>
         <div class="fg">
@@ -458,10 +458,10 @@ input::placeholder{color:var(--silver)}
     <div id="stepDone" style="display:none">
       <div class="card">
         <div class="done-screen">
-          <span class="done-icon">✅</span>
-          <h2>Stage 1 Complete!</h2>
+          <span class="done-icon" id="doneIcon">✅</span>
+          <h2 id="doneTitle">Stage 1 Complete!</h2>
           <p id="dl1"></p><p id="dl2"></p>
-          <p style="font-size:12px;margin-top:4px;color:var(--silver)">The advisor has been sent a secure link to complete their portion. You'll receive the final PDF by email when they're done.</p>
+          <p id="doneNote" style="font-size:12px;margin-top:4px;color:var(--silver)">The advisor has been sent a secure link to complete their portion. You'll receive the final PDF by email when they're done.</p>
           <div class="done-actions">
             <button class="btn btn-primary" onclick="startNew()">Start New Checklist</button>
           </div>
@@ -881,9 +881,8 @@ async function loadDraftList() {
     }).then(r => r.json());
     cachedDrafts = res.drafts || [];
     renderDraftList();
-    if (cachedDrafts.length > 0) {
-      document.getElementById('draftListPanel').style.display = 'block';
-    }
+    // Keep the saved-drafts panel collapsed on open — the coach expands it
+    // via the "View Saved Drafts" button when they want to resume one.
   } catch(e) { console.warn('Draft load failed:', e); }
 }
 
@@ -891,6 +890,8 @@ function renderDraftList() {
   const body = document.getElementById('draftListBody');
   const count = document.getElementById('draftListCount');
   count.textContent = cachedDrafts.length;
+  const vb = document.getElementById('viewDraftsBtn');
+  if (vb) vb.textContent = cachedDrafts.length ? `📋 View Saved Drafts (${cachedDrafts.length})` : '📋 View Saved Drafts';
   if (!cachedDrafts.length) {
     body.innerHTML = '<div class="draft-empty">No saved drafts found.</div>';
     return;
@@ -1090,7 +1091,9 @@ function validateStep1() {
   let ok = true;
   document.getElementById('nameErr').classList.toggle('show',!name); if(!name) ok=false;
   document.getElementById('stuIdErr').classList.toggle('show',!stuId); if(!stuId) ok=false;
-  document.getElementById('recipErr').classList.toggle('show',!re.test(recip)); if(!re.test(recip)) ok=false;
+  // Recipient is optional — only flag it when something was entered but isn't a valid email
+  const recipBad = recip && !re.test(recip);
+  document.getElementById('recipErr').classList.toggle('show',recipBad); if(recipBad) ok=false;
   if(coach.states.length>1 && !selState) {
     document.getElementById('stateErr').classList.add('show'); ok=false;
   }
@@ -1264,15 +1267,58 @@ function buildTextBody(){
 }
 
 // ── SUBMIT ────────────────────────────────────────────────
+// Save the checklist as a draft instead of emailing an advisor (no recipient entered).
+// Michigan residents are flagged so the admin portal groups them as "Michigan Transition Residents".
+async function saveTransitionDraft(name, sid){
+  if(!sid){ showToast('Student ID is required to save this resident.', 'error', 4000); return; }
+  if(!selState){ showToast('Please select a state.', 'error', 4000); return; }
+  const isMI = (selState === 'MI');
+  showToast('Saving…','sending',8000);
+  try{
+    const res = await fetch('/.netlify/functions/draft', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        action:'save', token:sessionToken,
+        studentId:sid, state:selState, stateName:STATES[selState].name,
+        residentName:name,
+        coachEmail:coach.email,
+        recipientEmail:'',
+        ccEmails:getCcEmails(),
+        formData:{ checked: cbStates, michigan_transition: isMI }
+      })
+    }).then(r=>r.json());
+    if(!res.success) throw new Error(res.error||'Save failed');
+    currentDraftId = res.draftId;
+
+    // Show the "Saved for admin team" confirmation screen
+    document.getElementById('doneIcon').textContent  = '📋';
+    document.getElementById('doneTitle').textContent = 'Saved for the admin team';
+    document.getElementById('dl1').textContent = `${name || 'Resident'}${sid ? ` (${sid})` : ''} — ${selState}`;
+    document.getElementById('dl2').textContent = isMI
+      ? 'Filed under “Michigan Transition Residents” in the admin portal.'
+      : 'No recipient was entered, so this was saved as a draft.';
+    document.getElementById('doneNote').textContent =
+      'The #TEACH admin team will review and complete it. Your checked items have been saved.';
+    showToast('✓ Saved for the admin team.', 'success', 4000);
+    goStep(5);
+  }catch(err){
+    showToast('Error: '+(err.message||'Save failed'),'error',8000);
+  }
+}
+
 async function submitForm(){
+  const recip=document.getElementById('recipEmail').value.trim();
+  const name=document.getElementById('resName').value;
+  const sid=document.getElementById('stuId').value;
+
+  // No recipient entered → don't email an advisor; save as a draft for the admin team.
+  if(!recip){ await saveTransitionDraft(name, sid); return; }
+
   const btn=document.getElementById('submitBtn');
   btn.disabled=true; btn.textContent='Sending…';
   showToast('Sending email…','sending',15000);
 
   const s=STATES[selState];
-  const name=document.getElementById('resName').value;
-  const sid=document.getElementById('stuId').value;
-  const recip=document.getElementById('recipEmail').value;
   const total=Object.keys(cbStates).length;
   const checkedCount=Object.values(cbStates).filter(Boolean).length;
   const subject=`#TEACH Completion Checklist — ${name}${sid?' ('+sid+')':''} — ${selState}`;
@@ -1314,6 +1360,9 @@ async function submitForm(){
     const pdfMsg=result.pdfGenerated?' PDF attached.':result.pdfError?' (PDF: '+result.pdfError+')':'';
     showToast('✓ Submitted!'+pdfMsg,'success',5000);
     const ccList = getCcEmails();
+    document.getElementById('doneIcon').textContent  = '✅';
+    document.getElementById('doneTitle').textContent = 'Stage 1 Complete!';
+    document.getElementById('doneNote').textContent  = "The advisor has been sent a secure link to complete their portion. You'll receive the final PDF by email when they're done.";
     document.getElementById('dl1').textContent=`Sent to: ${recip}${ccList.length ? ' + '+ccList.length+' CC' : ''}`;
     document.getElementById('dl2').textContent=`Coach copy: ${coach.email}`;
     goStep(5);
@@ -1344,5 +1393,6 @@ function showToast(msg,type='success',dur=4000){
 </script>
 </body>
 </html>
+
 
 
