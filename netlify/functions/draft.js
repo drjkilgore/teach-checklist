@@ -78,9 +78,9 @@ exports.handler = async (event) => {
         .select('*')
         .eq('student_id', studentId);
 
-      // Non-admins only see drafts for their states
+      // Non-admins only see their own drafts
       if (coach.role !== 'admin') {
-        query.in('state', coach.states);
+        query.eq('coach_id', coach.id);
       }
 
       const { data, error } = await query;
@@ -95,11 +95,11 @@ exports.handler = async (event) => {
     // ── GET ALL DRAFTS (for admin panel) ──────────────────
     if (action === 'get_all') {
       let query = supabase.from('checklist_drafts')
-        .select('id,student_id,state,state_name,resident_name,coach_email,created_at,updated_at')
+        .select('id,student_id,state,state_name,resident_name,coach_email,recipient_email,form_data,created_at,updated_at')
         .order('updated_at', { ascending: false });
 
       if (coach.role !== 'admin') {
-        query = query.in('state', coach.states);
+        query = query.eq('coach_id', coach.id);
       }
 
       const { data, error } = await query;
