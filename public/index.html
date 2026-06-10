@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -521,18 +520,25 @@ input::placeholder{color:var(--silver)}
       <div class="modal-section">
         <h3>How to Complete a Checklist (Step by Step)</h3>
         <ol class="step-list">
-          <li><span class="snum">1</span><div><strong>Resident Info</strong> — Enter the resident's name, Student ID, and the certification team email address. Student ID is required to save and resume drafts.</div></li>
+          <li><span class="snum">1</span><div><strong>Resident Info</strong> — Enter the resident's name and Student ID. The certification team email (<em>Send Completed Form To</em>) is now <strong>optional</strong> — add it here or later on the Review step. Student ID is required to save and resume drafts.</div></li>
           <li><span class="snum">2</span><div><strong>Checklist</strong> — Check your items in Sections 1, 2, and the Final Coaching Conversation in Section 4. All advisor items are grayed out — leave them. Use <em>Save Draft</em> to save progress and return later.</div></li>
           <li><span class="snum">3</span><div><strong>Documents</strong> — Attach any supporting files (transcripts, certifications, evaluations). These are sent to the certification team along with the checklist.</div></li>
-          <li><span class="snum">4</span><div><strong>Submit (Stage 1)</strong> — The certification team receives an email with your completed items and a secure <em>Complete Your Portion</em> button. If they are admin users, they can also complete Stage 2 directly from the Admin Portal.</div></li>
+          <li><span class="snum">4</span><div><strong>Submit (Stage 1)</strong> — On the Review step you can set or confirm the <em>Send to</em> address. Enter an address and the button reads <strong>✓ Submit &amp; Send</strong> — the certification team receives your completed items and a secure <em>Complete Your Portion</em> button. Leave it blank and the button reads <strong>💾 Save for Admin Team</strong>, saving it as a draft instead of emailing (see below).</div></li>
           <li><span class="snum">5</span><div><strong>Stage 2 complete</strong> — Once the certification team finishes, a final PDF is automatically generated and emailed back to you. No follow-up needed.</div></li>
         </ol>
       </div>
 
       <div class="modal-section">
         <h3>Saving & Resuming Drafts</h3>
-        <p>Click <strong>Save Draft</strong> on the checklist step at any time. The draft is tied to the resident's Student ID. To resume, click <strong>View Saved Drafts</strong> after logging in, or click the button on Step 1. Drafts are saved indefinitely until submitted.</p>
-        <p>If a coach is unavailable, an admin can open any saved draft directly from the <strong>Open Drafts</strong> tab in the Admin Portal and complete or submit it on their behalf.</p>
+        <p>The saved-drafts list now stays <strong>collapsed</strong> when you log in, so you can start a new checklist right away. Click <strong>📋 View Saved Drafts</strong> (it shows your draft count) to open the list and resume one.</p>
+        <p>You now only see <strong>drafts you created</strong> — other coaches' drafts are no longer visible to you. (Admins still see every draft.)</p>
+        <p>Click <strong>Save Draft</strong> on the checklist step at any time. The draft is tied to the resident's Student ID and saved indefinitely until submitted. If a coach is unavailable, an admin can open any saved draft directly from the <strong>Open Drafts</strong> tab in the Admin Portal and complete or submit it on their behalf.</p>
+      </div>
+
+      <div class="modal-section">
+        <h3>Saving for the Admin Team (incl. Michigan Transition Residents)</h3>
+        <p>If you submit with the <em>Send to</em> field left <strong>blank</strong>, the checklist is <strong>not emailed</strong> — it's saved as a draft for the admin team, and you'll see a <strong>📋 Saved for the admin team</strong> confirmation. Your checked items are preserved.</p>
+        <p><strong>Michigan</strong> residents saved this way are grouped under a <strong>🔵 Michigan Transition Residents</strong> heading in the Admin Portal's <strong>Open Drafts</strong> tab. An admin can open one, finish the checklist, enter a <em>Send to</em> address on the Review step, and <strong>Submit & Send</strong> it.</p>
       </div>
 
       <div class="modal-section">
@@ -546,7 +552,7 @@ input::placeholder{color:var(--silver)}
         <h3>Admin Portal (/admin)</h3>
         <p>The Admin Portal provides full visibility and control over the system:</p>
         <p>• <strong>Submissions tab</strong> — view all submissions with live status badges (<em>⏳ Awaiting Advisor</em> or <em>✓ Complete</em>), download Excel reports, access stored documents, and complete Stage 2 directly for any pending checklist.</p>
-        <p>• <strong>Open Drafts tab</strong> — see all saved drafts across your states, with an <em>📂 Open</em> button to load any draft into the checklist app.</p>
+        <p>• <strong>Open Drafts tab</strong> — load any saved draft into the checklist app with the <em>📂 Open</em> button. Drafts submitted without a recipient appear here; <strong>Michigan</strong> ones are grouped under a <strong>🔵 Michigan Transition Residents</strong> heading. Open one, complete it, add a <em>Send to</em> address on the Review step, and Submit &amp; Send.</p>
         <p>• <strong>Coaches tab</strong> (admin only) — approve new accounts, edit state assignments, grant admin access, and suspend accounts.</p>
       </div>
 
@@ -1417,6 +1423,7 @@ function showToast(msg,type='success',dur=4000){
 </script>
 </body>
 </html>
+
 
 
 
