@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -443,7 +444,15 @@ input::placeholder{color:var(--silver)}
       </div>
       <div class="card">
         <div class="card-title" style="font-size:13px"><span class="ct-bar"></span>Delivery</div>
-        <div class="sum-row"><span class="sk">Send to</span><span class="sv" id="sumRecip">—</span></div>
+        <div class="sum-row" style="align-items:center">
+          <span class="sk">Send to</span>
+          <span class="sv" style="flex:1;text-align:right">
+            <input type="email" id="sumRecipInput" placeholder="advisor@organization.com"
+              oninput="document.getElementById('recipEmail').value=this.value; updateSubmitMode()"
+              style="width:100%;max-width:340px;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;text-align:left">
+            <span id="sumRecipHint" style="display:block;font-weight:400;color:var(--muted);font-size:11px;margin-top:4px"></span>
+          </span>
+        </div>
         <div class="sum-row"><span class="sk">Coach CC</span><span class="sv" id="sumCoach">—</span></div>
         <div class="sum-row"><span class="sk">Attachments</span><span class="sv" id="sumFiles">—</span></div>
       </div>
@@ -1229,9 +1238,24 @@ function buildSummary(){
     body.appendChild(w);
   }
 
-  document.getElementById('sumRecip').textContent=document.getElementById('recipEmail').value||'—';
+  document.getElementById('sumRecipInput').value=document.getElementById('recipEmail').value||'';
+  updateSubmitMode();
   document.getElementById('sumCoach').textContent=coach.email||'—';
   document.getElementById('sumFiles').textContent=files.length?files.map(f=>f.name).join(', '):'None';
+}
+
+// Reflect whether submitting will SEND (recipient entered) or SAVE for the admin team (blank).
+function updateSubmitMode(){
+  const recip=(document.getElementById('recipEmail').value||'').trim();
+  const btn=document.getElementById('submitBtn');
+  const hint=document.getElementById('sumRecipHint');
+  if(recip){
+    if(btn) btn.textContent='✓ Submit & Send';
+    if(hint) hint.textContent='A completion link will be emailed to this address.';
+  }else{
+    if(btn) btn.textContent='💾 Save for Admin Team';
+    if(hint) hint.textContent='Leave blank to save for the admin team to complete later.';
+  }
 }
 
 // ── HTML EMAIL BUILDER ────────────────────────────────────
