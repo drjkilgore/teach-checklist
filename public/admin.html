@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -407,6 +408,11 @@ function renderSubTable(rows){
       ? `<button class="btn btn-green btn-sm" style="white-space:nowrap" onclick="openStage2('${r.id}','${(r.resident_name||'').replace(/'/g,'')}','${r.state}','${r.student_id||''}','${r.coach_email||''}','${r.recipient_email||''}')">✏️ Complete Stage 2</button>`
       : '';
 
+    // Print / Save-as-PDF — available once the checklist is fully complete
+    const printBtn = isFullyComplete
+      ? `<button class="btn btn-sky btn-sm" style="white-space:nowrap" onclick="printSubmission('${r.id}')">🖨️ Print</button>`
+      : '';
+
     return`<tr>
       <td><input type="checkbox" class="sub-cb" value="${r.id}"></td>
       <td style="color:var(--muted);white-space:nowrap">${dt}</td>
@@ -418,12 +424,61 @@ function renderSubTable(rows){
       <td>${statusBadge}</td>
       <td>${completePct}</td>
       <td style="font-size:12px">${files}</td>
-      <td style="white-space:normal;vertical-align:middle"><div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start">${docsBtn}${completeBtn}</div></td>
+      <td style="white-space:normal;vertical-align:middle"><div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start">${docsBtn}${printBtn}${completeBtn}</div></td>
     </tr>`;
   }).join('');
 }
 
 function toggleAll(cls,cb){document.querySelectorAll('.'+cls).forEach(c=>c.checked=cb.checked);}
+
+// ── PRINT / REPRINT A COMPLETED CHECKLIST ─────────────────
+function buildPrintHTML(sub){
+  const s  = STATES_S4[sub.state] || {};
+  const cb = sub.checked_items || {};
+  const date = (sub.advisor_completed_at ? new Date(sub.advisor_completed_at) : (sub.submitted_at ? new Date(sub.submitted_at) : new Date()))
+                 .toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const ck =(id)=> cb[id]?'&#10003;':'&#9744;';
+  const row=(id,label)=>{const c=cb[id];return `<tr><td style="padding:3px 6px;width:24px;text-align:center;font-size:15px;color:${c?'#002E5D':'#bbb'}">${ck(id)}</td><td style="padding:3px 6px;font-size:12.5px;color:${c?'#1a1a1a':'#777'}">${label}</td></tr>`;};
+  const sHead=(n,t)=>`<tr><td colspan="2" style="background:#002E5D;color:#fff;padding:6px 10px;font-size:12px;font-weight:700">${n}. ${t.toUpperCase()}</td></tr>`;
+  const subRows=(items)=>items.map(x=>`<tr><td></td><td style="padding:1px 6px 2px 22px;font-size:11px;color:#888">– ${x}</td></tr>`).join('');
+  const secRows=(num,arr)=>arr.map((item,i)=>row(`chk_${num}_${i}`,item.text||item)+(item.subs?subRows(item.subs):'')).join('');
+  const s1i=['All courses were completed and met the minimum 3.0 score requirement','All courses have been logged in the learning management system',"A transcript request can be processed at the resident's request"];
+  const s2i=['The Teacher Proficiency Assessment (TPA) scores (3) are recorded in the Status Report','The Family Conferences Self-Assessment has been recorded in the system','The Professionalism Self-Assessment has been recorded in the system','The Fall Assessment for Planning and Teaching has been recorded in the system','The Spring Assessment for Planning and Teaching has been recorded in the system'];
+  if(!s.noMentor)s2i.push('Mentor Assessment has been recorded in the system.');
+  const s6acc = sub.state==='NC' ? 'Regional or National Accreditation Confirmed' : 'Regional Accreditation Confirmed';
+  const sec5=[{text:'Confirm that the program balance is paid in full',subs:['Advisor Portal > Contract Tool > Payment Info','Intern Portal > Payments > Program Fees > Remaining Balance']}];
+  const sec6=['Official Transcripts on file', s6acc];
+  const sec7=[s.bgCheck]; const sec8=s.s8||[]; const sec9=[s.s9item];
+  const sec10=['Request to send formal Completion Certificate via Parchment sent to processor.'];
+  const table=`<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e8e8e8">`
+    +sHead(1,'Coursework')+s1i.map((t,i)=>row('chk_1_'+i,t)).join('')
+    +sHead(2,'#TEACH Assessments')+s2i.map((t,i)=>row('chk_2_'+i,t)).join('')
+    +sHead(3,'State Assessments and Requirements')+secRows(3,s.s3||[])
+    +sHead(4,'Documentation and Conversations')+secRows(4,s.s4||[])
+    +sHead(5,'Check Financial Standing')+secRows(5,sec5)
+    +sHead(6,'Official Transcripts')+secRows(6,sec6)
+    +sHead(7,'Background Checks')+secRows(7,sec7)
+    +sHead(8,s.s8lbl||'Completion Letter Sent')+secRows(8,sec8)
+    +sHead(9,s.s9lbl||'License')+secRows(9,sec9)
+    +sHead(10,'Completion Certificate')+secRows(10,sec10)
+    +`</table>`;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TEACH Checklist — ${sub.resident_name||'Resident'}</title>
+<style>@media print{.noprint{display:none!important}} body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#1a1a1a}</style></head>
+<body><div style="max-width:760px;margin:0 auto;padding:18px">
+  <div class="noprint" style="text-align:right;margin-bottom:10px"><button onclick="window.print()" style="background:#12A7E6;color:#fff;border:0;padding:9px 18px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer">🖨️ Print / Save as PDF</button></div>
+  <div style="background:#002E5D;padding:12px 18px;border-radius:6px 6px 0 0"><div style="font-size:22px;font-weight:900;color:#fff"><span style="color:#C5C5C5">#</span>TEACH</div><div style="font-size:11px;color:rgba(255,255,255,.6)">Resident Completion Checklist — FINAL</div></div>
+  <div style="background:#F5F5F5;border-bottom:2px solid #002E5D;padding:8px 18px;font-size:12px;color:#555"><strong style="color:#002E5D">Resident:</strong> ${sub.resident_name||''}${sub.student_id?' ('+sub.student_id+')':''} &nbsp; <strong style="color:#002E5D">State:</strong> ${sub.state}${s.name?' — '+s.name:''} &nbsp; <strong style="color:#002E5D">Date:</strong> ${date}</div>
+  <div style="padding:12px 0">${table}</div>
+  <div style="background:#002E5D;padding:8px 18px;font-size:10px;color:rgba(255,255,255,.5);border-radius:0 0 6px 6px">Confidential – Internal Use Only · #TEACH Checklist System</div>
+</div></body></html>`;
+}
+function printSubmission(id){
+  const sub = allSubs.find(r=>String(r.id)===String(id));
+  if(!sub){ showToast('Submission not found.','error'); return; }
+  const w = window.open('', '_blank');
+  if(!w){ showToast('Pop-up blocked — allow pop-ups for this site to print.','error'); return; }
+  w.document.write(buildPrintHTML(sub)); w.document.close();
+}
 
 async function deleteSelectedSubs(){
   const ids=Array.from(document.querySelectorAll('.sub-cb:checked')).map(c=>c.value);
